@@ -1,39 +1,66 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
-import ErrorHandler from "../middlewares/error.js";
+import ErrorHandler from "../middlewares/errorMiddlewares.js";
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { sendVerificationCode } from "../utils/sendVerificationCode.js";
 
-// Register User
 export const register = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  // Check if all fields are provided
-  if (!name || !email || !password) {
-    return next(new ErrorHandler("Please provide all required fields", 400));
+    // Check required fields
+    if (!name || !email || !password) {
+      return next(new ErrorHandler("Please enter all fields.", 400));
+    }
+
+    // Check if user already exists and is verified
+    const isRegistered = await User.findOne({ email, accountVerified: true });
+    if (isRegistered) {
+      return next(new ErrorHandler("User already exists", 400));
+    }
+
+    // Check unverified registration attempts
+    const registerationAttemptsByUser = await User.find({
+      email,
+      accountVerified: false,
+    });
+
+    if (registerationAttemptsByUser.length >= 5) {
+      return next(
+        new ErrorHandler(
+          "You have exceeded the number of registration attempts. Please contact support.",
+          400
+        )
+      );
+    }
+
+    // Check password length
+    if (password.length < 8 || password.length > 16) {
+      return next(
+        new ErrorHandler(
+          "Password must be between 8 and 16 characters.",
+          400
+        )
+      );
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
+
+    const verificationCode = await user.generateVerificationCode();
+    await user.save();
+    sendVerificationCode(verificationCode, email, res);
+  } // Add this closing brace
+    
+  catch (error) {
+    next(error);
   }
-
-  // Check if user already exists
-  let user = await User.findOne({ email });
-  if (user) {
-    return next(new ErrorHandler("User already exists", 400));
-  }
-
-  // Hash password before saving
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  // Create new user
-  user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    verificationCode: Math.floor(100000 + Math.random() * 900000), // 6-digit OTP
-    verificationCodeExpire: Date.now() + 15 * 60 * 1000, // 15 minutes expiry
-  });
-
-  res.status(201).json({
-    success: true,
-    message: "User registered successfully. Please verify your email.",
-    user,
-  });
 });
