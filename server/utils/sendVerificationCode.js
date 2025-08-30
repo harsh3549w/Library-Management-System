@@ -5,7 +5,7 @@ export async function sendVerificationCode(verificationCode, email, res) {
   try {
     const message = generateVerificationOtpEmailTemplate(verificationCode);
     await sendEmail({
-      to: email,
+      email: email,
       subject: "Verification Code (IIITDM KURNOOL LIBRARY)",
       message,
     });

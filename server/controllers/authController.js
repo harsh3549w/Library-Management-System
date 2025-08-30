@@ -1,12 +1,14 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
-import ErrorHandler from "../middlewares/errorMiddlewares.js";
+import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { sendVerificationCode } from "../utils/sendVerificationCode.js";
 
 export const register = catchAsyncErrors(async (req, res, next) => {
-  try {
+    console.log("Request body:", req.body);
+    console.log("Request headers:", req.headers);
+
     const { name, email, password } = req.body;
 
     // Check required fields
@@ -58,9 +60,4 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     const verificationCode = await user.generateVerificationCode();
     await user.save();
     sendVerificationCode(verificationCode, email, res);
-  } // Add this closing brace
-    
-  catch (error) {
-    next(error);
-  }
 });
