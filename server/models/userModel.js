@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 
 // Define User Schema
 const userSchema = new mongoose.Schema(
@@ -76,6 +78,32 @@ userSchema.methods.generateVerificationCode = function() {
   this.verificationCode = verificationCode;
   this.verificationCodeExpire = Date.now() + 15 * 60 * 1000;
   return verificationCode;
+};
+
+// Generate JWT token method
+userSchema.methods.generateToken = function() {
+    if (!process.env.JWT_SECRET_KEY || !process.env.JWT_EXPIRE) {
+        throw new Error('JWT configuration missing');
+    }
+    return jwt.sign(
+        { id: this._id },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: process.env.JWT_EXPIRE }
+    );
+};
+
+// Generate password reset token method
+userSchema.methods.getResetPasswordToken = function() {
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    this.resetPasswordToken = crypto
+        .createHash('sha256')
+        .update(resetToken)
+        .digest('hex');
+    
+    this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
+    
+    return resetToken;
 };
 
 // Export User Model
