@@ -15,54 +15,18 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password } = req.body;
 
     // Check required fields
-    if (!name || !email || !password) {
-      return next(new ErrorHandler("Please enter all fields.", 400));
-    }
 
     // Check if user already exists and is verified
-    const isRegistered = await User.findOne({ email, accountVerified: true });
-    if (isRegistered) {
-      return next(new ErrorHandler("User already exists", 400));
-    }
 
     // Check unverified registration attempts
-    const registrationAttemptsByUser = await User.find({
-      email,
-      accountVerified: false,
-    });
 
-    if (registrationAttemptsByUser.length >= 5) {
-      return next(
-        new ErrorHandler(
-          "You have exceeded the number of registration attempts. Please contact support.",
-          400
-        )
-      );
-    }
 
     // Check password length
-    if (password.length < 8 || password.length > 16) {
-      return next(
-        new ErrorHandler(
-          "Password must be between 8 and 16 characters.",
-          400
-        )
-      );
-    }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
 
-    const verificationCode = await user.generateVerificationCode();
-    await user.save();
-    sendVerificationCode(verificationCode, email, res);
 });
 
 export const verifyOTP = catchAsyncErrors(async (req, res, next) => {

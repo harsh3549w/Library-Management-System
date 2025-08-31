@@ -15,7 +15,6 @@ import AdminRoute from './components/ProtectedRoute/AdminRoute'
 
 // Pages
 import Login from './pages/Auth/Login'
-import Register from './pages/Auth/Register'
 import VerifyOTP from './pages/Auth/VerifyOTP'
 import ForgotPassword from './pages/Auth/ForgotPassword'
 import ResetPassword from './pages/Auth/ResetPassword'
@@ -91,7 +90,6 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
         <Route path="/verify-otp" element={!isAuthenticated ? <VerifyOTP /> : <Navigate to="/dashboard" />} />
         <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
         <Route path="/reset-password/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/dashboard" />} />
