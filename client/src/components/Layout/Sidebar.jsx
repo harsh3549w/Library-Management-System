@@ -1,0 +1,151 @@
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
+import { Link, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { 
+  X, 
+  Home, 
+  BookOpen, 
+  Users, 
+  UserCheck, 
+  Plus, 
+  Library,
+  BarChart3
+} from 'lucide-react'
+
+const Sidebar = ({ open, setOpen }) => {
+  const location = useLocation()
+  const { user } = useSelector((state) => state.auth)
+  const isAdmin = user?.role === 'Admin'
+
+  const navigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'Books', href: '/books', icon: BookOpen },
+    { name: 'My Borrowed Books', href: '/my-borrowed-books', icon: Library },
+    ...(isAdmin ? [
+      { name: 'Add Book', href: '/admin/add-book', icon: Plus },
+      { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
+      { name: 'Users', href: '/admin/users', icon: Users },
+      { name: 'Add Admin', href: '/admin/add-admin', icon: BarChart3 },
+    ] : []),
+  ]
+
+  const SidebarContent = () => (
+    <div className="flex flex-col h-full">
+      {/* Logo */}
+      <div className="flex items-center h-16 px-4 border-b border-gray-200">
+        <Link to="/dashboard" className="flex items-center">
+          <div className="flex-shrink-0">
+            <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">L</span>
+            </div>
+          </div>
+          <div className="ml-3">
+            <h1 className="text-lg font-semibold text-gray-900">Library</h1>
+          </div>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-2 py-4 space-y-1">
+        {navigation.map((item) => {
+          const isActive = location.pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`sidebar-link ${isActive ? 'active' : ''}`}
+              onClick={() => setOpen(false)}
+            >
+              <item.icon className="mr-3 h-5 w-5" />
+              {item.name}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* User info */}
+      <div className="flex-shrink-0 p-4 border-t border-gray-200">
+        <div className="flex items-center">
+          <div className="flex-shrink-0">
+            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-medium text-sm">
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </span>
+            </div>
+          </div>
+          <div className="ml-3">
+            <p className="text-sm font-medium text-gray-700">{user?.name}</p>
+            <p className="text-xs text-gray-500">{user?.role}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <>
+      {/* Mobile sidebar */}
+      <Transition.Root show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-50 lg:hidden" onClose={setOpen}>
+          <Transition.Child
+            as={Fragment}
+            enter="transition-opacity ease-linear duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="transition-opacity ease-linear duration-300"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 flex">
+            <Transition.Child
+              as={Fragment}
+              enter="transition ease-in-out duration-300 transform"
+              enterFrom="-translate-x-full"
+              enterTo="translate-x-0"
+              leave="transition ease-in-out duration-300 transform"
+              leaveFrom="translate-x-0"
+              leaveTo="-translate-x-full"
+            >
+              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
+                <Transition.Child
+                  as={Fragment}
+                  enter="ease-in-out duration-300"
+                  enterFrom="opacity-0"
+                  enterTo="opacity-100"
+                  leave="ease-in-out duration-300"
+                  leaveFrom="opacity-100"
+                  leaveTo="opacity-0"
+                >
+                  <div className="absolute top-0 right-0 -mr-12 pt-2">
+                    <button
+                      type="button"
+                      className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="sr-only">Close sidebar</span>
+                      <X className="h-6 w-6 text-white" />
+                    </button>
+                  </div>
+                </Transition.Child>
+                <SidebarContent />
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      {/* Desktop sidebar */}
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
+          <SidebarContent />
+        </div>
+      </div>
+    </>
+  )
+}
+
+export default Sidebar
