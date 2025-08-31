@@ -5,11 +5,15 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
+import fileUpload from "express-fileupload";
 import { connectDB } from "./database/db.js";
 import { errorMiddleware, ErrorHandler } from "./middlewares/errorMiddlewares.js";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
 import borrowRouter from "./routes/borrowRouter.js";
+import userRouter from "./routes/userRouter.js";
+import clientRouter from './routes/clientRouter.js';
+import { notifyUsers, notifyOverdueBooks } from './services/notifyUsers.js';
 
 export const app = express();
 
@@ -22,6 +26,14 @@ for (const varName of requiredEnvVars) {
     console.error(`Missing required environment variable: ${varName}`);
     process.exit(1);
   }
+}
+
+// Initialize notification services
+if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
+  notifyUsers();
+  notifyOverdueBooks();
+} else {
+  console.warn('Notification services disabled - missing email configuration');
 }
 
 // Enable CORS
@@ -64,11 +76,17 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(fileUpload({
+  useTempFiles: true,
+  tempFileDir: "/tmp/"
+}));
 
 // Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
+app.use("/api/v1/users", userRouter);
+app.use('/api/v1/client', clientRouter);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {
@@ -78,5 +96,3 @@ app.use((req, res, next) => {
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);
-
-connectDB();

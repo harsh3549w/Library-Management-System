@@ -1,6 +1,7 @@
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { Book } from "../models/bookModel.js";
 import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
+import { uploadMedia, deleteMedia } from "../utils/mediaUploader.js";
 
 export const addBook = catchAsyncErrors(async (req, res, next) => {
     const { title, author, description, price, quantity } = req.body;
@@ -8,13 +9,19 @@ export const addBook = catchAsyncErrors(async (req, res, next) => {
     if (!title || !author || !description || !price || !quantity) {
         return next(new ErrorHandler("Please fill all fields", 400));
     }
+    
+    let coverImage = {};
+    if (req.files?.coverImage) {
+        coverImage = await uploadMedia(req.files.coverImage, "library-app/books");
+    }
 
     const book = await Book.create({
         title,
         author,
         description,
         price,
-        quantity
+        quantity,
+        coverImage
     });
 
     res.status(201).json({
@@ -30,6 +37,11 @@ export const deleteBook = catchAsyncErrors(async (req, res, next) => {
 
     if (!book) {
         return next(new ErrorHandler("Book not found", 404));
+    }
+
+    // Delete cover image from Cloudinary if exists
+    if (book.coverImage?.public_id) {
+        await deleteMedia(book.coverImage.public_id);
     }
 
     await book.deleteOne();
@@ -65,6 +77,18 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
     
     if (!book) {
         return next(new ErrorHandler("Book not found", 404));
+    }
+    
+    // Handle new cover image upload
+    if (req.files?.coverImage) {
+        // Delete old image if exists
+        if (book.coverImage?.public_id) {
+            await deleteMedia(book.coverImage.public_id);
+        }
+        
+        // Upload new image
+        const coverImage = await uploadMedia(req.files.coverImage, "library-app/books");
+        book.coverImage = coverImage;
     }
     
     if (title) book.title = title;

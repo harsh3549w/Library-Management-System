@@ -1,5 +1,22 @@
+import { v2 as cloudinary } from "cloudinary";
 import { app } from "./app.js";
+
+// Validate Cloudinary environment variables before starting
+const cloudinaryVars = ["CLOUDINARY_CLIENT_NAME", "CLOUDINARY_CLIENT_API", "CLOUDINARY_CLIENT_SECRET"];
+for (const varName of cloudinaryVars) {
+  if (!process.env[varName]) {
+    console.error(`Missing required Cloudinary environment variable: ${varName}`);
+    process.exit(1);
+  }
+}
 import { connectDB } from "./database/db.js";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLIENT_NAME,
+  api_key: process.env.CLOUDINARY_CLIENT_API,
+  api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
+  secure: true
+});
 
 const startServer = async () => {
   try {
