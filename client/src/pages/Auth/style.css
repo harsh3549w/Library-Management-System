@@ -164,3 +164,85 @@
 .frame .forgot-password-link a:hover {
   text-decoration: underline;
 }
+
+/* Login page specific design tokens */
+:root {
+  --overlay: hsl(0 0% 100% / 0.30);              /* Unified page overlay tint (slightly stronger) */
+  --login-card: transparent;                     /* Card uses backdrop blur only, no extra tint */
+  --login-input: transparent;                    /* Inputs inherit same transparency as page */
+  --login-card-border: hsl(0 0% 0% / 0.28);      /* Subtle dark border around card */
+  --login-button: hsl(100 45% 65%);              /* Green button color */
+  --login-button-hover: hsl(100 45% 55%);        /* Darker green on hover */
+  --login-text-primary: hsl(0 0% 0%);            /* Black primary text */
+  --login-text-secondary: hsl(0 0% 0% / 0.5);    /* Semi-transparent black secondary text */
+}
+
+/* Minimal utility classes used by the new Login.jsx */
+.bg-login-card { background-color: var(--login-card); }
+.border-login-card { border-color: var(--login-card-border); }
+.bg-login-input { background-color: var(--login-input); }
+.bg-login-button { background-color: var(--login-button); }
+.bg-login-button:hover { background-color: var(--login-button-hover); }
+.text-login-text-primary { color: var(--login-text-primary); }
+.placeholder\:text-login-text-secondary::placeholder { color: var(--login-text-secondary); }
+
+/* Page overlay to unify transparency across entire viewport */
+.bg-page-overlay { background-color: var(--overlay); }
+
+/* Generic shorthands mimicking a subset of Tailwind used above */
+.min-h-screen { min-height: 100vh; }
+.w-full { width: 100%; }
+.relative { position: relative; }
+.absolute { position: absolute; }
+.inset-0 { top:0; right:0; bottom:0; left:0; }
+.top-6 { top: 1.5rem; }
+.right-6 { right: 1.5rem; }
+.z-10 { z-index: 10; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.bg-cover { background-size: cover; }
+.bg-center { background-position: center; }
+.bg-no-repeat { background-repeat: no-repeat; }
+.backdrop-blur-sm { backdrop-filter: blur(4px); }
+.backdrop-blur-md { backdrop-filter: blur(8px); }
+.rounded-3xl { border-radius: 1.5rem; }
+.rounded-full { border-radius: 9999px; }
+.w-28 { width: 7rem; }
+.h-28 { height: 7rem; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); }
+.border-2 { border-width: 2px; }
+.p-8 { padding: 2rem; }
+.h-16 { height: 4rem; }
+.w-5 { width: 1.25rem; }
+.h-5 { height: 1.25rem; }
+.mr-4 { margin-right: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.text-center { text-align: center; }
+.text-sm { font-size: .875rem; }
+.text-xs { font-size: .75rem; }
+.text-2xl { font-size: 1.5rem; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+.text-gray-800 { color: #1f2937; }
+.text-gray-700 { color: #374151; }
+.text-gray-600 { color: #4b5563; }
+.text-gray-500 { color: #6b7280; }
+.bg-black\/20 { background-color: rgba(0,0,0,0.2); }
+.hover\:-translate-y-0\.5:hover { transform: translateY(-2px); }
+.hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
+.disabled\:opacity-60:disabled { opacity: .6; }
+.disabled\:cursor-not-allowed:disabled { cursor: not-allowed; }
+.transition-all { transition: all .2s ease; }
+.duration-200 { transition-duration: .2s; }
+.duration-300 { transition-duration: .3s; }
+.hover\:underline:hover { text-decoration: underline; }
+.rounded-2xl { border-radius: 1rem; }
+.border { border-width: 1px; }
+.text-red-700 { color: #b91c1c; }
+.bg-red-100\/90 { background-color: rgba(254, 226, 226, .9); }
+.w-\[450px\] { width: 450px; }
+.h-\[420px\] { height: 420px; }
+.px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.hover\:shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1); }
