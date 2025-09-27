@@ -1,19 +1,21 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../../store/slices/authSlice'
-import { BookOpen, Eye, EyeOff } from 'lucide-react'
+import { Communication } from "./Communication";
+import { GeneralLock } from "./GeneralLock";
+import rectangle1 from "./rectangle-1.png.jpeg";
+import "./style.css";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   })
-  const [showPassword, setShowPassword] = useState(false)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { loading, isAuthenticated } = useSelector((state) => state.auth)
+  const { loading, isAuthenticated, error } = useSelector((state) => state.auth)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -30,100 +32,70 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    dispatch(login(formData))
+    if (formData.email && formData.password) {
+      dispatch(login(formData))
+    }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
-            <BookOpen className="h-8 w-8 text-white" />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-           
-           
-             
-          </p>
+    <div className="frame">
+      <div className="iiitdm-logo">
+        <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="60" cy="60" r="58" stroke="black" strokeWidth="4" fill="white"/>
+          <text x="60" y="40" textAnchor="middle" fontSize="16" fontWeight="bold" fill="black">IIITDM</text>
+          <text x="60" y="58" textAnchor="middle" fontSize="12" fill="black">KURNOOL</text>
+          <text x="60" y="80" textAnchor="middle" fontSize="8" fill="black">Indian Institute of Information</text>
+          <text x="60" y="90" textAnchor="middle" fontSize="8" fill="black">Technology Design &amp; Manufacturing</text>
+        </svg>
+      </div>
+
+      <div className="div" />
+
+      <form onSubmit={handleSubmit}>
+        <div className="div-2">
+          <Communication />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="email-input"
+            required
+          />
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="input-field rounded-t-lg"
-                placeholder="Email address"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="current-password"
-                required
-                className="input-field rounded-b-lg pr-10"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400" />
-                ) : (
-                  <Eye className="h-5 w-5 text-gray-400" />
-                )}
-              </button>
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link
-                to="/forgot-password"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Forgot your password?
-              </Link>
-            </div>
-          </div>
+        <div className="div-3">
+          <GeneralLock />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            className="password-input"
+            required
+          />
+        </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              ) : (
-                'Sign in'
-              )}
-            </button>
+        <button type="submit" className="div-4" disabled={loading}>
+          <div className="text-wrapper-3">
+            {loading ? 'Logging in...' : 'Login'}
           </div>
-        </form>
+        </button>
+      </form>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      <div className="forgot-password-link">
+        <Link to="/forgot-password">Forgot your password?</Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

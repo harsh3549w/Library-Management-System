@@ -8,27 +8,6 @@ import { sendToken } from "../utils/sendToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import { generateForgotPasswordEmailTemplate } from "../utils/emailTemplates.js";
 
-export const register = catchAsyncErrors(async (req, res, next) => {
-    console.log("Request body:", req.body);
-    console.log("Request headers:", req.headers);
-
-    const { name, email, password } = req.body;
-
-    // Check required fields
-
-    // Check if user already exists and is verified
-
-    // Check unverified registration attempts
-
-
-    // Check password length
-
-    // Hash password
-
-    // Create new user
-
-});
-
 export const verifyOTP = catchAsyncErrors(async (req, res, next) => {
     const { email, otp } = req.body;
 
@@ -59,24 +38,29 @@ export const verifyOTP = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
+    console.log("Login attempt:", req.body);
     const { email, password } = req.body;
     
     if (!email || !password) {
+        console.log("Missing fields - email:", !!email, "password:", !!password);
         return next(new ErrorHandler("Please enter all fields", 400));
     }
     
     const user = await User.findOne({ email, accountVerified: true }).select("+password");
     
     if (!user) {
+        console.log("User not found or not verified for email:", email);
         return next(new ErrorHandler("Invalid email or password", 400));
     }
     
     const isPasswordMatched = await bcrypt.compare(password, user.password);
     
     if (!isPasswordMatched) {
+        console.log("Password mismatch for user:", email);
         return next(new ErrorHandler("Invalid email or password", 400));
     }
     
+    console.log("Login successful for user:", email);
     sendToken(user, 200, "Login successful", res);
 });
 
@@ -117,7 +101,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     const resetToken = user.getResetPasswordToken();
     await user.save({ validateBeforeSave: false });
 
-    const resetPasswordUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
+    const resetPasswordUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     const message = generateForgotPasswordEmailTemplate(resetPasswordUrl);
 
     try {

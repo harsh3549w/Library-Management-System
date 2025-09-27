@@ -1,0 +1,166 @@
+.frame {
+  background-image: url('./rectangle-1.png.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame .rectangle {
+  display: none;
+}
+
+.frame .iiitdm-logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 120px;
+  height: 120px;
+  z-index: 10;
+}
+
+.frame .div {
+  background-color: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  height: 420px;
+  width: 450px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.frame .div-2 {
+  background-color: rgba(179, 179, 204, 0.6);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  height: 65px;
+  width: 380px;
+  position: absolute;
+  top: 80px;
+  left: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.frame .email-input {
+  background: transparent;
+  border: none;
+  color: #000000;
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  margin-left: 60px;
+  width: 300px;
+  outline: none;
+}
+
+.frame .email-input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.frame .div-3 {
+  background-color: rgba(179, 179, 204, 0.6);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  height: 65px;
+  width: 380px;
+  position: absolute;
+  top: 170px;
+  left: 35px;
+  display: flex;
+  align-items: center;
+}
+
+.frame .password-input {
+  background: transparent;
+  border: none;
+  color: #000000;
+  font-family: "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  margin-left: 60px;
+  width: 300px;
+  outline: none;
+}
+
+.frame .password-input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.frame .div-4 {
+  background-color: rgba(114, 191, 65, 0.9);
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: 25px;
+  height: 65px;
+  width: 380px;
+  position: absolute;
+  top: 260px;
+  left: 35px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame .div-4:hover {
+  background-color: rgba(90, 168, 50, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.frame .div-4:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.frame .text-wrapper-3 {
+  color: #000000;
+  font-family: "Arial", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  pointer-events: none;
+}
+
+.frame .error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid #ff0000;
+  border-radius: 15px;
+  color: #ff0000;
+  font-family: "Arial", sans-serif;
+  font-size: 14px;
+  padding: 10px;
+  position: absolute;
+  text-align: center;
+  top: 340px;
+  left: 35px;
+  width: 360px;
+}
+
+.frame .forgot-password-link {
+  position: absolute;
+  top: 380px;
+  left: 35px;
+  width: 380px;
+  text-align: center;
+}
+
+.frame .forgot-password-link a {
+  color: #2c5aa0;
+  font-family: "Arial", sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.frame .forgot-password-link a:hover {
+  text-decoration: underline;
+}
