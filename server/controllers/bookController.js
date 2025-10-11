@@ -4,10 +4,10 @@ import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
 import { uploadMedia, deleteMedia } from "../utils/mediaUploader.js";
 
 export const addBook = catchAsyncErrors(async (req, res, next) => {
-    const { title, author, description, price, quantity } = req.body;
+    const { title, author, isbn, publisher, genre, publicationYear, description, price, quantity } = req.body;
     
     if (!title || !author || !description || !price || !quantity) {
-        return next(new ErrorHandler("Please fill all fields", 400));
+        return next(new ErrorHandler("Please fill all required fields", 400));
     }
     
     let coverImage = {};
@@ -18,6 +18,10 @@ export const addBook = catchAsyncErrors(async (req, res, next) => {
     const book = await Book.create({
         title,
         author,
+        isbn,
+        publisher,
+        genre,
+        publicationYear: publicationYear ? parseInt(publicationYear) : undefined,
         description,
         price,
         quantity,
@@ -71,7 +75,7 @@ export const getAllBooks = catchAsyncErrors(async (req, res, next) => {
 
 export const updateBook = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
-    const { title, author, description, price, quantity } = req.body;
+    const { title, author, isbn, publisher, genre, publicationYear, description, price, quantity } = req.body;
     
     const book = await Book.findById(id);
     
@@ -93,6 +97,10 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
     
     if (title) book.title = title;
     if (author) book.author = author;
+    if (isbn) book.isbn = isbn;
+    if (publisher) book.publisher = publisher;
+    if (genre) book.genre = genre;
+    if (publicationYear) book.publicationYear = parseInt(publicationYear);
     if (description) book.description = description;
     if (price) book.price = price;
     if (quantity) book.quantity = quantity;

@@ -12,6 +12,7 @@ const EditBook = () => {
     isbn: '',
     publicationYear: '',
     quantity: '',
+    price: '',
     description: '',
     genre: '',
     publisher: '',
@@ -36,6 +37,7 @@ const EditBook = () => {
         isbn: book.isbn || '',
         publicationYear: book.publicationYear || '',
         quantity: book.quantity || '',
+        price: book.price || '',
         description: book.description || '',
         genre: book.genre || '',
         publisher: book.publisher || '',
@@ -56,6 +58,10 @@ const EditBook = () => {
 
     if (!formData.quantity || formData.quantity < 1) {
       newErrors.quantity = 'Quantity must be at least 1'
+    }
+
+    if (!formData.price || formData.price < 0) {
+      newErrors.price = 'Price is required and must be positive'
     }
 
     if (formData.publicationYear && (formData.publicationYear < 1800 || formData.publicationYear > new Date().getFullYear())) {
@@ -87,6 +93,7 @@ const EditBook = () => {
       const bookData = {
         ...formData,
         quantity: parseInt(formData.quantity),
+        price: parseFloat(formData.price),
         publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : undefined,
       }
       dispatch(updateBook({ id, bookData }))
@@ -225,6 +232,25 @@ const EditBook = () => {
                 onChange={handleChange}
               />
               {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
+            </div>
+
+            {/* Price */}
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                Price ($) *
+              </label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                step="0.01"
+                className={`input-field mt-1 ${errors.price ? 'border-red-500' : ''}`}
+                placeholder="Book price"
+                min="0"
+                value={formData.price}
+                onChange={handleChange}
+              />
+              {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
             </div>
 
             {/* Genre */}

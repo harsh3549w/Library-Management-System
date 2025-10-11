@@ -2,6 +2,13 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 import { ErrorHandler } from '../middlewares/errorMiddlewares.js';
 
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
 export const uploadMedia = async (file, folder, resourceType = 'auto') => {
   try {
     if (!file || !file.tempFilePath) {
@@ -10,9 +17,7 @@ export const uploadMedia = async (file, folder, resourceType = 'auto') => {
     
     const uploadOptions = {
       folder,
-      resource_type: resourceType,
-      unsigned: true,
-      upload_preset: 'library_app_unsigned' // Create this in Cloudinary dashboard
+      resource_type: resourceType
     };
     
     const result = await cloudinary.uploader.upload(file.tempFilePath, uploadOptions);

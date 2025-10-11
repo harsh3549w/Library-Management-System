@@ -3,7 +3,11 @@ import {
   getMyBorrowedBooks,
   getBorrowedBooksForAdmin,
   recordBorrowedBook,
-  returnBorrowBook
+  returnBorrowBook,
+  renewBook,
+  getMyFines,
+  getAllFines,
+  markFineAsPaid
 } from "../controllers/borrowControllers.js";
 import { isAuthenticated, isAuthorized } from "../middlewares/authMiddleware.js";
 
@@ -13,8 +17,12 @@ const router = express.Router();
 router.post("/record-borrow-book/:id", isAuthenticated, isAuthorized("Admin"), recordBorrowedBook);
 router.get("/borrowed-books-by-users", isAuthenticated, isAuthorized("Admin"), getBorrowedBooksForAdmin);
 router.put("/return-borrowed-book/:bookId", isAuthenticated, isAuthorized("Admin"), returnBorrowBook);
+router.get("/all-fines", isAuthenticated, isAuthorized("Admin"), getAllFines);
+router.put("/mark-fine-paid/:borrowId", isAuthenticated, isAuthorized("Admin"), markFineAsPaid);
 
 // User routes
 router.get("/my-borrowed-books", isAuthenticated, getMyBorrowedBooks);
+router.put("/renew/:borrowId", isAuthenticated, renewBook);
+router.get("/my-fines", isAuthenticated, getMyFines);
 
 export default router;

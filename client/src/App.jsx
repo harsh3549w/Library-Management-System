@@ -26,6 +26,21 @@ import BorrowedBooks from './pages/Borrow/BorrowedBooks'
 import AllBorrowedBooks from './pages/Borrow/AllBorrowedBooks'
 import Users from './pages/Users/Users'
 import AddAdmin from './pages/Users/AddAdmin'
+import SuggestBook from './pages/Suggestions/SuggestBook'
+import BookSuggestions from './pages/Suggestions/BookSuggestions'
+import MySuggestions from './pages/Suggestions/MySuggestions'
+import ManageSuggestions from './pages/Suggestions/ManageSuggestions'
+import VotingResults from './pages/Suggestions/VotingResults'
+import MyReservations from './pages/Reservations/MyReservations'
+import AllReservations from './pages/Reservations/AllReservations'
+import Archives from './pages/Archive/Archives'
+import UploadArchive from './pages/Archive/UploadArchive'
+import ArchiveDetail from './pages/Archive/ArchiveDetail'
+import MyFines from './pages/Fines/MyFines'
+import ManageFines from './pages/Fines/ManageFines'
+import MyTransactions from './pages/Transactions/MyTransactions'
+import AllTransactions from './pages/Transactions/AllTransactions'
+import Reports from './pages/Reports/Reports'
 
 function App() {
   const dispatch = useDispatch()
@@ -100,15 +115,28 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="books" element={<Books />} />
           <Route path="my-borrowed-books" element={<BorrowedBooks />} />
+          <Route path="my-reservations" element={<MyReservations />} />
+          <Route path="archives" element={<Archives />} />
+          <Route path="archive/:id" element={<ArchiveDetail />} />
+          <Route path="book-suggestions" element={<BookSuggestions />} />
+          <Route path="suggest-book" element={<SuggestBook />} />
+          <Route path="my-suggestions" element={<MySuggestions />} />
+          <Route path="my-fines" element={<MyFines />} />
+          <Route path="my-transactions" element={<MyTransactions />} />
           
           {/* Admin Routes */}
-          <Route path="admin" element={<AdminRoute><Layout /></AdminRoute>}>
-            <Route path="add-book" element={<AddBook />} />
-            <Route path="edit-book/:id" element={<EditBook />} />
-            <Route path="all-borrowed-books" element={<AllBorrowedBooks />} />
-            <Route path="users" element={<Users />} />
-            <Route path="add-admin" element={<AddAdmin />} />
-          </Route>
+          <Route path="admin/add-book" element={<AdminRoute><AddBook /></AdminRoute>} />
+          <Route path="admin/edit-book/:id" element={<AdminRoute><EditBook /></AdminRoute>} />
+          <Route path="admin/upload-archive" element={<AdminRoute><UploadArchive /></AdminRoute>} />
+          <Route path="admin/all-borrowed-books" element={<AdminRoute><AllBorrowedBooks /></AdminRoute>} />
+          <Route path="admin/all-reservations" element={<AdminRoute><AllReservations /></AdminRoute>} />
+          <Route path="admin/manage-fines" element={<AdminRoute><ManageFines /></AdminRoute>} />
+          <Route path="admin/all-transactions" element={<AdminRoute><AllTransactions /></AdminRoute>} />
+          <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
+          <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
+          <Route path="admin/voting-results" element={<AdminRoute><VotingResults /></AdminRoute>} />
+          <Route path="admin/users" element={<AdminRoute><Users /></AdminRoute>} />
+          <Route path="admin/add-admin" element={<AdminRoute><AddAdmin /></AdminRoute>} />
         </Route>
 
         {/* Catch all route */}

@@ -6,7 +6,7 @@ import { app } from "./app.js";
 import { connectDB } from "./database/db.js";
 
 // Validate Cloudinary environment variables
-const cloudinaryVars = ["CLOUDINARY_CLIENT_NAME", "CLOUDINARY_CLIENT_API", "CLOUDINARY_CLIENT_SECRET"];
+const cloudinaryVars = ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 for (const varName of cloudinaryVars) {
   if (!process.env[varName]) {
     console.error(`Missing required Cloudinary environment variable: ${varName}`);
@@ -15,9 +15,9 @@ for (const varName of cloudinaryVars) {
 }
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLIENT_NAME,
-  api_key: process.env.CLOUDINARY_CLIENT_API,
-  api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
   secure: true,
 });
 

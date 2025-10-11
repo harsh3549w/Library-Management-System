@@ -22,9 +22,18 @@ export const addBook = createAsyncThunk(
   'books/addBook',
   async (bookData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_URL}/book/admin/add`, bookData, {
+      const config = {
         withCredentials: true,
-      })
+      }
+      
+      // If bookData is FormData (for image uploads), set appropriate header
+      if (bookData instanceof FormData) {
+        config.headers = {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+      
+      const response = await axios.post(`${API_URL}/book/admin/add`, bookData, config)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add book')

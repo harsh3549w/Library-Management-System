@@ -34,6 +34,16 @@ const borrowSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  finePaid: {
+    type: Boolean,
+    default: false
+  },
+  renewalCount: {
+    type: Number,
+    default: 0,
+    max: 1 // Allow only one renewal
+  },
+  renewedAt: Date,
   notified: {
     type: Boolean,
     default: false

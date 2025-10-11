@@ -12,10 +12,13 @@ const AddBook = () => {
     isbn: '',
     publicationYear: '',
     quantity: '',
+    price: '',
     description: '',
     genre: '',
     publisher: '',
   })
+  const [coverImage, setCoverImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
   const [errors, setErrors] = useState({})
 
   const dispatch = useDispatch()
@@ -35,6 +38,10 @@ const AddBook = () => {
 
     if (!formData.quantity || formData.quantity < 1) {
       newErrors.quantity = 'Quantity must be at least 1'
+    }
+
+    if (!formData.price || formData.price < 0) {
+      newErrors.price = 'Price is required and must be positive'
     }
 
     if (formData.publicationYear && (formData.publicationYear < 1800 || formData.publicationYear > new Date().getFullYear())) {
@@ -60,15 +67,36 @@ const AddBook = () => {
     }
   }
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setErrors({ ...errors, coverImage: 'Image size should be less than 5MB' })
+        return
+      }
+      setCoverImage(file)
+      setImagePreview(URL.createObjectURL(file))
+      setErrors({ ...errors, coverImage: '' })
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
-      const bookData = {
-        ...formData,
-        quantity: parseInt(formData.quantity),
-        publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : undefined,
-      }
-      dispatch(addBook(bookData))
+      const bookFormData = new FormData()
+      bookFormData.append('title', formData.title)
+      bookFormData.append('author', formData.author)
+      bookFormData.append('description', formData.description)
+      bookFormData.append('price', formData.price)
+      bookFormData.append('quantity', formData.quantity)
+      
+      if (formData.isbn) bookFormData.append('isbn', formData.isbn)
+      if (formData.publisher) bookFormData.append('publisher', formData.publisher)
+      if (formData.genre) bookFormData.append('genre', formData.genre)
+      if (formData.publicationYear) bookFormData.append('publicationYear', formData.publicationYear)
+      if (coverImage) bookFormData.append('coverImage', coverImage)
+      
+      dispatch(addBook(bookFormData))
       navigate('/books')
     }
   }
@@ -93,6 +121,57 @@ const AddBook = () => {
       {/* Form */}
       <div className="card max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Cover Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Book Cover Image
+            </label>
+            <div className="mt-1 flex items-center space-x-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-40 w-32 object-cover rounded-lg border-2 border-gray-300"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCoverImage(null)
+                      setImagePreview(null)
+                    }}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="h-40 w-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                  <BookOpen className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
+              <div className="flex-1">
+                <label className="btn-secondary cursor-pointer inline-block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  Choose Image
+                </label>
+                <p className="text-xs text-gray-500 mt-2">
+                  PNG, JPG, GIF up to 5MB
+                </p>
+                {errors.coverImage && (
+                  <p className="text-sm text-red-600 mt-1">{errors.coverImage}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Title */}
             <div className="md:col-span-2">
@@ -179,6 +258,25 @@ const AddBook = () => {
                 onChange={handleChange}
               />
               {errors.quantity && <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>}
+            </div>
+
+            {/* Price */}
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                Price ($) *
+              </label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                step="0.01"
+                className={`input-field mt-1 ${errors.price ? 'border-red-500' : ''}`}
+                placeholder="Book price"
+                min="0"
+                value={formData.price}
+                onChange={handleChange}
+              />
+              {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
             </div>
 
             {/* Genre */}

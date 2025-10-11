@@ -136,81 +136,94 @@ const Books = () => {
       ) : sortedBooks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedBooks.map((book) => (
-            <div key={book._id} className="card hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-shrink-0">
-                  <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <BookOpen className="h-6 w-6 text-blue-600" />
+            <div key={book._id} className="card hover:shadow-lg transition-all duration-200 overflow-hidden p-0">
+              {/* Book Cover Image */}
+              <div className="relative h-64 bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
+                {book.coverImage?.url ? (
+                  <img
+                    src={book.coverImage.url}
+                    alt={book.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <BookOpen className="h-20 w-20 text-blue-300" />
                   </div>
-                </div>
-                <div className="flex space-x-2">
-                  {isAdmin && (
-                    <>
-                      <Link
-                        to={`/admin/edit-book/${book._id}`}
-                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Link>
-                      <button
-                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                        onClick={() => {
-                          // Handle delete
-                          if (window.confirm('Are you sure you want to delete this book?')) {
-                            // dispatch(deleteBook(book._id))
-                          }
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-semibold text-gray-900 line-clamp-2">{book.title}</h3>
-                <p className="text-sm text-gray-600">by {book.author}</p>
-                
-                {book.isbn && (
-                  <p className="text-xs text-gray-500">ISBN: {book.isbn}</p>
                 )}
                 
-                <div className="flex items-center justify-between pt-2">
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                {/* Admin Actions Overlay */}
+                {isAdmin && (
+                  <div className="absolute top-2 right-2 flex space-x-2">
+                    <Link
+                      to={`/admin/edit-book/${book._id}`}
+                      className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
+                    >
+                      <Edit className="h-4 w-4 text-blue-600" />
+                    </Link>
+                    <button
+                      className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this book?')) {
+                          // dispatch(deleteBook(book._id))
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-600" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Availability Badge */}
+                <div className="absolute top-2 left-2">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg ${
                     book.available 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-red-500 text-white'
                   }`}>
                     {book.available ? 'Available' : 'Unavailable'}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    {book.quantity} cop{book.quantity !== 1 ? 'ies' : 'y'}
+                </div>
+              </div>
+
+              {/* Book Details */}
+              <div className="p-4 space-y-3">
+                <div className="space-y-1">
+                  <h3 className="font-semibold text-gray-900 line-clamp-2 text-lg">{book.title}</h3>
+                  <p className="text-sm text-gray-600">by {book.author}</p>
+                </div>
+                
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-2">
+                    {book.genre && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                        {book.genre}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-gray-600 font-medium">
+                    {book.quantity} {book.quantity !== 1 ? 'copies' : 'copy'}
                   </span>
                 </div>
 
-                {book.publicationYear && (
-                  <p className="text-xs text-gray-500">
-                    Published: {book.publicationYear}
-                  </p>
+                {(book.isbn || book.publicationYear) && (
+                  <div className="text-xs text-gray-500 space-y-0.5">
+                    {book.isbn && <p>ISBN: {book.isbn}</p>}
+                    {book.publicationYear && <p>Published: {book.publicationYear}</p>}
+                  </div>
                 )}
 
-                <p className="text-xs text-gray-500">
-                  Added: {formatDate(book.createdAt)}
-                </p>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex space-x-2">
-                  <button className="flex-1 btn-secondary text-sm py-1">
-                    <Eye className="h-3 w-3 mr-1" />
-                    View Details
-                  </button>
-                  {isAdmin && book.available && (
-                    <button className="flex-1 btn-primary text-sm py-1">
-                      Borrow
+                <div className="pt-3 border-t border-gray-200">
+                  <div className="flex space-x-2">
+                    <button className="flex-1 btn-secondary text-sm py-2">
+                      <Eye className="h-4 w-4 mr-1" />
+                      Details
                     </button>
-                  )}
+                    {isAdmin && book.available && (
+                      <button className="flex-1 btn-primary text-sm py-2">
+                        Borrow
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,3 +1,85 @@
+# IDE and Editor
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
 server/config/config.env
-server/node_modules
+.env
+.env.local
+.env.development
+.env.production
+
+# Dependencies
+server/node_modules/
+client/node_modules/
+node_modules/
+
+# Build outputs
+client/dist/
+client/build/
+server/dist/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Documentation and Helper Files (temporary guides)
+CLOUDINARY_SETUP.md
+PAYMENT_GATEWAY_INTEGRATION.md
+RAZORPAY_SETUP_INSTRUCTIONS.md
+START_HERE.md
+START_SERVERS.md
+FINAL_STEPS.md
+DEBUG_PAYMENT_NOW.md
+PAYMENT_TROUBLESHOOTING.md
+IMPORTANT_RAZORPAY_KEYS.md
+FIXED_IMAGE_ISSUE.md
+RESTART_SERVER_NOW.md
+WHERE_TO_VIEW_IMAGES.md
+IMAGE_UPLOAD_TROUBLESHOOTING.md
+LOGIN_INSTRUCTIONS.md
+SEED_INSTRUCTIONS.md
+QUICK_START.md
+
+# Batch files (Windows helpers)
+*.bat
+install-razorpay.bat
+create-test-user-with-fines.bat
+start-backend.bat
+start-frontend.bat
+restart-backend.bat
+
+# Test and temporary files
+server/testCloudinary.js
+server/createTestUser.js
+server/createUserWithFines.js
+
+# Uploads and temp files
+/tmp/
+uploads/
+*.tmp
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Coverage reports
+coverage/
+*.lcov
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache

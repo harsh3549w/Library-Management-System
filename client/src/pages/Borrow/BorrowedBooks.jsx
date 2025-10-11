@@ -1,21 +1,55 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMyBorrowedBooks } from '../../store/slices/borrowSlice'
+import { getMyBorrowedBooks, renewBook, clearError, clearSuccess } from '../../store/slices/borrowSlice'
 import { 
   Library, 
   Calendar, 
   Clock,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  RotateCw,
+  DollarSign
 } from 'lucide-react'
 
 const BorrowedBooks = () => {
   const dispatch = useDispatch()
-  const { myBorrowedBooks, loading } = useSelector((state) => state.borrow)
+  const { myBorrowedBooks, loading, error, success, message } = useSelector((state) => state.borrow)
 
   useEffect(() => {
     dispatch(getMyBorrowedBooks())
   }, [dispatch])
+
+  useEffect(() => {
+    if (success && message) {
+      dispatch(getMyBorrowedBooks()) // Refresh data after renewal
+      setTimeout(() => {
+        dispatch(clearSuccess())
+      }, 3000)
+    }
+  }, [success, message, dispatch])
+
+  useEffect(() => {
+    if (error) {
+      setTimeout(() => {
+        dispatch(clearError())
+      }, 5000)
+    }
+  }, [error, dispatch])
+
+  const handleRenew = (borrowId) => {
+    if (window.confirm('Are you sure you want to renew this book? This will extend the due date by 7 days.')) {
+      dispatch(renewBook(borrowId))
+    }
+  }
+
+  const canRenew = (borrowed) => {
+    if (borrowed.returnDate) return false // Already returned
+    if (borrowed.renewalCount >= 1) return false // Already renewed
+    const today = new Date()
+    const dueDate = new Date(borrowed.dueDate)
+    if (today > dueDate) return false // Overdue
+    return true
+  }
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -72,6 +106,22 @@ const BorrowedBooks = () => {
         <h1 className="text-2xl font-bold text-gray-900">My Borrowed Books</h1>
         <p className="text-gray-600">Track your borrowed books and due dates</p>
       </div>
+
+      {/* Success Message */}
+      {success && message && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start">
+          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 mr-3" />
+          <p className="text-green-800">{message}</p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start">
+          <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5 mr-3" />
+          <p className="text-red-800">{error}</p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -142,12 +192,16 @@ const BorrowedBooks = () => {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Fine
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {myBorrowedBooks.map((borrowed) => {
                   const statusInfo = getStatusInfo(borrowed)
                   const StatusIcon = statusInfo.icon
+                  const renewalAllowed = canRenew(borrowed)
 
                   return (
                     <tr key={borrowed._id} className="hover:bg-gray-50">
@@ -187,6 +241,32 @@ const BorrowedBooks = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {borrowed.fine ? `$${borrowed.fine.toFixed(2)}` : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        {!borrowed.returnDate && (
+                          <>
+                            {renewalAllowed ? (
+                              <button
+                                onClick={() => handleRenew(borrowed._id)}
+                                disabled={loading}
+                                className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                              >
+                                <RotateCw className="h-3 w-3 mr-1" />
+                                Renew
+                              </button>
+                            ) : (
+                              <div className="text-xs text-gray-500">
+                                {borrowed.renewalCount >= 1 ? (
+                                  <span className="text-yellow-600">Already renewed</span>
+                                ) : getDaysRemaining(borrowed.dueDate) < 0 ? (
+                                  <span className="text-red-600">Overdue</span>
+                                ) : (
+                                  '-'
+                                )}
+                              </div>
+                            )}
+                          </>
+                        )}
                       </td>
                     </tr>
                   )

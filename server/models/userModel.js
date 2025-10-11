@@ -41,6 +41,18 @@ const userSchema = new mongoose.Schema(
       url: String,
     },
 
+    fineBalance: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    totalFinesPaid: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
     verificationCode: Number,
     verificationCodeExpires: Date,
     resetPasswordToken: String,
@@ -48,6 +60,11 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Virtual field to check if user can borrow
+userSchema.virtual('canBorrow').get(function() {
+  return this.fineBalance === 0;
+});
 
 // Generate verification code method
 userSchema.methods.generateVerificationCode = function() {

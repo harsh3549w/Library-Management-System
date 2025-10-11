@@ -10,7 +10,16 @@ import {
   UserCheck, 
   Plus, 
   Library,
-  BarChart3
+  BarChart3,
+  Lightbulb,
+  ThumbsUp,
+  TrendingUp,
+  Bookmark,
+  FileText,
+  Upload,
+  DollarSign,
+  Receipt,
+  PieChart
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen }) => {
@@ -22,11 +31,25 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'My Borrowed Books', href: '/my-borrowed-books', icon: Library },
+    { name: 'My Reservations', href: '/my-reservations', icon: Bookmark },
+    { name: 'My Fines', href: '/my-fines', icon: DollarSign },
+    { name: 'My Transactions', href: '/my-transactions', icon: Receipt },
+    { name: 'Archives', href: '/archives', icon: FileText },
+    { name: 'Book Suggestions', href: '/book-suggestions', icon: ThumbsUp },
+    { name: 'Suggest a Book', href: '/suggest-book', icon: Lightbulb },
+    { name: 'My Suggestions', href: '/my-suggestions', icon: Lightbulb },
     ...(isAdmin ? [
       { name: 'Add Book', href: '/admin/add-book', icon: Plus },
+      { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
       { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
+      { name: 'All Reservations', href: '/admin/all-reservations', icon: Bookmark },
+      { name: 'Manage Fines', href: '/admin/manage-fines', icon: DollarSign },
+      { name: 'All Transactions', href: '/admin/all-transactions', icon: Receipt },
+      { name: 'Reports', href: '/admin/reports', icon: PieChart },
+      { name: 'Manage Suggestions', href: '/admin/manage-suggestions', icon: BarChart3 },
+      { name: 'Voting Results', href: '/admin/voting-results', icon: TrendingUp },
       { name: 'Users', href: '/admin/users', icon: Users },
-      { name: 'Add Admin', href: '/admin/add-admin', icon: BarChart3 },
+      { name: 'Add Admin', href: '/admin/add-admin', icon: UserCheck },
     ] : []),
   ]
 

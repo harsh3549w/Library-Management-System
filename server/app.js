@@ -14,7 +14,14 @@ import bookRouter from "./routes/bookRouter.js";
 import borrowRouter from "./routes/borrowRouter.js";
 import userRouter from "./routes/userRouter.js";
 import clientRouter from './routes/clientRouter.js';
+import suggestionRouter from './routes/suggestionRouter.js';
+import reservationRouter from './routes/reservationRouter.js';
+import archiveRouter from './routes/archiveRouter.js';
+import transactionRouter from './routes/transactionRouter.js';
+import reportRouter from './routes/reportRouter.js';
+import paymentRouter from './routes/paymentRouter.js';
 import { notifyUsers, notifyOverdueBooks } from './services/notifyUsers.js';
+import { expireOldReservations } from './services/reservationService.js';
 
 export const app = express();
 
@@ -34,6 +41,9 @@ if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
 } else {
   console.warn('Notification services disabled - missing email configuration');
 }
+
+// Initialize reservation expiry service
+expireOldReservations();
 
 // Enable CORS
 const allowedOrigins = [process.env.FRONTEND_URL];
@@ -86,6 +96,12 @@ app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/users", userRouter);
 app.use('/api/v1/client', clientRouter);
+app.use('/api/v1/suggestion', suggestionRouter);
+app.use('/api/v1/reservation', reservationRouter);
+app.use('/api/v1/archive', archiveRouter);
+app.use('/api/v1/transaction', transactionRouter);
+app.use('/api/v1/report', reportRouter);
+app.use('/api/v1/payment', paymentRouter);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {
