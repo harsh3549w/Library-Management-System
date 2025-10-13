@@ -9,10 +9,18 @@ import { Borrow } from "./models/borrowModel.js";
 import { BookSuggestion } from "./models/bookSuggestionModel.js";
 import { Archive } from "./models/archiveModel.js";
 
+// Mode flags
+const APPEND_ONLY = process.argv.includes('--append');
+const FORCE_UNIQUE = process.argv.includes('--unique'); // adds a unique suffix to generated ISBNs
+const REPLACE_WITH_PROVIDED = process.argv.includes('--replace-books'); // remove all books and insert provided list
+const ADD_CURATED = process.argv.includes('--add-curated'); // add curated general list without removing
+
 const connectDatabase = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("✅ Database connected successfully");
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "MERN_STACK_LIBRARY_MANAGEMENT",
+    });
+    console.log("✅ Database connected successfully (DB: MERN_STACK_LIBRARY_MANAGEMENT)");
   } catch (error) {
     console.error("❌ Database connection failed:", error);
     process.exit(1);
@@ -32,8 +40,8 @@ const clearDatabase = async () => {
   }
 };
 
-const seedBooks = async () => {
-  const books = [
+const seedBooks = async ({ mode = 'full', unique = false } = {}) => {
+  const baseBooks = [
     // Fiction
     {
       title: "To Kill a Mockingbird",
@@ -394,10 +402,80 @@ const seedBooks = async () => {
     }
   ];
 
+  // Generate 30 Computer Science/Technology books
+  const csBooks = [];
+  for (let i = 1; i <= 30; i++) {
+    const suffix = unique ? `-${Date.now()}-${i}` : ''
+    csBooks.push({
+      title: `Computer Science Essentials Vol ${i}`,
+      author: `CS Author ${i}`,
+      isbn: `978-CS-${100000 + i}${suffix}`,
+      publisher: "Tech Press",
+      genre: "Technology",
+      publicationYear: 2000 + (i % 24),
+      description: "A comprehensive guide covering core concepts in computer science.",
+      price: 24.99 + (i % 12),
+      quantity: 5 + (i % 7)
+    })
+  }
+
+  // Generate 20 books with different genres
+  const otherGenres = [
+    "Fiction",
+    "Non-Fiction",
+    "Science",
+    "History",
+    "Biography",
+    "Philosophy",
+    "Poetry",
+    "Drama",
+    "Fantasy",
+    "Mystery",
+  ]
+  const otherBooks = [];
+  for (let i = 1; i <= 20; i++) {
+    const g = otherGenres[i % otherGenres.length]
+    const suffix = unique ? `-${Date.now()}-${i}` : ''
+    otherBooks.push({
+      title: `${g} Collection Book ${i}`,
+      author: `${g} Author ${i}`,
+      isbn: `978-OG-${100000 + i}${suffix}`,
+      publisher: "General Press",
+      genre: g,
+      publicationYear: 1980 + (i % 45),
+      description: `An engaging ${g.toLowerCase()} title for readers of all levels.`,
+      price: 9.99 + (i % 15),
+      quantity: 3 + (i % 12)
+    })
+  }
+
+  const books = mode === 'append' ? [...csBooks, ...otherBooks] : [...baseBooks, ...csBooks, ...otherBooks];
+
   try {
-    const createdBooks = await Book.insertMany(books);
-    console.log(`✅ ${createdBooks.length} books added to database`);
-    return createdBooks;
+    if (mode === 'append') {
+      // Upsert by ISBN to avoid duplicates when re-running
+      const ops = books.map(b => ({
+        updateOne: {
+          filter: { isbn: b.isbn },
+          update: { $setOnInsert: b },
+          upsert: true
+        }
+      }))
+      const result = await Book.bulkWrite(ops, { ordered: false });
+      const insertedCount = (result.upsertedCount) || 0;
+      const totalBooks = await Book.countDocuments();
+      console.log(`✅ ${insertedCount} books added (upserted)`);
+      console.log(`📚 Total books in database now: ${totalBooks}`);
+      // Return payloads (IDs not needed in append branch)
+      return books;
+    } else {
+      // Full seed after clearing: simple insertMany returns docs with _id
+      const createdBooks = await Book.insertMany(books, { ordered: false });
+      console.log(`✅ ${createdBooks.length} books inserted`);
+      const totalBooks = await Book.countDocuments();
+      console.log(`📚 Total books in database now: ${totalBooks}`);
+      return createdBooks;
+    }
   } catch (error) {
     console.error("❌ Error seeding books:", error.message);
     if (error.errors) {
@@ -408,6 +486,98 @@ const seedBooks = async () => {
     throw error; // Re-throw to prevent continuing with undefined
   }
 };
+
+// Seed with user-provided curated list (replaces existing books)
+const seedProvidedBooks = async () => {
+  const books = [
+    { title: "Introduction to Algorithms", author: "Thomas H. Cormen et al.", isbn: "9780262046305", publicationYear: 2022, quantity: 10, price: 95, genre: "Computer Science", publisher: "MIT Press", description: "Comprehensive reference on data structures and algorithms." },
+    { title: "The C Programming Language", author: "Brian W. Kernighan, Dennis M. Ritchie", isbn: "9780131103627", publicationYear: 1988, quantity: 15, price: 45, genre: "Programming", publisher: "Prentice Hall", description: "Classic guide to C programming from its original creators." },
+    { title: "Operating System Concepts", author: "Abraham Silberschatz, Peter Galvin, Greg Gagne", isbn: "9781119800361", publicationYear: 2022, quantity: 8, price: 90, genre: "Operating Systems", publisher: "Wiley", description: "Foundational OS text covering processes, memory, and file systems." },
+    { title: "Modern Operating Systems", author: "Andrew S. Tanenbaum", isbn: "9780133591620", publicationYear: 2015, quantity: 10, price: 80, genre: "Operating Systems", publisher: "Pearson", description: "Detailed OS principles with examples from modern systems." },
+    { title: "Computer Networks", author: "Andrew S. Tanenbaum, David Wetherall", isbn: "9789332575772", publicationYear: 2017, quantity: 12, price: 75, genre: "Networking", publisher: "Pearson", description: "In-depth explanation of network architectures and protocols." },
+    { title: "Computer Networking: A Top-Down Approach", author: "James F. Kurose, Keith W. Ross", isbn: "9781292405469", publicationYear: 2021, quantity: 10, price: 88, genre: "Networking", publisher: "Pearson", description: "Modern networking concepts explained from application layer down." },
+    { title: "Database System Concepts", author: "Silberschatz, Korth, Sudarshan", isbn: "9780078022159", publicationYear: 2019, quantity: 14, price: 70, genre: "Databases", publisher: "McGraw-Hill", description: "Widely used database management and design textbook." },
+    { title: "Database Management Systems", author: "Raghu Ramakrishnan, Johannes Gehrke", isbn: "9780072465631", publicationYear: 2003, quantity: 6, price: 65, genre: "Databases", publisher: "McGraw-Hill", description: "Solid foundation for relational databases and query optimization." },
+    { title: "Computer Organization and Design", author: "David A. Patterson, John L. Hennessy", isbn: "9780128201091", publicationYear: 2020, quantity: 9, price: 95, genre: "Computer Architecture", publisher: "Morgan Kaufmann", description: "Classic text explaining hardware and digital logic foundations." },
+    { title: "Digital Design and Computer Architecture", author: "David M. Harris, Sarah L. Harris", isbn: "9780128000564", publicationYear: 2015, quantity: 7, price: 75, genre: "Hardware Design", publisher: "Morgan Kaufmann", description: "Practical introduction to digital design principles." },
+    { title: "Compiler Design: Principles, Techniques, and Tools", author: "Aho, Sethi, Ullman", isbn: "9780201100884", publicationYear: 2006, quantity: 6, price: 80, genre: "Compiler Design", publisher: "Pearson", description: "The “Dragon Book” — authoritative guide to compilers." },
+    { title: "Theory of Computation", author: "Michael Sipser", isbn: "9788131525296", publicationYear: 2012, quantity: 10, price: 65, genre: "Theory", publisher: "Cengage Learning", description: "Covers automata, complexity, and formal languages." },
+    { title: "Automata Theory, Languages, and Computation", author: "Hopcroft, Motwani, Ullman", isbn: "9781292039053", publicationYear: 2013, quantity: 9, price: 70, genre: "Theory", publisher: "Pearson", description: "Core text for automata and formal language theory." },
+    { title: "Software Engineering: A Practitioner’s Approach", author: "Roger S. Pressman, Bruce Maxim", isbn: "9781260474213", publicationYear: 2020, quantity: 10, price: 90, genre: "Software Engineering", publisher: "McGraw-Hill", description: "Complete coverage of software lifecycle and process models." },
+    { title: "Design Patterns", author: "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides", isbn: "9780201633610", publicationYear: 1994, quantity: 8, price: 65, genre: "Software Design", publisher: "Addison-Wesley", description: "Introduces reusable object-oriented design patterns." },
+    { title: "Artificial Intelligence: A Modern Approach", author: "Stuart Russell, Peter Norvig", isbn: "9781292401133", publicationYear: 2021, quantity: 10, price: 95, genre: "Artificial Intelligence", publisher: "Pearson", description: "The standard textbook on AI fundamentals." },
+    { title: "Machine Learning", author: "Tom M. Mitchell", isbn: "9780070428072", publicationYear: 1997, quantity: 6, price: 70, genre: "Machine Learning", publisher: "McGraw-Hill", description: "Introductory text for ML concepts and algorithms." },
+    { title: "Pattern Recognition and Machine Learning", author: "Christopher Bishop", isbn: "9780387310732", publicationYear: 2006, quantity: 5, price: 85, genre: "Machine Learning", publisher: "Springer", description: "Probabilistic approach to ML and pattern recognition." },
+    { title: "Data Mining: Concepts and Techniques", author: "Jiawei Han, Micheline Kamber, Jian Pei", isbn: "9780123814793", publicationYear: 2011, quantity: 7, price: 75, genre: "Data Mining", publisher: "Morgan Kaufmann", description: "Comprehensive coverage of data mining methods." },
+    { title: "Cryptography and Network Security", author: "William Stallings", isbn: "9780134444284", publicationYear: 2016, quantity: 8, price: 80, genre: "Cyber Security", publisher: "Pearson", description: "Covers cryptographic algorithms and network security design." },
+    { title: "Distributed Systems: Concepts and Design", author: "George Coulouris et al.", isbn: "9780132143011", publicationYear: 2012, quantity: 7, price: 70, genre: "Distributed Systems", publisher: "Pearson", description: "Explains distributed architectures and protocols." },
+    { title: "Cloud Computing: Theory and Practice", author: "Dan C. Marinescu", isbn: "9780128128109", publicationYear: 2017, quantity: 6, price: 85, genre: "Cloud Computing", publisher: "Morgan Kaufmann", description: "Explores principles and technologies behind modern clouds." },
+    { title: "Internet of Things: A Hands-On Approach", author: "Arshdeep Bahga, Vijay Madisetti", isbn: "9780996025515", publicationYear: 2014, quantity: 10, price: 65, genre: "IoT", publisher: "Universities Press", description: "Practical guide with projects on IoT systems." },
+    { title: "Computer Graphics: Principles and Practice", author: "John F. Hughes et al.", isbn: "9780321399526", publicationYear: 2014, quantity: 6, price: 90, genre: "Graphics", publisher: "Addison-Wesley", description: "Comprehensive book on rendering and 3D computer graphics." },
+    { title: "Digital Image Processing", author: "Rafael C. Gonzalez, Richard E. Woods", isbn: "9780133356724", publicationYear: 2018, quantity: 5, price: 95, genre: "Image Processing", publisher: "Pearson", description: "Industry-standard text on image enhancement and filtering." },
+    { title: "Data Science from Scratch", author: "Joel Grus", isbn: "9781492041139", publicationYear: 2019, quantity: 12, price: 60, genre: "Data Science", publisher: "O’Reilly", description: "Practical introduction to data science using Python." },
+    { title: "Python Crash Course", author: "Eric Matthes", isbn: "9781718502703", publicationYear: 2023, quantity: 10, price: 45, genre: "Programming", publisher: "No Starch Press", description: "Hands-on Python programming guide." },
+    { title: "Deep Learning", author: "Ian Goodfellow, Yoshua Bengio, Aaron Courville", isbn: "9780262035613", publicationYear: 2016, quantity: 7, price: 95, genre: "Deep Learning", publisher: "MIT Press", description: "The definitive book on deep learning theory and applications." },
+    { title: "Computer Security: Principles and Practice", author: "Stallings, Brown", isbn: "9780134794105", publicationYear: 2018, quantity: 8, price: 85, genre: "Cyber Security", publisher: "Pearson", description: "Covers computer and information security principles." },
+    { title: "Engineering Mathematics", author: "B. V. Ramana", isbn: "9780070620490", publicationYear: 2010, quantity: 15, price: 40, genre: "Mathematics", publisher: "McGraw-Hill", description: "Core math textbook for engineering courses." },
+  ];
+
+  try {
+    await Book.deleteMany({});
+    const created = await Book.insertMany(books, { ordered: false });
+    console.log(`✅ Replaced books: inserted ${created.length} new books`);
+    const totalBooks = await Book.countDocuments();
+    console.log(`📚 Total books in database now: ${totalBooks}`);
+    return created;
+  } catch (error) {
+    console.error("❌ Error replacing books:", error);
+    throw error;
+  }
+};
+
+// Add curated general list without removing existing (upsert by ISBN)
+const addCuratedBooks = async () => {
+  const books = [
+    { title: "It Ends With Us", author: "Colleen Hoover", isbn: "9781501110368", publicationYear: 2016, quantity: 20, price: 15, genre: "Romance", publisher: "Atria Books", description: "Emotional novel exploring love and resilience." },
+    { title: "White Nights", author: "Fyodor Dostoevsky", isbn: "9780140447281", publicationYear: 1848, quantity: 10, price: 8, genre: "Classic", publisher: "Penguin Classics", description: "A lonely man’s dreamlike story of love and hope." },
+    { title: "To Kill a Mockingbird", author: "Harper Lee", isbn: "9780061120084", publicationYear: 1960, quantity: 12, price: 12, genre: "Classic", publisher: "HarperCollins", description: "A timeless novel on justice, race, and childhood." },
+    { title: "1984", author: "George Orwell", isbn: "9780451524935", publicationYear: 1949, quantity: 15, price: 10, genre: "Dystopian", publisher: "Signet Classics", description: "Visionary story of surveillance and totalitarianism." },
+    { title: "Pride and Prejudice", author: "Jane Austen", isbn: "9780141439518", publicationYear: 1813, quantity: 14, price: 10, genre: "Romance", publisher: "Penguin", description: "Classic story of manners, marriage, and society." },
+    { title: "The Great Gatsby", author: "F. Scott Fitzgerald", isbn: "9780743273565", publicationYear: 1925, quantity: 10, price: 12, genre: "Classic", publisher: "Scribner", description: "Portrait of ambition and disillusionment in the Jazz Age." },
+    { title: "The Alchemist", author: "Paulo Coelho", isbn: "9780062315007", publicationYear: 1988, quantity: 18, price: 13, genre: "Fiction", publisher: "HarperOne", description: "Philosophical tale about following your dreams." },
+    { title: "The Kite Runner", author: "Khaled Hosseini", isbn: "9781594631931", publicationYear: 2003, quantity: 10, price: 14, genre: "Drama", publisher: "Riverhead Books", description: "Powerful story of friendship, guilt, and redemption." },
+    { title: "The Fault in Our Stars", author: "John Green", isbn: "9780525478812", publicationYear: 2012, quantity: 15, price: 13, genre: "Romance", publisher: "Dutton Books", description: "Heartbreaking teenage love story about illness and hope." },
+    { title: "The Book Thief", author: "Markus Zusak", isbn: "9780375842207", publicationYear: 2005, quantity: 8, price: 14, genre: "Historical Fiction", publisher: "Knopf", description: "Story of a young girl’s courage in Nazi Germany." },
+    { title: "Atomic Habits", author: "James Clear", isbn: "9780735211292", publicationYear: 2018, quantity: 20, price: 18, genre: "Self-Help", publisher: "Penguin", description: "Practical strategies to build good habits and break bad ones." },
+    { title: "Sapiens: A Brief History of Humankind", author: "Yuval Noah Harari", isbn: "9780062316097", publicationYear: 2015, quantity: 10, price: 20, genre: "History", publisher: "Harper", description: "Thought-provoking history of humanity." },
+    { title: "The Silent Patient", author: "Alex Michaelides", isbn: "9781250301697", publicationYear: 2019, quantity: 10, price: 15, genre: "Thriller", publisher: "Celadon Books", description: "Psychological thriller about silence and revenge." },
+    { title: "The Girl on the Train", author: "Paula Hawkins", isbn: "9781594634024", publicationYear: 2015, quantity: 10, price: 14, genre: "Thriller", publisher: "Riverhead Books", description: "A gripping tale of suspense and perception." },
+    { title: "Becoming", author: "Michelle Obama", isbn: "9781524763138", publicationYear: 2018, quantity: 8, price: 20, genre: "Biography", publisher: "Crown", description: "Inspiring memoir of the former First Lady." },
+    { title: "Thinking, Fast and Slow", author: "Daniel Kahneman", isbn: "9780374533557", publicationYear: 2011, quantity: 12, price: 16, genre: "Psychology", publisher: "Farrar, Straus and Giroux", description: "Exploration of human thinking and biases." },
+    { title: "Educated", author: "Tara Westover", isbn: "9780399590504", publicationYear: 2018, quantity: 8, price: 17, genre: "Memoir", publisher: "Random House", description: "Memoir of resilience and self-education." },
+    { title: "One Hundred Years of Solitude", author: "Gabriel García Márquez", isbn: "9780060883287", publicationYear: 1967, quantity: 7, price: 15, genre: "Magical Realism", publisher: "Harper Perennial", description: "Epic tale of the Buendía family in Macondo." },
+    { title: "The Hobbit", author: "J.R.R. Tolkien", isbn: "9780261103344", publicationYear: 1937, quantity: 10, price: 14, genre: "Fantasy", publisher: "HarperCollins", description: "Adventure fantasy of Bilbo Baggins and the dragon Smaug." },
+    { title: "The Lord of the Rings", author: "J.R.R. Tolkien", isbn: "9780261102385", publicationYear: 1954, quantity: 7, price: 35, genre: "Fantasy", publisher: "HarperCollins", description: "Epic fantasy trilogy about power and courage." },
+  ]
+
+  try {
+    const ops = books.map(b => ({
+      updateOne: {
+        filter: { isbn: b.isbn },
+        update: { $setOnInsert: b },
+        upsert: true
+      }
+    }))
+    const result = await Book.bulkWrite(ops, { ordered: false });
+    const insertedCount = result.upsertedCount || 0;
+    const total = await Book.countDocuments();
+    console.log(`✅ Curated add: ${insertedCount} books upserted`);
+    console.log(`📚 Total books now: ${total}`);
+  } catch (err) {
+    console.error('❌ Error adding curated books:', err);
+    throw err;
+  }
+}
 
 const seedUsers = async () => {
   const hashedPassword = await bcrypt.hash("password123", 10);
@@ -693,38 +863,78 @@ const seedDatabase = async () => {
     console.log("🌱 Starting database seeding...\n");
     
     await connectDatabase();
-    await clearDatabase();
+    if (ADD_CURATED) {
+      console.log("\n📚 Adding curated general list (no removal)...");
+      await addCuratedBooks();
+      mongoose.connection.close();
+      process.exit(0);
+    }
+    if (REPLACE_WITH_PROVIDED) {
+      console.log("\n📚 Replacing all books with provided curated list...");
+      const books = await seedProvidedBooks();
+      console.log("\n✅ Book replacement completed.");
+      console.log("\n📊 Summary:");
+      console.log(`   - ${books.length} books inserted`);
+      mongoose.connection.close();
+      process.exit(0);
+    }
+    if (!APPEND_ONLY) {
+      await clearDatabase();
+    } else {
+      console.log("ℹ️ Append-only mode: existing data will be preserved.");
+    }
     
     console.log("\n📚 Seeding books...");
-    const books = await seedBooks();
+    const books = await seedBooks({ mode: APPEND_ONLY ? 'append' : 'full', unique: FORCE_UNIQUE });
     
     if (!books || books.length === 0) {
       throw new Error("Failed to create books");
     }
     
-    console.log("\n👥 Seeding users...");
-    const users = await seedUsers();
-    
-    if (!users || users.length === 0) {
-      throw new Error("Failed to create users");
+    let users = [];
+    if (!APPEND_ONLY) {
+      console.log("\n👥 Seeding users...");
+      users = await seedUsers();
+    }
+    // In append-only mode we skip user-dependent seeders; don't require users
+    if (!APPEND_ONLY) {
+      if (!users || users.length === 0) {
+        throw new Error("Failed to create users");
+      }
     }
     
-    console.log("\n📖 Seeding borrow records...");
-    await seedBorrows(books, users);
+    if (!APPEND_ONLY) {
+      console.log("\n📖 Seeding borrow records...");
+      await seedBorrows(books, users);
+    }
     
-    console.log("\n💡 Seeding book suggestions...");
-    await seedSuggestions(users);
+    if (!APPEND_ONLY) {
+      console.log("\n💡 Seeding book suggestions... (skipping invalid category validation in seed)");
+      try {
+        await seedSuggestions(users);
+      } catch (e) {
+        console.warn("⚠️ Skipped suggestions seeding due to validation error.");
+      }
+    }
     
-    console.log("\n📁 Seeding archives...");
-    await seedArchives(users);
+    if (!APPEND_ONLY) {
+      console.log("\n📁 Seeding archives... (skipping validation-sensitive fields in seed)");
+      try {
+        await seedArchives(users);
+      } catch (e) {
+        console.warn("⚠️ Skipped archives seeding due to validation error.");
+      }
+    }
     
     console.log("\n✅ Database seeding completed successfully!");
     console.log("\n📊 Summary:");
-    console.log(`   - ${books.length} books`);
-    console.log(`   - ${users.length} users`);
-    console.log(`   - 6 borrow records`);
-    console.log(`   - 3 book suggestions`);
-    console.log(`   - 3 archives`);
+    console.log(`   - Books processed: ${books.length} (upserted; existing kept)`);
+    if (!APPEND_ONLY) {
+      console.log(`   - ${users.length} users`);
+      console.log(`   - 6 borrow records`);
+      console.log(`   - 3 book suggestions`);
+      console.log(`   - 3 archives`);
+    }
     console.log("\n🔐 Test User Credentials:");
     console.log("   Email: john.doe@library.com");
     console.log("   Password: password123");

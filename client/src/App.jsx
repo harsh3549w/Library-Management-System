@@ -28,7 +28,6 @@ import Users from './pages/Users/Users'
 import AddAdmin from './pages/Users/AddAdmin'
 import SuggestBook from './pages/Suggestions/SuggestBook'
 import BookSuggestions from './pages/Suggestions/BookSuggestions'
-import MySuggestions from './pages/Suggestions/MySuggestions'
 import ManageSuggestions from './pages/Suggestions/ManageSuggestions'
 import VotingResults from './pages/Suggestions/VotingResults'
 import MyReservations from './pages/Reservations/MyReservations'
@@ -120,7 +119,7 @@ function App() {
           <Route path="archive/:id" element={<ArchiveDetail />} />
           <Route path="book-suggestions" element={<BookSuggestions />} />
           <Route path="suggest-book" element={<SuggestBook />} />
-          <Route path="my-suggestions" element={<MySuggestions />} />
+          {/* Removed My Suggestions route to avoid duplication with Book Suggestions */}
           <Route path="my-fines" element={<MyFines />} />
           <Route path="my-transactions" element={<MyTransactions />} />
           

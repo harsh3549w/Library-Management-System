@@ -37,7 +37,6 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Book Suggestions', href: '/book-suggestions', icon: ThumbsUp },
     { name: 'Suggest a Book', href: '/suggest-book', icon: Lightbulb },
-    { name: 'My Suggestions', href: '/my-suggestions', icon: Lightbulb },
     ...(isAdmin ? [
       { name: 'Add Book', href: '/admin/add-book', icon: Plus },
       { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },

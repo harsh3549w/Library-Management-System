@@ -21,7 +21,7 @@ const SuggestBook = () => {
     if (success) {
       setTimeout(() => {
         dispatch(clearSuccess())
-        navigate('/my-suggestions')
+        navigate('/book-suggestions')
       }, 2000)
     }
   }, [success, dispatch, navigate])

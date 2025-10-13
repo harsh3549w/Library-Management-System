@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { getAllBooks } from '../../store/slices/bookSlice'
+import { getAllBooks, deleteBook, updateBook } from '../../store/slices/bookSlice'
 import { 
   Search, 
   Filter, 
@@ -16,6 +16,11 @@ const Books = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
   const [sortBy, setSortBy] = useState('title')
+  const [detailBook, setDetailBook] = useState(null)
+  const [coverFile, setCoverFile] = useState(null)
+  const [coverPreview, setCoverPreview] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
 
   const dispatch = useDispatch()
   const { books, loading } = useSelector((state) => state.books)
@@ -28,14 +33,15 @@ const Books = () => {
   }, [dispatch])
 
   // Filter and search books
+  const isAvailable = (book) => (typeof book.availability === 'boolean' ? book.availability : (book.quantity || 0) > 0)
   const filteredBooks = books.filter((book) => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          book.isbn?.toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesFilter = filterStatus === 'all' || 
-                         (filterStatus === 'available' && book.available) ||
-                         (filterStatus === 'unavailable' && !book.available)
+                         (filterStatus === 'available' && isAvailable(book)) ||
+                         (filterStatus === 'unavailable' && !isAvailable(book))
     
     return matchesSearch && matchesFilter
   })
@@ -164,7 +170,7 @@ const Books = () => {
                       className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all"
                       onClick={() => {
                         if (window.confirm('Are you sure you want to delete this book?')) {
-                          // dispatch(deleteBook(book._id))
+                          dispatch(deleteBook(book._id))
                         }
                       }}
                     >
@@ -176,11 +182,11 @@ const Books = () => {
                 {/* Availability Badge */}
                 <div className="absolute top-2 left-2">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold shadow-lg ${
-                    book.available 
+                    isAvailable(book) 
                       ? 'bg-green-500 text-white' 
                       : 'bg-red-500 text-white'
                   }`}>
-                    {book.available ? 'Available' : 'Unavailable'}
+                    {isAvailable(book) ? 'Available' : 'Unavailable'}
                   </span>
                 </div>
               </div>
@@ -214,11 +220,11 @@ const Books = () => {
 
                 <div className="pt-3 border-t border-gray-200">
                   <div className="flex space-x-2">
-                    <button className="flex-1 btn-secondary text-sm py-2">
-                      <Eye className="h-4 w-4 mr-1" />
-                      Details
+                    <button className="flex-1 btn-secondary text-sm py-2 flex items-center justify-center gap-2" onClick={() => setDetailBook(book)}>
+                      <Eye className="h-4 w-4" />
+                      <span>Details</span>
                     </button>
-                    {isAdmin && book.available && (
+                    {isAdmin && isAvailable(book) && (
                       <button className="flex-1 btn-primary text-sm py-2">
                         Borrow
                       </button>
@@ -247,6 +253,135 @@ const Books = () => {
           )}
         </div>
       )}
+    {/* Details Modal */}
+    {detailBook && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => { setDetailBook(null); setCoverFile(null); setCoverPreview(''); setUploadError('') }}>
+        <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-5 text-white flex items-start justify-between">
+            <div>
+              <h3 className="text-xl font-semibold leading-tight">{detailBook.title}</h3>
+              <p className="text-sm opacity-90">by {detailBook.author}</p>
+            </div>
+            <button className="text-white/80 hover:text-white" onClick={() => { setDetailBook(null); setCoverFile(null); setCoverPreview(''); setUploadError('') }}>✕</button>
+          </div>
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="w-full aspect-[3/4] rounded-lg bg-gray-50 border flex items-center justify-center overflow-hidden">
+                {(coverPreview || detailBook.coverImage?.url) ? (
+                  <img src={coverPreview || detailBook.coverImage?.url} alt={detailBook.title} className="w-full h-full object-cover" />
+                ) : (
+                  <BookOpen className="h-16 w-16 text-gray-300" />
+                )}
+              </div>
+              <div className="text-xs text-gray-500">ISBN: {detailBook.isbn || '—'}</div>
+              <div className="text-xs text-gray-500">Published: {detailBook.publicationYear || '—'}</div>
+              <div className="text-xs text-gray-500">Publisher: {detailBook.publisher || '—'}</div>
+              <span className={`inline-flex w-fit items-center px-2.5 py-1 rounded-full text-xs font-semibold ${isAvailable(detailBook) ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                {isAvailable(detailBook) ? 'Available' : 'Unavailable'}
+              </span>
+            </div>
+            <div className="space-y-4">
+              {detailBook.genre && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">{detailBook.genre}</span>
+              )}
+              {detailBook.description && (
+                <p className="text-sm text-gray-700 whitespace-pre-line">{detailBook.description}</p>
+              )}
+              {isAdmin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Update Cover Image</label>
+                  <div
+                    className="border-2 border-dashed rounded-lg p-4 text-center text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 transition-colors outline-none focus:ring-2 focus:ring-indigo-300"
+                    tabIndex={0}
+                    role="button"
+                    contentEditable={false}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) {
+                        setCoverFile(file);
+                        setCoverPreview(URL.createObjectURL(file));
+                        setUploadError('');
+                      }
+                    }}
+                    onPaste={(e) => {
+                      const files = e.clipboardData?.files;
+                      if (files && files.length > 0) {
+                        const file = files[0];
+                        setCoverFile(file);
+                        setCoverPreview(URL.createObjectURL(file));
+                        setUploadError('');
+                        return;
+                      }
+                      const items = e.clipboardData?.items;
+                      if (items) {
+                        for (let i = 0; i < items.length; i++) {
+                          const it = items[i];
+                          if (it.kind === 'file' && it.type.startsWith('image/')) {
+                            const file = it.getAsFile();
+                            if (file) {
+                              setCoverFile(file);
+                              setCoverPreview(URL.createObjectURL(file));
+                              setUploadError('');
+                              break;
+                            }
+                          }
+                        }
+                      }
+                    }}
+                    onClick={() => document.getElementById('coverInputHidden')?.click()}
+                  >
+                    {coverPreview ? (
+                      <div className="mb-2">Ready to upload new cover</div>
+                    ) : (
+                      <>
+                        <div className="mb-1 font-medium">Drag & drop, paste (Ctrl+V), or click to select</div>
+                        <div className="text-xs text-gray-500">PNG, JPG up to ~5MB</div>
+                      </>
+                    )}
+                  </div>
+                  <input id="coverInputHidden" type="file" accept="image/*" className="hidden" onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setCoverFile(file);
+                      setCoverPreview(URL.createObjectURL(file));
+                      setUploadError('');
+                    }
+                  }} />
+                  {uploadError && <p className="text-sm text-red-600 mt-2">{uploadError}</p>}
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      className="btn-primary disabled:opacity-50"
+                      disabled={!coverFile || uploading}
+                      onClick={async () => {
+                        if (!coverFile) return;
+                        try {
+                          setUploading(true);
+                          const fd = new FormData();
+                          fd.append('coverImage', coverFile);
+                          await dispatch(updateBook({ id: detailBook._id, bookData: fd }));
+                          await dispatch(getAllBooks());
+                          setCoverFile(null);
+                          setCoverPreview('');
+                        } catch (err) {
+                          setUploadError('Upload failed');
+                        } finally {
+                          setUploading(false);
+                        }
+                      }}
+                    >
+                      {uploading ? 'Uploading...' : 'Save Cover'}
+                    </button>
+                    <button className="btn-secondary" onClick={() => { setCoverFile(null); setCoverPreview(''); setUploadError('') }}>Reset</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   )
 }

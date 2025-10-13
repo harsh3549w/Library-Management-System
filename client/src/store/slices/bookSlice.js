@@ -6,9 +6,9 @@ const API_URL = 'http://localhost:4000/api/v1'
 // Async thunks
 export const getAllBooks = createAsyncThunk(
   'books/getAllBooks',
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, limit = 200 } = {}, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/book/all`, {
+      const response = await axios.get(`${API_URL}/book/all?page=${page}&limit=${limit}` , {
         withCredentials: true,
       })
       return response.data
@@ -45,9 +45,11 @@ export const updateBook = createAsyncThunk(
   'books/updateBook',
   async ({ id, bookData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/book/admin/update/${id}`, bookData, {
-        withCredentials: true,
-      })
+      const config = { withCredentials: true }
+      if (bookData instanceof FormData) {
+        config.headers = { 'Content-Type': 'multipart/form-data' }
+      }
+      const response = await axios.put(`${API_URL}/book/admin/update/${id}`, bookData, config)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update book')

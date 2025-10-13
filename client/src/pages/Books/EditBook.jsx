@@ -18,6 +18,7 @@ const EditBook = () => {
     publisher: '',
   })
   const [errors, setErrors] = useState({})
+  const [coverImageFile, setCoverImageFile] = useState(null)
 
   const { id } = useParams()
   const dispatch = useDispatch()
@@ -90,13 +91,29 @@ const EditBook = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
-      const bookData = {
-        ...formData,
-        quantity: parseInt(formData.quantity),
-        price: parseFloat(formData.price),
-        publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : undefined,
+      // Use FormData when uploading an image
+      let payload
+      if (coverImageFile) {
+        const fd = new FormData()
+        Object.entries({
+          ...formData,
+          quantity: parseInt(formData.quantity),
+          price: parseFloat(formData.price),
+          publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : ''
+        }).forEach(([k, v]) => {
+          if (v !== undefined && v !== '') fd.append(k, v)
+        })
+        fd.append('coverImage', coverImageFile)
+        payload = fd
+      } else {
+        payload = {
+          ...formData,
+          quantity: parseInt(formData.quantity),
+          price: parseFloat(formData.price),
+          publicationYear: formData.publicationYear ? parseInt(formData.publicationYear) : undefined,
+        }
       }
-      dispatch(updateBook({ id, bookData }))
+      dispatch(updateBook({ id, bookData: payload }))
       navigate('/books')
     }
   }
@@ -147,6 +164,30 @@ const EditBook = () => {
       <div className="card max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Cover Image */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Cover Image
+              </label>
+              <div className="mt-1 flex items-center gap-4">
+                {book?.coverImage?.url ? (
+                  <img src={book.coverImage.url} alt={book.title} className="h-24 w-24 object-cover rounded" />
+                ) : (
+                  <div className="h-24 w-24 rounded bg-gray-100 flex items-center justify-center text-gray-400">
+                    <BookOpen className="h-6 w-6" />
+                  </div>
+                )}
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)}
+                    className="block w-full text-sm text-gray-900 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">PNG, JPG up to ~5MB.</p>
+                </div>
+              </div>
+            </div>
             {/* Title */}
             <div className="md:col-span-2">
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">

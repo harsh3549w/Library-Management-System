@@ -142,6 +142,7 @@ const Dashboard = () => {
           ) : recentBorrowed.length > 0 ? (
             <div className="space-y-3">
               {recentBorrowed.map((borrowed) => {
+                if (!borrowed?.book) return null
                 const daysRemaining = getDaysRemaining(borrowed.dueDate)
                 const isOverdue = daysRemaining < 0
                 const isDueSoon = daysRemaining <= 3 && daysRemaining >= 0
@@ -149,8 +150,8 @@ const Dashboard = () => {
                 return (
                   <div key={borrowed._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div>
-                      <h3 className="font-medium text-gray-900">{borrowed.book.title}</h3>
-                      <p className="text-sm text-gray-500">by {borrowed.book.author}</p>
+                      <h3 className="font-medium text-gray-900">{borrowed.book?.title || 'Unknown Book'}</h3>
+                      <p className="text-sm text-gray-500">by {borrowed.book?.author || 'Unknown Author'}</p>
                     </div>
                     <div className="text-right">
                       <div className="flex items-center space-x-1">

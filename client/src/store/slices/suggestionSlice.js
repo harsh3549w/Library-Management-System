@@ -32,19 +32,7 @@ export const getAllSuggestions = createAsyncThunk(
   }
 )
 
-export const getMySuggestions = createAsyncThunk(
-  'suggestion/getMy',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(`${API_URL}/suggestion/my-suggestions`, {
-        withCredentials: true,
-      })
-      return response.data
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch your suggestions')
-    }
-  }
-)
+// Removed getMySuggestions as the dedicated "My Suggestions" page was removed
 
 export const voteForSuggestion = createAsyncThunk(
   'suggestion/vote',
@@ -122,7 +110,6 @@ export const getVotingStats = createAsyncThunk(
 
 const initialState = {
   suggestions: [],
-  mySuggestions: [],
   stats: null,
   loading: false,
   error: null,
@@ -153,7 +140,6 @@ const suggestionSlice = createSlice({
         state.loading = false
         state.success = true
         state.message = action.payload.message
-        state.mySuggestions.unshift(action.payload.suggestion)
       })
       .addCase(createSuggestion.rejected, (state, action) => {
         state.loading = false
@@ -172,19 +158,7 @@ const suggestionSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
-      // Get My Suggestions
-      .addCase(getMySuggestions.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(getMySuggestions.fulfilled, (state, action) => {
-        state.loading = false
-        state.mySuggestions = action.payload.suggestions
-      })
-      .addCase(getMySuggestions.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
+      // Removed per de-duplication of suggestions views
       // Vote for Suggestion
       .addCase(voteForSuggestion.pending, (state) => {
         state.error = null
@@ -248,9 +222,6 @@ const suggestionSlice = createSlice({
         state.success = true
         state.message = action.payload.message
         state.suggestions = state.suggestions.filter(
-          s => s._id !== action.payload.suggestionId
-        )
-        state.mySuggestions = state.mySuggestions.filter(
           s => s._id !== action.payload.suggestionId
         )
       })
