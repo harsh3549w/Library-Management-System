@@ -78,8 +78,74 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// User borrows a book for themselves
+export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const user = req.user;
+  
+  const book = await Book.findById(id);
+  if (!book) {
+    return next(new ErrorHandler("Book not found", 404));
+  }
+
+  // Check if user has unpaid fines
+  if (user.fineBalance > 0) {
+    return next(new ErrorHandler(`Cannot borrow books. You have an outstanding fine balance of $${user.fineBalance.toFixed(2)}. Please pay your fines before borrowing.`, 403));
+  }
+  
+  if (book.quantity <= 0) {
+    return next(new ErrorHandler("Book not available", 400));
+  }
+  
+  const isAlreadyBorrowed = await Borrow.findOne({
+    "user.id": user._id,
+    book: id,
+    returnDate: null,
+  });
+  
+  if (isAlreadyBorrowed) {
+    return next(new ErrorHandler("You have already borrowed this book", 400));
+  }
+  
+  book.quantity -= 1;
+  book.availability = book.quantity > 0;
+  await book.save();
+  
+  const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  
+  const borrow = await Borrow.create({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    },
+    book: book._id,
+    dueDate,
+    price: book.price
+  });
+
+  // Create transaction record
+  await createTransaction({
+    type: 'borrow',
+    user: user._id,
+    book: book._id,
+    amount: 0,
+    description: `Borrowed "${book.title}" by ${book.author}`,
+    metadata: {
+      borrowId: borrow._id,
+      dueDate: dueDate
+    }
+  });
+  
+  res.status(200).json({
+    success: true,
+    message: "Book borrowed successfully! Due date: " + dueDate.toLocaleDateString(),
+    borrow
+  });
+});
+
 export const getMyBorrowedBooks = catchAsyncErrors(async (req, res, next) => {
-  const borrows = await Borrow.find({ "user.id": req.user.id }).populate("book");
+  const borrows = await Borrow.find({ "user.id": req.user._id }).populate("book");
 
   res.status(200).json({
     success: true,

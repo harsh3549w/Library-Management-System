@@ -8,6 +8,11 @@ import { sendEmail } from "../utils/emailService.js";
 export const reserveBook = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params; // book id
 
+  // Check if user has unpaid fines
+  if (req.user.fineBalance > 0) {
+    return next(new ErrorHandler(`Cannot reserve books. You have an outstanding fine balance of $${req.user.fineBalance.toFixed(2)}. Please pay your fines before reserving.`, 403));
+  }
+
   const book = await Book.findById(id);
   if (!book) {
     return next(new ErrorHandler("Book not found", 404));
@@ -110,7 +115,7 @@ export const cancelReservation = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Fulfill reservation (admin/system)
+// Fulfill reservation (admin/system) - Automatically borrows the book
 export const fulfillReservation = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
 
@@ -123,22 +128,83 @@ export const fulfillReservation = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Reservation is not active", 400));
   }
 
+  // Check if this is the first (oldest) active reservation for this book
+  const olderReservation = await Reservation.findOne({
+    book: reservation.book._id,
+    status: 'active',
+    createdAt: { $lt: reservation.createdAt }
+  });
+
+  if (olderReservation) {
+    return next(new ErrorHandler("Please fulfill previous reservations for this book first", 400));
+  }
+
   // Check if book is now available
   const book = await Book.findById(reservation.book._id);
   if (!book || book.quantity <= 0) {
     return next(new ErrorHandler("Book is still not available", 400));
   }
 
+  // Import Borrow model
+  const { Borrow } = await import("../models/borrowModel.js");
+  const { User } = await import("../models/userModel.js");
+  
+  // Get the user
+  const user = await User.findById(reservation.user.id);
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  // Check if user has unpaid fines
+  if (user.fineBalance > 0) {
+    return next(new ErrorHandler(`Cannot fulfill reservation. User has an outstanding fine balance of $${user.fineBalance.toFixed(2)}`, 403));
+  }
+
+  // Decrease book quantity (borrow the book)
+  book.quantity -= 1;
+  book.availability = book.quantity > 0;
+  await book.save();
+
+  const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+  // Create borrow record
+  const borrow = await Borrow.create({
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email
+    },
+    book: book._id,
+    dueDate,
+    price: book.price
+  });
+
+  // Mark reservation as fulfilled
   reservation.status = 'fulfilled';
   reservation.fulfilledAt = new Date();
   await reservation.save();
+
+  // Create transaction record
+  const { createTransaction } = await import("./transactionController.js");
+  await createTransaction({
+    type: 'borrow',
+    user: user._id,
+    book: book._id,
+    amount: 0,
+    description: `Borrowed "${book.title}" via reservation fulfillment`,
+    metadata: {
+      borrowId: borrow._id,
+      reservationId: reservation._id,
+      dueDate: dueDate
+    }
+  });
 
   // Send notification to user
   try {
     await sendEmail({
       email: reservation.user.email,
-      subject: "Reserved Book Now Available",
-      message: `Hello ${reservation.user.name},\n\nGood news! The book "${book.title}" that you reserved is now available. Please visit the library to borrow it within 48 hours.\n\nBest regards,\nLibrary Team`
+      subject: "Reservation Fulfilled - Book Borrowed",
+      message: `Hello ${reservation.user.name},\n\nYour reservation for "${book.title}" has been fulfilled! The book has been borrowed on your behalf.\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease collect it from the library.\n\nBest regards,\nLibrary Team`
     });
   } catch (error) {
     console.error("Failed to send reservation notification:", error);
@@ -146,8 +212,9 @@ export const fulfillReservation = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Reservation fulfilled and user notified",
-    reservation
+    message: "Reservation fulfilled - Book borrowed for user",
+    reservation,
+    borrow
   });
 });
 

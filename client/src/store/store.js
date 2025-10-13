@@ -16,7 +16,7 @@ export const store = configureStore({
     borrow: borrowReducer,
     users: userReducer,
     suggestions: suggestionReducer,
-    reservations: reservationReducer,
+    reservation: reservationReducer,
     archives: archiveReducer,
     transactions: transactionReducer,
     reports: reportReducer,

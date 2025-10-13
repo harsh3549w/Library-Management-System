@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { getAllBooks, deleteBook, updateBook } from '../../store/slices/bookSlice'
+import { borrowBookForSelf, clearError as clearBorrowError, clearSuccess as clearBorrowSuccess } from '../../store/slices/borrowSlice'
+import { reserveBook, clearError as clearReserveError, clearSuccess as clearReserveSuccess } from '../../store/slices/reservationSlice'
 import { 
   Search, 
   Filter, 
@@ -9,7 +11,11 @@ import {
   Plus,
   Edit,
   Trash2,
-  Eye
+  Eye,
+  BookMarked,
+  CheckCircle,
+  AlertCircle,
+  Bell
 } from 'lucide-react'
 
 const Books = () => {
@@ -25,12 +31,62 @@ const Books = () => {
   const dispatch = useDispatch()
   const { books, loading } = useSelector((state) => state.books)
   const { user } = useSelector((state) => state.auth)
+  const { loading: borrowLoading, success: borrowSuccess, error: borrowError, message: borrowMessage } = useSelector((state) => state.borrow)
+  const { loading: reserveLoading, success: reserveSuccess, error: reserveError, message: reserveMessage } = useSelector((state) => state.reservation)
 
   const isAdmin = user?.role === 'Admin'
 
   useEffect(() => {
     dispatch(getAllBooks())
   }, [dispatch])
+
+  useEffect(() => {
+    if (borrowSuccess && borrowMessage) {
+      // Refresh books after successful borrow
+      dispatch(getAllBooks())
+      setTimeout(() => {
+        dispatch(clearBorrowSuccess())
+      }, 3000)
+    }
+  }, [borrowSuccess, borrowMessage, dispatch])
+
+  useEffect(() => {
+    if (borrowError) {
+      setTimeout(() => {
+        dispatch(clearBorrowError())
+      }, 5000)
+    }
+  }, [borrowError, dispatch])
+
+  useEffect(() => {
+    if (reserveSuccess && reserveMessage) {
+      // Refresh books after successful reservation
+      dispatch(getAllBooks())
+      setTimeout(() => {
+        dispatch(clearReserveSuccess())
+      }, 3000)
+    }
+  }, [reserveSuccess, reserveMessage, dispatch])
+
+  useEffect(() => {
+    if (reserveError) {
+      setTimeout(() => {
+        dispatch(clearReserveError())
+      }, 5000)
+    }
+  }, [reserveError, dispatch])
+
+  const handleBorrowBook = (bookId) => {
+    if (window.confirm('Are you sure you want to borrow this book?')) {
+      dispatch(borrowBookForSelf(bookId))
+    }
+  }
+
+  const handleReserveBook = (bookId) => {
+    if (window.confirm('Reserve this book? You will be notified when it becomes available.')) {
+      dispatch(reserveBook(bookId))
+    }
+  }
 
   // Filter and search books
   const isAvailable = (book) => (typeof book.availability === 'boolean' ? book.availability : (book.quantity || 0) > 0)
@@ -88,6 +144,38 @@ const Books = () => {
           </Link>
         )}
       </div>
+
+      {/* Success Message */}
+      {borrowSuccess && borrowMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
+          <CheckCircle className="h-5 w-5 text-green-600 mr-3" />
+          <p className="text-green-800">{borrowMessage}</p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {borrowError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+          <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
+          <p className="text-red-800">{borrowError}</p>
+        </div>
+      )}
+
+      {/* Reservation Success Message */}
+      {reserveSuccess && reserveMessage && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center">
+          <CheckCircle className="h-5 w-5 text-blue-600 mr-3" />
+          <p className="text-blue-800">{reserveMessage}</p>
+        </div>
+      )}
+
+      {/* Reservation Error Message */}
+      {reserveError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
+          <AlertCircle className="h-5 w-5 text-red-600 mr-3" />
+          <p className="text-red-800">{reserveError}</p>
+        </div>
+      )}
 
       {/* Search and Filters */}
       <div className="card">
@@ -224,10 +312,28 @@ const Books = () => {
                       <Eye className="h-4 w-4" />
                       <span>Details</span>
                     </button>
-                    {isAdmin && isAvailable(book) && (
-                      <button className="flex-1 btn-primary text-sm py-2">
-                        Borrow
-                      </button>
+                    {!isAdmin && (
+                      <>
+                        {isAvailable(book) ? (
+                          <button 
+                            className="flex-1 btn-primary text-sm py-2 flex items-center justify-center gap-2"
+                            onClick={() => handleBorrowBook(book._id)}
+                            disabled={borrowLoading}
+                          >
+                            <BookMarked className="h-4 w-4" />
+                            <span>{borrowLoading ? 'Borrowing...' : 'Borrow'}</span>
+                          </button>
+                        ) : (
+                          <button 
+                            className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-sm py-2 flex items-center justify-center gap-2 rounded-lg transition-colors disabled:opacity-50"
+                            onClick={() => handleReserveBook(book._id)}
+                            disabled={reserveLoading}
+                          >
+                            <Bell className="h-4 w-4" />
+                            <span>{reserveLoading ? 'Reserving...' : 'Reserve'}</span>
+                          </button>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>

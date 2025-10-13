@@ -18,7 +18,7 @@ import {
 
 const MyReservations = () => {
   const dispatch = useDispatch()
-  const { myReservations, loading, success, message, error } = useSelector((state) => state.reservations)
+  const { myReservations, loading, success, message, error } = useSelector((state) => state.reservation)
 
   useEffect(() => {
     dispatch(getMyReservations())

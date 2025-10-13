@@ -24,12 +24,8 @@ import AddBook from './pages/Books/AddBook'
 import EditBook from './pages/Books/EditBook'
 import BorrowedBooks from './pages/Borrow/BorrowedBooks'
 import AllBorrowedBooks from './pages/Borrow/AllBorrowedBooks'
-import Users from './pages/Users/Users'
-import AddAdmin from './pages/Users/AddAdmin'
-import SuggestBook from './pages/Suggestions/SuggestBook'
 import BookSuggestions from './pages/Suggestions/BookSuggestions'
 import ManageSuggestions from './pages/Suggestions/ManageSuggestions'
-import VotingResults from './pages/Suggestions/VotingResults'
 import MyReservations from './pages/Reservations/MyReservations'
 import AllReservations from './pages/Reservations/AllReservations'
 import Archives from './pages/Archive/Archives'
@@ -118,8 +114,6 @@ function App() {
           <Route path="archives" element={<Archives />} />
           <Route path="archive/:id" element={<ArchiveDetail />} />
           <Route path="book-suggestions" element={<BookSuggestions />} />
-          <Route path="suggest-book" element={<SuggestBook />} />
-          {/* Removed My Suggestions route to avoid duplication with Book Suggestions */}
           <Route path="my-fines" element={<MyFines />} />
           <Route path="my-transactions" element={<MyTransactions />} />
           
@@ -133,9 +127,6 @@ function App() {
           <Route path="admin/all-transactions" element={<AdminRoute><AllTransactions /></AdminRoute>} />
           <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
-          <Route path="admin/voting-results" element={<AdminRoute><VotingResults /></AdminRoute>} />
-          <Route path="admin/users" element={<AdminRoute><Users /></AdminRoute>} />
-          <Route path="admin/add-admin" element={<AdminRoute><AddAdmin /></AdminRoute>} />
         </Route>
 
         {/* Catch all route */}

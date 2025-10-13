@@ -120,6 +120,20 @@ export const markFineAsPaid = createAsyncThunk(
   }
 )
 
+export const borrowBookForSelf = createAsyncThunk(
+  'borrow/borrowBookForSelf',
+  async (bookId, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/borrow/borrow/${bookId}`, {}, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to borrow book')
+    }
+  }
+)
+
 const initialState = {
   myBorrowedBooks: [],
   allBorrowedBooks: [],
@@ -253,6 +267,20 @@ const borrowSlice = createSlice({
         state.message = action.payload.message
       })
       .addCase(markFineAsPaid.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Borrow Book For Self
+      .addCase(borrowBookForSelf.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(borrowBookForSelf.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = true
+        state.message = action.payload.message
+      })
+      .addCase(borrowBookForSelf.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

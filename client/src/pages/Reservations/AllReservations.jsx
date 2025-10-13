@@ -22,7 +22,7 @@ import {
 const AllReservations = () => {
   const [statusFilter, setStatusFilter] = useState('active')
   const dispatch = useDispatch()
-  const { allReservations, loading, success, message, error } = useSelector((state) => state.reservations)
+  const { allReservations, loading, success, message, error } = useSelector((state) => state.reservation)
 
   useEffect(() => {
     dispatch(getAllReservations({ status: statusFilter }))
@@ -55,6 +55,24 @@ const AllReservations = () => {
     if (window.confirm('Are you sure you want to cancel this reservation?')) {
       dispatch(cancelReservation(reservationId))
     }
+  }
+
+  // Check if a reservation is the first (oldest) active one for its book
+  const isFirstReservation = (reservation) => {
+    if (reservation.status !== 'active') return false
+    
+    const sameBookReservations = allReservations.filter(
+      r => r.book?._id === reservation.book?._id && r.status === 'active'
+    )
+    
+    if (sameBookReservations.length === 0) return true
+    
+    // Sort by creation date
+    const sortedReservations = [...sameBookReservations].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    )
+    
+    return sortedReservations[0]._id === reservation._id
   }
 
   const formatDate = (dateString) => {
@@ -203,21 +221,32 @@ const AllReservations = () => {
 
                 {/* Action Buttons */}
                 {reservation.status === 'active' && (
-                  <div className="mt-4 lg:mt-0 lg:ml-6 flex gap-2">
-                    <button
-                      onClick={() => handleFulfill(reservation._id)}
-                      className="btn-primary inline-flex items-center"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Fulfill
-                    </button>
-                    <button
-                      onClick={() => handleCancel(reservation._id)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition-colors"
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Cancel
-                    </button>
+                  <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleFulfill(reservation._id)}
+                        disabled={!isFirstReservation(reservation)}
+                        className={`btn-primary inline-flex items-center ${
+                          !isFirstReservation(reservation) ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                        title={!isFirstReservation(reservation) ? 'Fulfill previous reservations first' : 'Fulfill this reservation'}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Fulfill
+                      </button>
+                      <button
+                        onClick={() => handleCancel(reservation._id)}
+                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition-colors"
+                      >
+                        <XCircle className="h-4 w-4 mr-2" />
+                        Cancel
+                      </button>
+                    </div>
+                    {!isFirstReservation(reservation) && (
+                      <p className="text-xs text-yellow-600 font-medium">
+                        ⚠️ Fulfill previous reservers first
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

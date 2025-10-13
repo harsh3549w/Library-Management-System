@@ -127,13 +127,35 @@ const MyFines = () => {
 
       {/* Warning if user has unpaid fines */}
       {myFines && myFines.fineBalance > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start">
-          <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
-          <div>
-            <p className="font-medium text-yellow-900">Borrowing Restricted</p>
-            <p className="text-yellow-800 text-sm mt-1">
-              You cannot borrow new books until your outstanding fines are paid. Please visit the library to make a payment.
-            </p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start">
+              <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" />
+              <div>
+                <p className="font-medium text-yellow-900">Borrowing Restricted</p>
+                <p className="text-yellow-800 text-sm mt-1">
+                  You cannot borrow new books until your outstanding fines are paid.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                // Create a temporary borrow object with the total fine balance
+                setSelectedBorrow({
+                  _id: 'total_balance',
+                  fine: myFines.fineBalance,
+                  book: {
+                    title: 'Outstanding Fine Balance',
+                    author: 'Multiple Books'
+                  }
+                })
+                setShowPayment(true)
+              }}
+              className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap"
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Pay ${myFines.fineBalance.toFixed(2)} Now
+            </button>
           </div>
         </div>
       )}

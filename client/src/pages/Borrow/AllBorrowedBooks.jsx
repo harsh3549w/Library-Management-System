@@ -167,6 +167,9 @@ const AllBorrowedBooks = () => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {allBorrowedBooks.map((borrowed) => {
+                  // Skip if book data is missing
+                  if (!borrowed.book || !borrowed.user) return null;
+                  
                   const statusInfo = getStatusInfo(borrowed)
                   const StatusIcon = statusInfo.icon
 
@@ -204,7 +207,7 @@ const AllBorrowedBooks = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {formatDate(borrowed.borrowedDate)}
+                          {formatDate(borrowed.borrowDate)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
