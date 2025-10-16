@@ -178,26 +178,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="card">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <button className="flex items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-            <BookOpen className="h-5 w-5 text-blue-600 mr-3" />
-            <span className="text-blue-900 font-medium">Browse Books</span>
-          </button>
-          <button className="flex items-center p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
-            <Library className="h-5 w-5 text-green-600 mr-3" />
-            <span className="text-green-900 font-medium">My Borrowed Books</span>
-          </button>
-          {isAdmin && (
-            <button className="flex items-center p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
-              <Users className="h-5 w-5 text-purple-600 mr-3" />
-              <span className="text-purple-900 font-medium">Manage Users</span>
-            </button>
-          )}
-        </div>
-      </div>
     </div>
   )
 }

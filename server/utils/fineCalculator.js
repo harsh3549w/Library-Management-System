@@ -1,10 +1,10 @@
 export const calculateFine = (dueDate) => {
-  const finePerHour = 0.1; // $0.10 per hour
+  const finePerDay = 1; // ₹1 per day
   const today = new Date();
   
   if (today > dueDate) {
-    const lateHours = Math.ceil((today - dueDate) / (1000 * 60 * 60));
-    const fine = lateHours * finePerHour;
+    const lateDays = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
+    const fine = lateDays * finePerDay;
     return fine;
   }
   return 0;

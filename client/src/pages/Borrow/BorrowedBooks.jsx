@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMyBorrowedBooks, renewBook, clearError, clearSuccess } from '../../store/slices/borrowSlice'
+import { getMyBorrowedBooks, renewBook, returnBorrowedBook, clearError, clearSuccess } from '../../store/slices/borrowSlice'
 import { 
   Library, 
   Calendar, 
@@ -8,7 +8,8 @@ import {
   AlertTriangle,
   CheckCircle,
   RotateCw,
-  DollarSign
+  DollarSign,
+  RotateCcw
 } from 'lucide-react'
 
 const BorrowedBooks = () => {
@@ -37,8 +38,14 @@ const BorrowedBooks = () => {
   }, [error, dispatch])
 
   const handleRenew = (borrowId) => {
-    if (window.confirm('Are you sure you want to renew this book? This will extend the due date by 7 days.')) {
+    if (window.confirm('Are you sure you want to renew this book? This will extend the due date by 10 minutes.')) {
       dispatch(renewBook(borrowId))
+    }
+  }
+
+  const handleReturn = (borrowId) => {
+    if (window.confirm('Are you sure you want to return this book? This action cannot be undone.')) {
+      dispatch(returnBorrowedBook(borrowId))
     }
   }
 
@@ -243,12 +250,12 @@ const BorrowedBooks = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {borrowed.fine ? `$${borrowed.fine.toFixed(2)}` : '-'}
+                        {borrowed.fine ? `₹${borrowed.fine.toFixed(2)}` : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {!borrowed.returnDate && (
-                          <>
-                            {renewalAllowed ? (
+                          <div className="flex flex-col gap-2">
+                            {renewalAllowed && (
                               <button
                                 onClick={() => handleRenew(borrowed._id)}
                                 disabled={loading}
@@ -257,7 +264,16 @@ const BorrowedBooks = () => {
                                 <RotateCw className="h-3 w-3 mr-1" />
                                 Renew
                               </button>
-                            ) : (
+                            )}
+                            <button
+                              onClick={() => handleReturn(borrowed._id)}
+                              disabled={loading}
+                              className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                            >
+                              <RotateCcw className="h-3 w-3 mr-1" />
+                              Return
+                            </button>
+                            {!renewalAllowed && (
                               <div className="text-xs text-gray-500">
                                 {borrowed.renewalCount >= 1 ? (
                                   <span className="text-yellow-600">Already renewed</span>
@@ -268,7 +284,7 @@ const BorrowedBooks = () => {
                                 )}
                               </div>
                             )}
-                          </>
+                          </div>
                         )}
                       </td>
                     </tr>
@@ -295,7 +311,7 @@ const BorrowedBooks = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Due Dates</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Books are typically due in 14 days</li>
+              <li>• Books are typically due in 10 minutes (testing mode)</li>
               <li>• You can renew books before they're due</li>
               <li>• Late returns may incur fines</li>
             </ul>
@@ -303,8 +319,8 @@ const BorrowedBooks = () => {
           <div>
             <h4 className="font-medium text-gray-900 mb-2">Fines</h4>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• $0.50 per day for overdue books</li>
-              <li>• Maximum fine of $10.00 per book</li>
+              <li>• ₹1 per day for overdue books</li>
+              <li>• No maximum fine limit</li>
               <li>• Fines must be paid before borrowing more books</li>
             </ul>
           </div>

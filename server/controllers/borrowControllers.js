@@ -45,7 +45,7 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   book.availability = book.quantity > 0;
   await book.save();
   
-  const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const dueDate = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes for testing
   
   
   const borrow = await Borrow.create({
@@ -111,7 +111,7 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
   book.availability = book.quantity > 0;
   await book.save();
   
-  const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const dueDate = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes for testing
   
   const borrow = await Borrow.create({
     user: {
@@ -140,6 +140,77 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Book borrowed successfully! Due date: " + dueDate.toLocaleDateString(),
+    borrow
+  });
+});
+
+// User returns their own borrowed book
+export const returnMyBorrowedBook = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params; // borrow id
+  const user = req.user;
+
+  const borrow = await Borrow.findById(id).populate('book');
+  if (!borrow) {
+    return next(new ErrorHandler("Borrow record not found", 404));
+  }
+
+  // Check if user owns this borrow record
+  if (borrow.user.id.toString() !== user._id.toString()) {
+    return next(new ErrorHandler("You can only return your own borrowed books", 403));
+  }
+
+  // Check if book is already returned
+  if (borrow.returnDate) {
+    return next(new ErrorHandler("Book has already been returned", 400));
+  }
+
+  const book = await Book.findById(borrow.book._id);
+  if (!book) {
+    return next(new ErrorHandler("Book not found", 404));
+  }
+
+  // Mark as returned
+  borrow.returnDate = new Date();
+  const fine = calculateFine(borrow.dueDate);
+  borrow.fine = fine;
+  await borrow.save();
+
+  // Update book quantity
+  book.quantity += 1;
+  book.availability = book.quantity > 0;
+  await book.save();
+
+  // Update user's fine balance if there's a fine
+  if (fine > 0) {
+    user.fineBalance += fine;
+    await user.save();
+  }
+
+  // Create transaction record for return
+  await createTransaction({
+    type: 'return',
+    user: user._id,
+    book: borrow.book._id,
+    amount: fine,
+    description: `Returned "${book.title}" by ${book.author}${fine > 0 ? ` with fine of $${fine.toFixed(2)}` : ''}`,
+    metadata: {
+      borrowId: borrow._id,
+      returnDate: borrow.returnDate,
+      fine: fine
+    }
+  });
+
+  // Auto-allocate books to waiting users
+  const { autoAllocateBooks } = await import("../services/autoAllocationService.js");
+  await autoAllocateBooks(borrow.book._id);
+
+  res.status(200).json({
+    success: true,
+    message: fine > 0 
+      ? `Book returned successfully. Fine of $${fine.toFixed(2)} has been added to your account.` 
+      : "Book returned successfully",
+    fine: fine > 0 ? fine : 0,
+    userFineBalance: user.fineBalance,
     borrow
   });
 });
@@ -217,8 +288,9 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
     }
   });
   
-  // Check for reservations and notify users
-  await checkAndNotifyReservations(bookId);
+  // Auto-allocate books to waiting users
+  const { autoAllocateBooks } = await import("../services/autoAllocationService.js");
+  await autoAllocateBooks(bookId);
   
   res.status(200).json({
     success: true,
@@ -266,9 +338,9 @@ export const renewBook = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Cannot renew. This book has been reserved by another user.", 400));
   }
 
-  // Extend due date by 7 days
+  // Extend due date by 10 minutes for testing
   const newDueDate = new Date(borrow.dueDate);
-  newDueDate.setDate(newDueDate.getDate() + 7);
+  newDueDate.setMinutes(newDueDate.getMinutes() + 10);
 
   borrow.dueDate = newDueDate;
   borrow.renewalCount += 1;

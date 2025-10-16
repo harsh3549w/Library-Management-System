@@ -22,6 +22,7 @@ import reportRouter from './routes/reportRouter.js';
 import paymentRouter from './routes/paymentRouter.js';
 import { notifyUsers, notifyOverdueBooks } from './services/notifyUsers.js';
 import { expireOldReservations } from './services/reservationService.js';
+import { processAllocationQueue } from './services/autoAllocationService.js';
 
 export const app = express();
 
@@ -44,6 +45,10 @@ if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
 
 // Initialize reservation expiry service
 expireOldReservations();
+
+// Initialize auto-allocation service (runs every 5 minutes)
+setInterval(processAllocationQueue, 5 * 60 * 1000);
+console.log('Auto-allocation service initialized - checking every 5 minutes');
 
 // Enable CORS
 const allowedOrigins = [process.env.FRONTEND_URL];

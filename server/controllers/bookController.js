@@ -25,6 +25,7 @@ export const addBook = catchAsyncErrors(async (req, res, next) => {
         description,
         price,
         quantity,
+        availability: quantity > 0,
         coverImage
     });
 
@@ -103,9 +104,19 @@ export const updateBook = catchAsyncErrors(async (req, res, next) => {
     if (publicationYear) book.publicationYear = parseInt(publicationYear);
     if (description) book.description = description;
     if (price) book.price = price;
+    const oldQuantity = book.quantity;
     if (quantity) book.quantity = quantity;
     
+    // Update availability based on quantity
+    book.availability = book.quantity > 0;
+    
     await book.save();
+    
+    // Trigger auto-allocation if quantity increased from 0
+    if (oldQuantity === 0 && book.quantity > 0) {
+        const { autoAllocateBooks } = await import("../services/autoAllocationService.js");
+        await autoAllocateBooks(book._id);
+    }
     
     res.status(200).json({
         success: true,

@@ -160,61 +160,21 @@ export const fulfillReservation = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(`Cannot fulfill reservation. User has an outstanding fine balance of $${user.fineBalance.toFixed(2)}`, 403));
   }
 
-  // Decrease book quantity (borrow the book)
-  book.quantity -= 1;
-  book.availability = book.quantity > 0;
-  await book.save();
-
-  const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-  // Create borrow record
-  const borrow = await Borrow.create({
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email
-    },
-    book: book._id,
-    dueDate,
-    price: book.price
-  });
-
-  // Mark reservation as fulfilled
+  // Use auto-allocation service instead of manual borrowing
+  const { autoAllocateBooks } = await import("../services/autoAllocationService.js");
+  
+  // Mark reservation as fulfilled (auto-allocation will handle the borrowing)
   reservation.status = 'fulfilled';
   reservation.fulfilledAt = new Date();
   await reservation.save();
 
-  // Create transaction record
-  const { createTransaction } = await import("./transactionController.js");
-  await createTransaction({
-    type: 'borrow',
-    user: user._id,
-    book: book._id,
-    amount: 0,
-    description: `Borrowed "${book.title}" via reservation fulfillment`,
-    metadata: {
-      borrowId: borrow._id,
-      reservationId: reservation._id,
-      dueDate: dueDate
-    }
-  });
-
-  // Send notification to user
-  try {
-    await sendEmail({
-      email: reservation.user.email,
-      subject: "Reservation Fulfilled - Book Borrowed",
-      message: `Hello ${reservation.user.name},\n\nYour reservation for "${book.title}" has been fulfilled! The book has been borrowed on your behalf.\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease collect it from the library.\n\nBest regards,\nLibrary Team`
-    });
-  } catch (error) {
-    console.error("Failed to send reservation notification:", error);
-  }
+  // Trigger auto-allocation for this book
+  await autoAllocateBooks(book._id);
 
   res.status(200).json({
     success: true,
-    message: "Reservation fulfilled - Book borrowed for user",
-    reservation,
-    borrow
+    message: "Reservation fulfilled - Book will be auto-allocated to user",
+    reservation
   });
 });
 

@@ -86,7 +86,7 @@ const MyFines = () => {
               <div>
                 <p className="text-sm font-medium text-red-600">Outstanding Balance</p>
                 <p className="text-3xl font-bold text-red-900 mt-2">
-                  ${myFines.fineBalance?.toFixed(2) || '0.00'}
+                  ₹{myFines.fineBalance?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="p-3 bg-red-200 rounded-full">
@@ -100,7 +100,7 @@ const MyFines = () => {
               <div>
                 <p className="text-sm font-medium text-green-600">Total Paid</p>
                 <p className="text-3xl font-bold text-green-900 mt-2">
-                  ${myFines.totalFinesPaid?.toFixed(2) || '0.00'}
+                  ₹{myFines.totalFinesPaid?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="p-3 bg-green-200 rounded-full">
@@ -154,7 +154,7 @@ const MyFines = () => {
               className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 whitespace-nowrap"
             >
               <CreditCard className="h-4 w-4 mr-2" />
-              Pay ${myFines.fineBalance.toFixed(2)} Now
+              Pay ₹{myFines.fineBalance.toFixed(2)} Now
             </button>
           </div>
         </div>

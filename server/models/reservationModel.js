@@ -29,8 +29,8 @@ const reservationSchema = new mongoose.Schema({
     type: Date,
     required: true,
     default: function() {
-      // 48 hours from now
-      return new Date(Date.now() + 48 * 60 * 60 * 1000);
+      // 30 minutes from now for testing
+      return new Date(Date.now() + 30 * 60 * 1000);
     }
   },
   status: {

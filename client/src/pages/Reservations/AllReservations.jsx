@@ -2,8 +2,6 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   getAllReservations,
-  fulfillReservation,
-  cancelReservation,
   clearSuccess,
   clearError
 } from '../../store/slices/reservationSlice'
@@ -45,35 +43,6 @@ const AllReservations = () => {
     }
   }, [error, dispatch])
 
-  const handleFulfill = (reservationId) => {
-    if (window.confirm('Mark this reservation as fulfilled? The user will be notified.')) {
-      dispatch(fulfillReservation(reservationId))
-    }
-  }
-
-  const handleCancel = (reservationId) => {
-    if (window.confirm('Are you sure you want to cancel this reservation?')) {
-      dispatch(cancelReservation(reservationId))
-    }
-  }
-
-  // Check if a reservation is the first (oldest) active one for its book
-  const isFirstReservation = (reservation) => {
-    if (reservation.status !== 'active') return false
-    
-    const sameBookReservations = allReservations.filter(
-      r => r.book?._id === reservation.book?._id && r.status === 'active'
-    )
-    
-    if (sameBookReservations.length === 0) return true
-    
-    // Sort by creation date
-    const sortedReservations = [...sameBookReservations].sort(
-      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-    )
-    
-    return sortedReservations[0]._id === reservation._id
-  }
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -219,34 +188,15 @@ const AllReservations = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
+                {/* Queue Position Info */}
                 {reservation.status === 'active' && (
-                  <div className="mt-4 lg:mt-0 lg:ml-6 flex flex-col gap-2">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleFulfill(reservation._id)}
-                        disabled={!isFirstReservation(reservation)}
-                        className={`btn-primary inline-flex items-center ${
-                          !isFirstReservation(reservation) ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        title={!isFirstReservation(reservation) ? 'Fulfill previous reservations first' : 'Fulfill this reservation'}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Fulfill
-                      </button>
-                      <button
-                        onClick={() => handleCancel(reservation._id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition-colors"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Cancel
-                      </button>
-                    </div>
-                    {!isFirstReservation(reservation) && (
-                      <p className="text-xs text-yellow-600 font-medium">
-                        ⚠️ Fulfill previous reservers first
+                  <div className="mt-4 lg:mt-0 lg:ml-6">
+                    <div className="text-sm text-gray-600">
+                      <p className="font-medium">Queue Position</p>
+                      <p className="text-xs text-blue-600">
+                        Will be auto-allocated when book becomes available
                       </p>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>

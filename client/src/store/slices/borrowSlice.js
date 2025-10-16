@@ -51,9 +51,9 @@ export const recordBorrowedBook = createAsyncThunk(
 
 export const returnBorrowedBook = createAsyncThunk(
   'borrow/returnBorrowedBook',
-  async (bookId, { rejectWithValue }) => {
+  async (borrowId, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`${API_URL}/borrow/return-borrowed-book/${bookId}`, {}, {
+      const response = await axios.put(`${API_URL}/borrow/return/${borrowId}`, {}, {
         withCredentials: true,
       })
       return response.data

@@ -56,6 +56,12 @@ const bookSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Pre-save hook to automatically update availability based on quantity
+bookSchema.pre('save', function(next) {
+  this.availability = this.quantity > 0;
+  next();
+});
+
 // Index for ISBN lookups
 bookSchema.index({ isbn: 1 });
 

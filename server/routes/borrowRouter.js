@@ -8,7 +8,8 @@ import {
   getMyFines,
   getAllFines,
   markFineAsPaid,
-  borrowBookForSelf
+  borrowBookForSelf,
+  returnMyBorrowedBook
 } from "../controllers/borrowControllers.js";
 import { isAuthenticated, isAuthorized } from "../middlewares/authMiddleware.js";
 
@@ -24,6 +25,7 @@ router.put("/mark-fine-paid/:borrowId", isAuthenticated, isAuthorized("Admin"), 
 // User routes
 router.post("/borrow/:id", isAuthenticated, borrowBookForSelf);
 router.get("/my-borrowed-books", isAuthenticated, getMyBorrowedBooks);
+router.put("/return/:id", isAuthenticated, returnMyBorrowedBook);
 router.put("/renew/:borrowId", isAuthenticated, renewBook);
 router.get("/my-fines", isAuthenticated, getMyFines);
 

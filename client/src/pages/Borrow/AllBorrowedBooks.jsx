@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBorrowedBooksForAdmin, returnBorrowedBook } from '../../store/slices/borrowSlice'
+import { getBorrowedBooksForAdmin } from '../../store/slices/borrowSlice'
 import { 
   Library, 
   Calendar, 
   Clock,
   AlertTriangle,
   CheckCircle,
-  RotateCcw,
   User
 } from 'lucide-react'
 
 const AllBorrowedBooks = () => {
-  const [selectedBook, setSelectedBook] = useState(null)
-  const [showReturnModal, setShowReturnModal] = useState(false)
-
   const dispatch = useDispatch()
   const { allBorrowedBooks, loading } = useSelector((state) => state.borrow)
 
@@ -70,11 +66,6 @@ const AllBorrowedBooks = () => {
     }
   }
 
-  const handleReturn = (bookId) => {
-    dispatch(returnBorrowedBook(bookId))
-    setShowReturnModal(false)
-    setSelectedBook(null)
-  }
 
   const stats = [
     {
@@ -228,16 +219,7 @@ const AllBorrowedBooks = () => {
                         {borrowed.fine ? `$${borrowed.fine.toFixed(2)}` : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => {
-                            setSelectedBook(borrowed)
-                            setShowReturnModal(true)
-                          }}
-                          className="text-blue-600 hover:text-blue-900 flex items-center"
-                        >
-                          <RotateCcw className="h-4 w-4 mr-1" />
-                          Return
-                        </button>
+                        <span className="text-gray-500">-</span>
                       </td>
                     </tr>
                   )
@@ -256,43 +238,6 @@ const AllBorrowedBooks = () => {
         </div>
       )}
 
-      {/* Return Confirmation Modal */}
-      {showReturnModal && selectedBook && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="mt-3 text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
-                <RotateCcw className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mt-4">Return Book</h3>
-              <div className="mt-2 px-7 py-3">
-                <p className="text-sm text-gray-500">
-                  Are you sure you want to return "{selectedBook.book.title}" borrowed by {selectedBook.user.name}?
-                </p>
-                {selectedBook.fine > 0 && (
-                  <p className="text-sm text-red-600 mt-2">
-                    Fine amount: ${selectedBook.fine.toFixed(2)}
-                  </p>
-                )}
-              </div>
-              <div className="flex justify-center space-x-4 mt-4">
-                <button
-                  onClick={() => setShowReturnModal(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => handleReturn(selectedBook.book._id)}
-                  className="btn-primary"
-                >
-                  Confirm Return
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
