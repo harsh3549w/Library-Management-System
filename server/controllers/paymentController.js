@@ -27,9 +27,61 @@ const getRazorpayInstance = () => {
   return razorpay;
 };
 
+// Create Razorpay order for total fine balance payment
+export const createTotalBalancePaymentOrder = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+  
+  // Get user's total fine balance
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ErrorHandler('User not found', 404));
+  }
+  
+  if (user.fineBalance <= 0) {
+    return next(new ErrorHandler('No outstanding fines to pay', 400));
+  }
+  
+  // Create Razorpay order for total balance
+  const shortReceiptId = `total_balance_${Date.now()}`.substring(0, 40);
+  
+  const options = {
+    amount: Math.round(user.fineBalance * 100), // Convert to paise
+    currency: 'INR',
+    receipt: shortReceiptId,
+    notes: {
+      userId: userId.toString(),
+      type: 'total_balance_payment',
+      description: 'Total outstanding fine balance payment'
+    }
+  };
+  
+  try {
+    const razorpayInstance = getRazorpayInstance();
+    const order = await razorpayInstance.orders.create(options);
+    
+    res.status(200).json({
+      success: true,
+      orderId: order.id,
+      amount: user.fineBalance,
+      currency: order.currency,
+      key: process.env.RAZORPAY_KEY_ID,
+      type: 'total_balance',
+      description: 'Total Outstanding Fine Balance'
+    });
+  } catch (error) {
+    console.error('Razorpay total balance order creation error:', error);
+    return next(new ErrorHandler(`Failed to create payment order: ${error.message}`, 500));
+  }
+});
+
 // Create Razorpay order for fine payment
 export const createFinePaymentOrder = catchAsyncErrors(async (req, res, next) => {
   const { borrowId } = req.params;
+  
+  // Handle special case for total balance
+  if (borrowId === 'total_balance') {
+    return createTotalBalancePaymentOrder(req, res, next);
+  }
   
   const borrow = await Borrow.findById(borrowId).populate('book');
   if (!borrow) {
@@ -87,7 +139,8 @@ export const verifyPayment = catchAsyncErrors(async (req, res, next) => {
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-    borrowId
+    borrowId,
+    paymentType
   } = req.body;
   
   // Verify signature
@@ -103,7 +156,66 @@ export const verifyPayment = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler('Payment verification failed', 400));
   }
   
-  // Payment is authentic, update records
+  // Handle total balance payment
+  if (paymentType === 'total_balance' || borrowId === 'total_balance') {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return next(new ErrorHandler('User not found', 404));
+    }
+    
+    if (user.fineBalance <= 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'No outstanding fines to pay'
+      });
+    }
+    
+    const totalFineAmount = user.fineBalance;
+    
+    // Mark all unpaid fines as paid
+    await Borrow.updateMany(
+      {
+        'user.id': userId,
+        finePaid: false,
+        fine: { $gt: 0 }
+      },
+      {
+        $set: { finePaid: true }
+      }
+    );
+    
+    // Update user balance
+    user.totalFinesPaid += totalFineAmount;
+    user.fineBalance = 0;
+    await user.save();
+    
+    // Create transaction record for total balance payment
+    await createTransaction({
+      type: 'fine_payment',
+      user: user._id,
+      amount: totalFineAmount,
+      paymentMethod: 'online',
+      paymentStatus: 'completed',
+      description: `Total fine balance payment of ₹${totalFineAmount.toFixed(2)} via Razorpay`,
+      metadata: {
+        razorpayOrderId: razorpay_order_id,
+        razorpayPaymentId: razorpay_payment_id,
+        paymentGateway: 'razorpay',
+        paymentType: 'total_balance'
+      }
+    });
+    
+    return res.status(200).json({
+      success: true,
+      message: `Total fine balance of ₹${totalFineAmount.toFixed(2)} paid successfully!`,
+      userFineBalance: user.fineBalance,
+      totalFinesPaid: user.totalFinesPaid
+    });
+  }
+  
+  // Handle individual fine payment
   const borrow = await Borrow.findById(borrowId).populate('book');
   if (!borrow) {
     return next(new ErrorHandler('Borrow record not found', 404));

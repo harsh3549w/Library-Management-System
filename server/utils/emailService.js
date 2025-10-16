@@ -6,17 +6,23 @@ export const sendEmail = async (options) => {
     port: process.env.SMTP_PORT,
     secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.SMTP_MAIL,
+      pass: process.env.SMTP_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: process.env.SMTP_FROM_EMAIL,
+    from: process.env.SMTP_MAIL,
     to: options.email,
     subject: options.subject,
-    html: options.message,
+    text: options.message, // Changed from html to text for plain text emails
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Email sent successfully to ${options.email}`);
+  } catch (error) {
+    console.error('Email sending failed:', error);
+    throw error;
+  }
 };

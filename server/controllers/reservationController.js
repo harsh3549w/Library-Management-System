@@ -192,11 +192,13 @@ export const checkAndNotifyReservations = async (bookId) => {
     if (reservation) {
       // Notify user that book is available
       try {
+        console.log(`Attempting to send book available notification to ${reservation.user.email}`);
         await sendEmail({
           email: reservation.user.email,
           subject: "Reserved Book Now Available",
           message: `Hello ${reservation.user.name},\n\nGood news! The book "${reservation.book.title}" that you reserved is now available. Please visit the library to borrow it within 48 hours.\n\nBest regards,\nLibrary Team`
         });
+        console.log(`✅ Book available notification sent successfully to ${reservation.user.email}`);
 
         reservation.notified = true;
         await reservation.save();

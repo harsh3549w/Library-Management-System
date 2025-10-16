@@ -140,13 +140,15 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
 
   // Send email notification
   try {
+    console.log(`Attempting to send borrow notification to ${user.email}`);
     await sendEmail({
       email: user.email,
       subject: "Book Successfully Borrowed",
       message: `Hello ${user.name},\n\nYour book has been successfully borrowed!\n\nBook Details:\n• Title: "${book.title}"\n• Author: ${book.author}\n• ISBN: ${book.isbn || 'N/A'}\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease return the book by the due date to avoid late fees.\n\nBest regards,\nLibrary Team`
     });
+    console.log(`✅ Borrow notification sent successfully to ${user.email}`);
   } catch (error) {
-    console.error("Failed to send borrow notification:", error);
+    console.error("❌ Failed to send borrow notification:", error);
   }
   
   res.status(200).json({

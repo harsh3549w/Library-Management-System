@@ -48,6 +48,27 @@ export const RazorpayPayment = ({ borrow, onClose, onSuccess }) => {
         name: 'Library Management System',
         description: `Fine payment for "${bookTitle}"`,
         order_id: orderId,
+        config: {
+          display: {
+            blocks: {
+              utib: { //name of the bank
+                name: 'Pay using Razorpay',
+                instruments: [
+                  {
+                    method: 'upi'
+                  },
+                  {
+                    method: 'card'
+                  }
+                ]
+              }
+            },
+            sequence: ['block.utib'],
+            preferences: {
+              show_default_blocks: true
+            }
+          }
+        },
         handler: async function (response) {
           try {
             // Verify payment
@@ -57,7 +78,8 @@ export const RazorpayPayment = ({ borrow, onClose, onSuccess }) => {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                borrowId: borrow._id
+                borrowId: borrow._id,
+                paymentType: borrow._id === 'total_balance' ? 'total_balance' : 'individual'
               },
               { withCredentials: true }
             )
