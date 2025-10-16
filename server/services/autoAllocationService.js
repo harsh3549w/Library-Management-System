@@ -113,8 +113,8 @@ export const autoAllocateBooks = async (bookId) => {
         // Send notification to user
         await sendEmail({
           email: user.email,
-          subject: "Book Auto-Allocated - Ready for Pickup",
-          message: `Hello ${user.name},\n\nGreat news! The book "${book.title}" that you reserved has been automatically allocated to you.\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease visit the library to collect your book.\n\nBest regards,\nLibrary Team`
+          subject: "Reserved Book Auto-Allocated - Ready for Pickup",
+          message: `Hello ${user.name},\n\nGreat news! The book you reserved has been automatically allocated to you.\n\nBook Details:\n• Title: "${book.title}"\n• Author: ${book.author}\n• ISBN: ${book.isbn || 'N/A'}\n\nThis book was allocated to you via the reservation system (first-come-first-served queue).\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease visit the library to collect your book. Remember to return it by the due date to avoid late fees.\n\nBest regards,\nLibrary Team`
         });
 
         console.log(`Successfully auto-allocated book "${book.title}" to user ${user.name}`);

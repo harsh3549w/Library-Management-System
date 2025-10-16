@@ -7,6 +7,7 @@ import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
 import { calculateFine } from "../utils/fineCalculator.js";
 import { checkAndNotifyReservations } from "./reservationController.js";
 import { createTransaction } from "./transactionController.js";
+import { sendEmail } from "../utils/emailService.js";
 
 export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
@@ -136,6 +137,17 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
       dueDate: dueDate
     }
   });
+
+  // Send email notification
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Book Successfully Borrowed",
+      message: `Hello ${user.name},\n\nYour book has been successfully borrowed!\n\nBook Details:\n• Title: "${book.title}"\n• Author: ${book.author}\n• ISBN: ${book.isbn || 'N/A'}\n\nDue Date: ${dueDate.toLocaleDateString()}\n\nPlease return the book by the due date to avoid late fees.\n\nBest regards,\nLibrary Team`
+    });
+  } catch (error) {
+    console.error("Failed to send borrow notification:", error);
+  }
   
   res.status(200).json({
     success: true,
@@ -356,7 +368,7 @@ export const renewBook = catchAsyncErrors(async (req, res, next) => {
     description: `Renewed "${borrow.book.title}" - Extended due date to ${newDueDate.toLocaleDateString()}`,
     metadata: {
       borrowId: borrow._id,
-      oldDueDate: new Date(borrow.dueDate.getTime() - 7 * 24 * 60 * 60 * 1000),
+      oldDueDate: new Date(borrow.dueDate.getTime() - 10 * 60 * 1000), // 10 minutes for testing
       newDueDate: newDueDate
     }
   });
