@@ -155,3 +155,77 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     sendToken(user, 200, "Password reset successfully", res);
 });
+
+// Update user information
+export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
+    const { name, email, phone, currentPassword, newPassword } = req.body;
+    
+    // Get current user
+    const user = await User.findById(req.user._id);
+    if (!user) {
+        return next(new ErrorHandler("User not found", 404));
+    }
+
+    // Validate required fields
+    if (!name || !email || !phone) {
+        return next(new ErrorHandler("Name, email, and phone are required", 400));
+    }
+
+    // Check if email is already taken by another user
+    if (email !== user.email) {
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
+            return next(new ErrorHandler("Email is already taken", 400));
+        }
+    }
+
+    // Update basic information
+    user.name = name.trim();
+    user.email = email.toLowerCase().trim();
+    user.phone = phone.trim();
+
+    // Handle password update if provided
+    if (newPassword && newPassword.trim() !== '') {
+        if (!currentPassword || currentPassword.trim() === '') {
+            return next(new ErrorHandler("Current password is required to change password", 400));
+        }
+
+        // Verify current password
+        const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+        if (!isCurrentPasswordValid) {
+            return next(new ErrorHandler("Current password is incorrect", 400));
+        }
+
+        // Validate new password
+        if (newPassword.length < 6) {
+            return next(new ErrorHandler("New password must be at least 6 characters", 400));
+        }
+
+        // Hash and update password
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedNewPassword;
+    }
+
+    // Save updated user
+    await user.save();
+
+    // Send response with updated user data (excluding password)
+    const updatedUser = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        accountVerified: user.accountVerified,
+        fineBalance: user.fineBalance,
+        totalFinesPaid: user.totalFinesPaid,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+    };
+
+    res.status(200).json({
+        success: true,
+        message: "User information updated successfully",
+        user: updatedUser
+    });
+});

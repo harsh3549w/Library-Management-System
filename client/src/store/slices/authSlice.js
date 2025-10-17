@@ -82,6 +82,20 @@ export const resetPassword = createAsyncThunk(
   }
 )
 
+export const updateUserInfo = createAsyncThunk(
+  'auth/updateUserInfo',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${API_URL}/auth/update-info`, userData, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update user information')
+    }
+  }
+)
+
 const initialState = {
   user: null,
   isAuthenticated: false,
@@ -187,6 +201,20 @@ const authSlice = createSlice({
         state.passwordResetSent = false
       })
       .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Update User Info
+      .addCase(updateUserInfo.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateUserInfo.fulfilled, (state, action) => {
+        state.loading = false
+        state.user = action.payload.user
+        state.success = true
+      })
+      .addCase(updateUserInfo.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

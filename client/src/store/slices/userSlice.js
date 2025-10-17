@@ -32,6 +32,20 @@ export const registerNewAdmin = createAsyncThunk(
   }
 )
 
+export const registerNewUser = createAsyncThunk(
+  'users/registerNewUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/users/add/new-user`, userData, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to add new user')
+    }
+  }
+)
+
 const initialState = {
   users: [],
   loading: false,
@@ -76,6 +90,20 @@ const userSlice = createSlice({
         state.success = true
       })
       .addCase(registerNewAdmin.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Register New User
+      .addCase(registerNewUser.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(registerNewUser.fulfilled, (state, action) => {
+        state.loading = false
+        state.users.push(action.payload.user)
+        state.success = true
+      })
+      .addCase(registerNewUser.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

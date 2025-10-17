@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
 
+    phone: {
+      type: String,
+      required: [true, "Please provide your phone number"],
+      trim: true,
+    },
+
     password: {
       type: String,
       required: [true, "Please provide a password"],

@@ -36,6 +36,8 @@ import ManageFines from './pages/Fines/ManageFines'
 import MyTransactions from './pages/Transactions/MyTransactions'
 import AllTransactions from './pages/Transactions/AllTransactions'
 import Reports from './pages/Reports/Reports'
+import AddUser from './pages/Users/AddUser'
+import EditInfo from './pages/Users/EditInfo'
 
 function App() {
   const dispatch = useDispatch()
@@ -116,6 +118,7 @@ function App() {
           <Route path="book-suggestions" element={<BookSuggestions />} />
           <Route path="my-fines" element={<MyFines />} />
           <Route path="my-transactions" element={<MyTransactions />} />
+          <Route path="edit-info" element={<EditInfo />} />
           
           {/* Admin Routes */}
           <Route path="admin/add-book" element={<AdminRoute><AddBook /></AdminRoute>} />
@@ -127,6 +130,7 @@ function App() {
           <Route path="admin/all-transactions" element={<AdminRoute><AllTransactions /></AdminRoute>} />
           <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
+          <Route path="admin/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
         </Route>
 
         {/* Catch all route */}

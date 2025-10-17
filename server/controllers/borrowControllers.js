@@ -9,6 +9,57 @@ import { checkAndNotifyReservations } from "./reservationController.js";
 import { createTransaction } from "./transactionController.js";
 import { sendEmail } from "../utils/emailService.js";
 
+// Update fines for all overdue books
+export const updateOverdueFines = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const today = new Date();
+    
+    // Find all overdue books that haven't been returned
+    const overdueBooks = await Borrow.find({
+      dueDate: { $lt: today },
+      returnDate: null
+    }).populate('book');
+
+    let updatedCount = 0;
+    let totalFines = 0;
+
+    for (const borrow of overdueBooks) {
+      const fine = calculateFine(borrow.dueDate);
+      
+      if (fine > 0 && borrow.fine !== fine) {
+        // Store old fine before updating
+        const oldFine = borrow.fine || 0;
+        
+        // Update the borrow record with new fine
+        borrow.fine = fine;
+        await borrow.save();
+
+        // Update user's fine balance
+        const user = await User.findById(borrow.user.id);
+        if (user) {
+          // Remove old fine from balance and add new fine
+          user.fineBalance = Math.max(0, user.fineBalance - oldFine) + fine;
+          await user.save();
+        }
+
+        updatedCount++;
+        totalFines += fine;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Updated fines for ${updatedCount} overdue books`,
+      updatedCount,
+      totalFines
+    });
+
+  } catch (error) {
+    console.error("Error updating overdue fines:", error);
+    return next(new ErrorHandler("Failed to update overdue fines", 500));
+  }
+});
+
 export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
   const { email } = req.body;
@@ -230,7 +281,34 @@ export const returnMyBorrowedBook = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getMyBorrowedBooks = catchAsyncErrors(async (req, res, next) => {
-  const borrows = await Borrow.find({ "user.id": req.user._id }).populate("book");
+  const userId = req.user._id;
+  
+  // First, update fines for overdue books
+  const today = new Date();
+  const overdueBooks = await Borrow.find({
+    "user.id": userId,
+    dueDate: { $lt: today },
+    returnDate: null
+  });
+
+  // Calculate and update fines for overdue books
+  for (const borrow of overdueBooks) {
+    const fine = calculateFine(borrow.dueDate);
+    if (fine > 0 && borrow.fine !== fine) {
+      const oldFine = borrow.fine || 0;
+      borrow.fine = fine;
+      await borrow.save();
+
+      // Update user's fine balance
+      const user = await User.findById(userId);
+      if (user) {
+        user.fineBalance = Math.max(0, user.fineBalance - oldFine) + fine;
+        await user.save();
+      }
+    }
+  }
+
+  const borrows = await Borrow.find({ "user.id": userId }).populate("book");
 
   res.status(200).json({
     success: true,
@@ -387,6 +465,31 @@ export const renewBook = catchAsyncErrors(async (req, res, next) => {
 export const getMyFines = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
 
+  // First, update fines for overdue books
+  const today = new Date();
+  const overdueBooks = await Borrow.find({
+    "user.id": userId,
+    dueDate: { $lt: today },
+    returnDate: null
+  });
+
+  // Calculate and update fines for overdue books
+  for (const borrow of overdueBooks) {
+    const fine = calculateFine(borrow.dueDate);
+    if (fine > 0 && borrow.fine !== fine) {
+      const oldFine = borrow.fine || 0;
+      borrow.fine = fine;
+      await borrow.save();
+
+      // Update user's fine balance
+      const user = await User.findById(userId);
+      if (user) {
+        user.fineBalance = Math.max(0, user.fineBalance - oldFine) + fine;
+        await user.save();
+      }
+    }
+  }
+
   // Get all borrows with fines
   const borrowsWithFines = await Borrow.find({
     "user.id": userId,
@@ -473,5 +576,75 @@ export const markFineAsPaid = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: `Fine of $${borrow.fine.toFixed(2)} marked as paid`,
     userFineBalance: user.fineBalance
+  });
+});
+
+// Extend due date for a specific user's book
+export const extendDueDate = catchAsyncErrors(async (req, res, next) => {
+  const { email, isbn } = req.body;
+
+  if (!email || !isbn) {
+    return next(new ErrorHandler("Email and ISBN are required", 400));
+  }
+
+  // Find user by email
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    return next(new ErrorHandler("User not found with this email", 404));
+  }
+
+  // Find the book by ISBN
+  const book = await Book.findOne({ 
+    isbn: isbn.trim() 
+  });
+  if (!book) {
+    return next(new ErrorHandler("Book not found with this ISBN", 404));
+  }
+
+  // Find the active borrow record for this user and book
+  const borrow = await Borrow.findOne({
+    "user.id": user._id,
+    book: book._id,
+    returnDate: null // Only active borrows
+  }).populate('book');
+
+  if (!borrow) {
+    return next(new ErrorHandler("No active borrow found for this user and book", 404));
+  }
+
+  // Extend due date by 7 days
+  const currentDueDate = new Date(borrow.dueDate);
+  const newDueDate = new Date(currentDueDate);
+  newDueDate.setDate(newDueDate.getDate() + 7);
+
+  // Update the borrow record
+  borrow.dueDate = newDueDate;
+  borrow.renewed = true;
+  borrow.renewalCount = (borrow.renewalCount || 0) + 1;
+  await borrow.save();
+
+  // Send email notification to user
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Book Due Date Extended",
+      message: `Hello ${user.name},\n\nYour book due date has been extended by the library administrator.\n\nBook Details:\n• Title: "${book.title}"\n• Author: ${book.author}\n• ISBN: ${book.isbn || 'N/A'}\n\nPrevious Due Date: ${currentDueDate.toLocaleDateString()}\nNew Due Date: ${newDueDate.toLocaleDateString()}\n\nPlease return the book by the new due date to avoid late fees.\n\nBest regards,\nLibrary Team`
+    });
+  } catch (emailError) {
+    console.error(`Failed to send extension email to ${user.email}:`, emailError);
+  }
+
+  res.status(200).json({
+    success: true,
+    message: `Due date extended successfully by 7 days for "${book.title}"`,
+    borrow: {
+      _id: borrow._id,
+      bookTitle: book.title,
+      userName: user.name,
+      userEmail: user.email,
+      previousDueDate: currentDueDate,
+      newDueDate: newDueDate,
+      renewalCount: borrow.renewalCount
+    }
   });
 });

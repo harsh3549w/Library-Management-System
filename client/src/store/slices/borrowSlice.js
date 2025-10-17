@@ -134,6 +134,34 @@ export const borrowBookForSelf = createAsyncThunk(
   }
 )
 
+export const extendDueDate = createAsyncThunk(
+  'borrow/extendDueDate',
+  async (extendData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/borrow/extend-due`, extendData, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to extend due date')
+    }
+  }
+)
+
+export const updateOverdueFines = createAsyncThunk(
+  'borrow/updateOverdueFines',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/borrow/update-my-fines`, {}, {
+        withCredentials: true,
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to update overdue fines')
+    }
+  }
+)
+
 const initialState = {
   myBorrowedBooks: [],
   allBorrowedBooks: [],
@@ -281,6 +309,36 @@ const borrowSlice = createSlice({
         state.message = action.payload.message
       })
       .addCase(borrowBookForSelf.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Extend Due Date
+      .addCase(extendDueDate.pending, (state) => {
+        state.loading = true
+        state.error = null
+        state.success = false
+      })
+      .addCase(extendDueDate.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = true
+        state.message = action.payload.message
+      })
+      .addCase(extendDueDate.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+        state.success = false
+      })
+      // Update Overdue Fines
+      .addCase(updateOverdueFines.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateOverdueFines.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = true
+        state.message = action.payload.message
+      })
+      .addCase(updateOverdueFines.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

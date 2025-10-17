@@ -16,7 +16,9 @@ import {
   Upload,
   DollarSign,
   Receipt,
-  PieChart
+  PieChart,
+  UserPlus,
+  Edit
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen }) => {
@@ -29,6 +31,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'Add Book', href: '/admin/add-book', icon: Plus },
+    { name: 'Add User', href: '/admin/add-user', icon: UserPlus },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
     { name: 'All Reservations', href: '/admin/all-reservations', icon: Bookmark },
@@ -46,6 +49,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'My Transactions', href: '/my-transactions', icon: Receipt },
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Book Suggestions', href: '/book-suggestions', icon: ThumbsUp },
+    { name: 'Edit Info', href: '/edit-info', icon: Edit },
   ]
 
   const SidebarContent = () => (

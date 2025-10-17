@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMyBorrowedBooks, renewBook, returnBorrowedBook, clearError, clearSuccess } from '../../store/slices/borrowSlice'
+import { getMyBorrowedBooks, renewBook, returnBorrowedBook, updateOverdueFines, clearError, clearSuccess } from '../../store/slices/borrowSlice'
 import { 
   Library, 
   Calendar, 
@@ -17,7 +17,10 @@ const BorrowedBooks = () => {
   const { myBorrowedBooks, loading, error, success, message } = useSelector((state) => state.borrow)
 
   useEffect(() => {
-    dispatch(getMyBorrowedBooks())
+    // First update overdue fines, then get borrowed books
+    dispatch(updateOverdueFines()).then(() => {
+      dispatch(getMyBorrowedBooks())
+    })
   }, [dispatch])
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getMyFines, clearError, clearSuccess } from '../../store/slices/borrowSlice'
+import { getMyFines, updateOverdueFines, clearError, clearSuccess } from '../../store/slices/borrowSlice'
 import { 
   DollarSign, 
   AlertCircle, 
@@ -19,7 +19,10 @@ const MyFines = () => {
   const [selectedBorrow, setSelectedBorrow] = useState(null)
 
   useEffect(() => {
-    dispatch(getMyFines())
+    // First update overdue fines, then get fines
+    dispatch(updateOverdueFines()).then(() => {
+      dispatch(getMyFines())
+    })
   }, [dispatch])
 
   useEffect(() => {
