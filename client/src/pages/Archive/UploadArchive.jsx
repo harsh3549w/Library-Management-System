@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { uploadArchive, clearSuccess, clearError } from '../../store/slices/archiveSlice'
-import { FileText, Upload, Tag, User, Calendar, AlertCircle, CheckCircle } from 'lucide-react'
+import { FileText, Upload, Tag, User, Calendar } from 'lucide-react'
 
 const UploadArchive = () => {
   const [formData, setFormData] = useState({
@@ -20,6 +20,7 @@ const UploadArchive = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { loading, success, error, message } = useSelector((state) => state.archives)
+  const { user } = useSelector((state) => state.auth)
 
   useEffect(() => {
     if (success) {
@@ -37,6 +38,7 @@ const UploadArchive = () => {
       }, 5000)
     }
   }, [error, dispatch])
+
 
   const handleChange = (e) => {
     setFormData({
@@ -75,6 +77,7 @@ const UploadArchive = () => {
     uploadData.append('category', formData.category)
     uploadData.append('tags', formData.tags)
     uploadData.append('accessLevel', formData.accessLevel)
+    // Always use S3 - no provider selection needed
     if (formData.author) uploadData.append('author', formData.author)
     if (formData.publishedYear) uploadData.append('publishedYear', formData.publishedYear)
 
@@ -260,6 +263,7 @@ const UploadArchive = () => {
             />
             <p className="text-xs text-gray-500 mt-1">Separate tags with commas</p>
           </div>
+
 
           {/* Access Level */}
           <div>

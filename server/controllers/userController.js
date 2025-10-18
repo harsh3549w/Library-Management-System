@@ -17,9 +17,9 @@ export const registerNewAdmin = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Admin avatar is required", 400));
   }
   
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return next(new ErrorHandler("Please fill all fields", 400));
+  const { name, email, password, phone } = req.body;
+  if (!name || !email || !password || !phone) {
+    return next(new ErrorHandler("Please fill all fields including phone number", 400));
   }
   
   const isRegistered = await User.findOne({ email, accountVerified: true });
@@ -42,6 +42,7 @@ export const registerNewAdmin = catchAsyncErrors(async (req, res, next) => {
   const user = await User.create({
     name,
     email,
+    phone,
     password: hashedPassword,
     role: "Admin",
     accountVerified: true,

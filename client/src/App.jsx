@@ -38,6 +38,7 @@ import AllTransactions from './pages/Transactions/AllTransactions'
 import Reports from './pages/Reports/Reports'
 import AddUser from './pages/Users/AddUser'
 import EditInfo from './pages/Users/EditInfo'
+import Profile from './pages/Profile/Profile'
 
 function App() {
   const dispatch = useDispatch()
@@ -118,6 +119,7 @@ function App() {
           <Route path="book-suggestions" element={<BookSuggestions />} />
           <Route path="my-fines" element={<MyFines />} />
           <Route path="my-transactions" element={<MyTransactions />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="edit-info" element={<EditInfo />} />
           
           {/* Admin Routes */}

@@ -1,7 +1,7 @@
 import { Archive } from "../models/archiveModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
-import { uploadMedia, deleteMedia } from "../utils/mediaUploader.js";
+import { uploadToS3, deleteFromS3, checkS3Config } from "../services/s3Service.js";
 
 // Upload archive
 export const uploadArchive = catchAsyncErrors(async (req, res, next) => {
@@ -29,8 +29,14 @@ export const uploadArchive = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("File size should not exceed 50MB", 400));
   }
 
-  // Upload to Cloudinary
-  const uploadResult = await uploadMedia(file, "library-app/archives", "raw");
+  // Check if S3 is configured
+  const s3Config = await checkS3Config();
+  if (!s3Config.configured) {
+    return next(new ErrorHandler("AWS S3 integration is not configured. Please contact administrator.", 500));
+  }
+  
+  // Upload to S3
+  const uploadResult = await uploadToS3(file, title.replace(/[^a-zA-Z0-9.-]/g, '_'));
 
   // Parse tags if provided as string
   let tagsArray = [];
@@ -42,10 +48,11 @@ export const uploadArchive = catchAsyncErrors(async (req, res, next) => {
     title,
     description,
     category,
-    fileType: file.mimetype.split('/')[1],
+    fileType: file.mimetype ? file.mimetype.split('/')[1] : 'unknown',
     fileUrl: uploadResult.url,
-    publicId: uploadResult.public_id,
+    publicId: uploadResult.publicId || uploadResult.etag,
     fileSize: file.size,
+    provider: 's3',
     uploadedBy: {
       id: req.user._id,
       name: req.user.name,
@@ -59,7 +66,7 @@ export const uploadArchive = catchAsyncErrors(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    message: "Archive uploaded successfully",
+    message: `Archive uploaded successfully to S3`,
     archive
   });
 });
@@ -151,11 +158,14 @@ export const deleteArchive = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Not authorized to delete this archive", 403));
   }
 
-  // Delete from Cloudinary
+  // Delete from S3
   try {
-    await deleteMedia(archive.publicId);
+    // Extract file path from S3 URL or use stored publicId
+    const filePath = archive.publicId || `archives/${archive.fileUrl.split('/').pop()}`;
+    await deleteFromS3(filePath);
   } catch (error) {
-    console.error("Failed to delete from Cloudinary:", error);
+    console.error('Failed to delete from S3:', error);
+    // Continue with database deletion even if file deletion fails
   }
 
   await archive.deleteOne();
@@ -218,4 +228,5 @@ export const getArchiveStats = catchAsyncErrors(async (req, res, next) => {
     }
   });
 });
+
 

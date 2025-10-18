@@ -15,6 +15,7 @@ const connect = async () => {
 const createAdmin = async () => {
   const name = process.argv.find(a => a.startsWith("--name="))?.split("=")[1] || "Library Admin";
   const email = process.argv.find(a => a.startsWith("--email="))?.split("=")[1] || "admin@library.com";
+  const phone = process.argv.find(a => a.startsWith("--phone="))?.split("=")[1] || "0000000000";
   const passwordRaw = process.argv.find(a => a.startsWith("--password="))?.split("=")[1] || "password123";
 
   try {
@@ -31,6 +32,7 @@ const createAdmin = async () => {
     const admin = await User.create({
       name,
       email,
+      phone,
       password,
       role: "Admin",
       accountVerified: true,

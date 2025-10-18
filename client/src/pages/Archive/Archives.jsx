@@ -17,7 +17,8 @@ import {
   Search,
   Filter,
   TrendingUp,
-  Upload
+  Upload,
+  Cloud
 } from 'lucide-react'
 
 const Archives = () => {
@@ -222,6 +223,12 @@ const Archives = () => {
                         <div className="flex items-center">
                           <Eye className="h-4 w-4 mr-1" />
                           {archive.views} views
+                        </div>
+                        <div className="flex items-center">
+                          <Cloud className="h-4 w-4 mr-1 text-blue-600" />
+                          <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                            AWS S3
+                          </span>
                         </div>
                       </div>
 

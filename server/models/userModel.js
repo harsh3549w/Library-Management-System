@@ -64,7 +64,11 @@ const userSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  }
 );
 
 // Virtual field to check if user can borrow

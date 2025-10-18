@@ -35,7 +35,12 @@ const archiveSchema = new mongoose.Schema({
   },
   publicId: {
     type: String,
-    required: true
+    required: false // S3 file path or ETag
+  },
+  provider: {
+    type: String,
+    enum: ['s3'],
+    default: 's3'
   },
   fileSize: {
     type: Number,

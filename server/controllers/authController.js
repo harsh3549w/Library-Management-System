@@ -79,9 +79,13 @@ export const logout = catchAsyncErrors(async (req, res, next) => {
 
 export const getUser = catchAsyncErrors(async (req, res, next) => {
     const user = req.user;
+    
+    // Ensure virtual fields are included
+    const userData = user.toJSON();
+    
     res.status(200).json({
         success: true,
-        user
+        user: userData
     });
 });
 
