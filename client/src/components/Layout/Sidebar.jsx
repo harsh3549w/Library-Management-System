@@ -63,12 +63,16 @@ const Sidebar = ({ open, setOpen }) => {
       <div className="flex items-center h-20 px-6 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="h-10 w-10 bg-[#2563EB] rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">L</span>
+            <div className="h-16 w-16 bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm border border-white/50">
+              <img
+                src="/images/iiitdm-logo.jpeg"
+                alt="IIITDM Logo"
+                className="w-full h-full object-cover rounded-lg"
+              />
             </div>
           </div>
           <div className="ml-4">
-            <h1 className="text-xl font-semibold text-gray-700">Library</h1>
+            <h1 className="text-xl font-semibold text-gray-700">E-Library</h1>
           </div>
         </Link>
       </div>

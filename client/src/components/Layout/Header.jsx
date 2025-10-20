@@ -1,11 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search } from 'lucide-react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Menu, Search, User, LogOut, ChevronDown } from 'lucide-react'
+import { logout } from '../../store/slices/authSlice'
 
 const Header = ({ onMenuClick }) => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+  const dropdownRef = useRef(null)
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   // Handle search functionality
   const handleSearch = (e) => {
@@ -20,9 +39,23 @@ const Header = ({ onMenuClick }) => {
     setSearchTerm(e.target.value)
   }
 
+  // Handle logout
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate('/login')
+    setIsProfileDropdownOpen(false)
+  }
+
+  // Handle profile navigation
+  const handleProfileClick = () => {
+    navigate('/profile')
+    setIsProfileDropdownOpen(false)
+  }
+
   return (
     <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-4 mt-4">
       <div className="flex items-center justify-between px-6 py-4">
+
         {/* Mobile menu button */}
         <button
           type="button"
@@ -55,16 +88,38 @@ const Header = ({ onMenuClick }) => {
           <Link to="/contact" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">Contact Us</Link>
         </nav>
 
-        {/* IIITDM Logo and E-Library */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm border border-white/50">
-            <img
-              src="/images/iiitdm-logo.jpeg"
-              alt="IIITDM Logo"
-              className="w-[50px] h-[50px] object-cover rounded-lg"
-            />
-          </div>
-          <span className="text-gray-800 font-medium text-lg">E-Library</span>
+        {/* Right side - User Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+            className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/50 shadow-sm hover:bg-white/80 transition-colors"
+          >
+            <User className="h-5 w-5 text-gray-600" />
+            <span className="text-gray-800 font-medium text-sm">
+              {user?.name || user?.email || 'User'}
+            </span>
+            <ChevronDown className="h-4 w-4 text-gray-600" />
+          </button>
+
+          {/* Dropdown Menu */}
+          {isProfileDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+              <button
+                onClick={handleProfileClick}
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <User className="h-4 w-4" />
+                Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
