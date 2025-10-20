@@ -18,7 +18,8 @@ import {
   Receipt,
   PieChart,
   UserPlus,
-  Edit
+  Edit,
+  Gift
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen }) => {
@@ -40,6 +41,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'All Transactions', href: '/admin/all-transactions', icon: Receipt },
     { name: 'Reports', href: '/admin/reports', icon: PieChart },
     { name: 'Manage Suggestions', href: '/admin/manage-suggestions', icon: BarChart3 },
+    { name: 'Manage Donations', href: '/admin/manage-donations', icon: Gift },
   ] : [
     // User navigation
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -50,6 +52,8 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'My Transactions', href: '/my-transactions', icon: Receipt },
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Book Suggestions', href: '/book-suggestions', icon: ThumbsUp },
+    { name: 'Donate Book', href: '/donate-book', icon: Gift },
+    { name: 'My Donations', href: '/my-donations', icon: BookOpen },
     { name: 'Edit Info', href: '/edit-info', icon: Edit },
   ]
 

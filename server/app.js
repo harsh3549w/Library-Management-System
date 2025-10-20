@@ -21,6 +21,7 @@ import transactionRouter from './routes/transactionRouter.js';
 import reportRouter from './routes/reportRouter.js';
 import paymentRouter from './routes/paymentRouter.js';
 import recommendationRouter from './routes/recommendationRouter.js';
+import donationRouter from './routes/donationRouter.js';
 import { notifyUsers, notifyOverdueBooks } from './services/notifyUsers.js';
 import { expireOldReservations } from './services/reservationService.js';
 import { processAllocationQueue } from './services/autoAllocationService.js';
@@ -109,6 +110,7 @@ app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/report', reportRouter);
 app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/recommendations', recommendationRouter);
+app.use('/api/v1/donation', donationRouter);
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {

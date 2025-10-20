@@ -39,6 +39,9 @@ import Reports from './pages/Reports/Reports'
 import AddUser from './pages/Users/AddUser'
 import EditInfo from './pages/Users/EditInfo'
 import Profile from './pages/Profile/Profile'
+import DonateBook from './pages/Donations/DonateBook'
+import MyDonations from './pages/Donations/MyDonations'
+import ManageDonations from './pages/Donations/ManageDonations'
 
 function App() {
   const dispatch = useDispatch()
@@ -122,6 +125,8 @@ function App() {
           <Route path="my-transactions" element={<MyTransactions />} />
           <Route path="profile" element={<Profile />} />
           <Route path="edit-info" element={<EditInfo />} />
+          <Route path="donate-book" element={<DonateBook />} />
+          <Route path="my-donations" element={<MyDonations />} />
           
           {/* Admin Routes */}
           <Route path="admin/add-book" element={<AdminRoute><AddBook /></AdminRoute>} />
@@ -134,6 +139,7 @@ function App() {
           <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
           <Route path="admin/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
+          <Route path="admin/manage-donations" element={<AdminRoute><ManageDonations /></AdminRoute>} />
         </Route>
 
         {/* Catch all route */}

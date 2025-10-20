@@ -9,6 +9,7 @@ import reservationReducer from './slices/reservationSlice'
 import archiveReducer from './slices/archiveSlice'
 import transactionReducer from './slices/transactionSlice'
 import reportReducer from './slices/reportSlice'
+import donationReducer from './slices/donationSlice'
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     archives: archiveReducer,
     transactions: transactionReducer,
     reports: reportReducer,
+    donations: donationReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

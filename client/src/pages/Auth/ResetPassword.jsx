@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { resetPassword } from '../../store/slices/authSlice'
+import { resetPassword, clearError as clearAuthError } from '../../store/slices/authSlice'
 import { BookOpen, Eye, EyeOff } from 'lucide-react'
 
 const ResetPassword = () => {
@@ -16,7 +16,7 @@ const ResetPassword = () => {
   const { token } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { loading, isAuthenticated } = useSelector((state) => state.auth)
+  const { loading, isAuthenticated, success, error } = useSelector((state) => state.auth)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,17 +24,53 @@ const ResetPassword = () => {
     }
   }, [isAuthenticated, navigate])
 
+  // Clear any existing auth errors when component mounts
+  useEffect(() => {
+    dispatch(clearAuthError())
+  }, [dispatch])
+
+  // Handle successful password reset
+  useEffect(() => {
+    if (success) {
+      dispatch(clearAuthError())
+      navigate('/login', { 
+        state: { message: 'Password reset successfully! Please login with your new password.' }
+      })
+    }
+  }, [success, dispatch, navigate])
+
+  // Real-time validation for password matching
+  useEffect(() => {
+    if (formData.password && formData.confirmPassword && formData.confirmPassword.length > 0) {
+      if (formData.password !== formData.confirmPassword) {
+        setErrors(prev => ({
+          ...prev,
+          confirmPassword: 'Password & confirm password do not match'
+        }))
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          confirmPassword: ''
+        }))
+      }
+    }
+  }, [formData.password, formData.confirmPassword])
+
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.password) {
+    if (!formData.password || formData.password.trim() === '') {
       newErrors.password = 'Password is required'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters'
+    } else if (formData.password.length > 16) {
+      newErrors.password = 'Password must not exceed 16 characters'
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match'
+    if (!formData.confirmPassword || formData.confirmPassword.trim() === '') {
+      newErrors.confirmPassword = 'Please confirm your password'
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Password & confirm password do not match'
     }
 
     setErrors(newErrors)
@@ -42,14 +78,26 @@ const ResetPassword = () => {
   }
 
   const handleChange = (e) => {
+    const { name, value } = e.target
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     })
-    if (errors[e.target.name]) {
+    
+    // Clear errors for the current field
+    if (errors[name]) {
       setErrors({
         ...errors,
-        [e.target.name]: '',
+        [name]: '',
+      })
+    }
+    
+    // Clear confirm password error when password changes
+    if (name === 'password' && errors.confirmPassword) {
+      setErrors({
+        ...errors,
+        confirmPassword: '',
       })
     }
   }
@@ -57,7 +105,13 @@ const ResetPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (validateForm()) {
-      dispatch(resetPassword({ token, password: formData.password }))
+      // Clear any existing auth errors before submitting
+      dispatch(clearAuthError())
+      dispatch(resetPassword({ 
+        token, 
+        password: formData.password, 
+        confirmPassword: formData.confirmPassword 
+      }))
     }
   }
 
@@ -137,6 +191,9 @@ const ResetPassword = () => {
                 </button>
               </div>
               {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword}</p>}
+              {formData.password && formData.confirmPassword && formData.password === formData.confirmPassword && (
+                <p className="mt-1 text-sm text-green-600">✓ Passwords match</p>
+              )}
             </div>
           </div>
 
