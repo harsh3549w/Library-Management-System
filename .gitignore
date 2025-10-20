@@ -76,10 +76,12 @@ restart-backend.bat
 server/testCloudinary.js
 server/createTestUser.js
 server/createUserWithFines.js
+server/createAdmin.js
 server/checkPhoneField.js
 server/testS3Integration.js
 server/test*.js
 server/validateAWSCredentials.js
+server/seedDatabase.js
 
 # Uploads and temp files
 /tmp/
