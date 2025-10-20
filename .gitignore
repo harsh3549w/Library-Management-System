@@ -35,6 +35,7 @@ Thumbs.db
 desktop.ini
 
 # Documentation and Helper Files (temporary guides)
+*.md
 CLOUDINARY_SETUP.md
 PAYMENT_GATEWAY_INTEGRATION.md
 RAZORPAY_SETUP_INSTRUCTIONS.md
@@ -51,6 +52,9 @@ IMAGE_UPLOAD_TROUBLESHOOTING.md
 LOGIN_INSTRUCTIONS.md
 SEED_INSTRUCTIONS.md
 QUICK_START.md
+FIRST_TIME_LOGIN_FEATURE.md
+MANDATORY_PASSWORD_CHANGE_IMPLEMENTATION.md
+OTP_AUTHENTICATION_IMPLEMENTATION.md
 
 # AWS S3 Integration Guides
 AWS_S3_SETUP_GUIDE.md
@@ -72,6 +76,10 @@ restart-backend.bat
 server/testCloudinary.js
 server/createTestUser.js
 server/createUserWithFines.js
+server/checkPhoneField.js
+server/testS3Integration.js
+server/test*.js
+server/validateAWSCredentials.js
 
 # Uploads and temp files
 /tmp/
