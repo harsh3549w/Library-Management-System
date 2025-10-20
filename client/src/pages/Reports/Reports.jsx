@@ -143,7 +143,7 @@ const Reports = () => {
                   <div>
                     <p className="text-sm font-medium text-yellow-600">Total Fines</p>
                     <p className="text-3xl font-bold text-yellow-900 mt-2">
-                      ${libraryStats.fines.totalFines?.toFixed(2) || '0.00'}
+                      ₹{libraryStats.fines.totalFines?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                   <div className="p-3 bg-yellow-200 rounded-full">
@@ -157,7 +157,7 @@ const Reports = () => {
                   <div>
                     <p className="text-sm font-medium text-green-600">Paid Fines</p>
                     <p className="text-3xl font-bold text-green-900 mt-2">
-                      ${libraryStats.fines.paidFines?.toFixed(2) || '0.00'}
+                      ₹{libraryStats.fines.paidFines?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                   <div className="p-3 bg-green-200 rounded-full">
@@ -171,7 +171,7 @@ const Reports = () => {
                   <div>
                     <p className="text-sm font-medium text-red-600">Unpaid Fines</p>
                     <p className="text-3xl font-bold text-red-900 mt-2">
-                      ${libraryStats.fines.unpaidFines?.toFixed(2) || '0.00'}
+                      ₹{libraryStats.fines.unpaidFines?.toFixed(2) || '0.00'}
                     </p>
                   </div>
                   <div className="p-3 bg-red-200 rounded-full">

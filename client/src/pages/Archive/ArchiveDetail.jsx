@@ -227,8 +227,8 @@ const ArchiveDetail = () => {
             onClick={handleDownload}
             className="btn-primary inline-flex items-center flex-1"
           >
-            <Download className="h-4 w-4 mr-2" />
-            Download PDF
+            <Eye className="h-4 w-4 mr-2" />
+            View PDF
           </button>
           {isAdmin && (
             <button

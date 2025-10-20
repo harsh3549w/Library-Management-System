@@ -135,7 +135,7 @@ const AllTransactions = () => {
               <div>
                 <p className="text-sm font-medium text-green-600">Fine Revenue</p>
                 <p className="text-3xl font-bold text-green-900 mt-2">
-                  ${stats.fineRevenue?.toFixed(2) || '0.00'}
+                  ₹{stats.fineRevenue?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="p-3 bg-green-200 rounded-full">
@@ -149,7 +149,7 @@ const AllTransactions = () => {
               <div>
                 <p className="text-sm font-medium text-blue-600">Book Purchases</p>
                 <p className="text-3xl font-bold text-blue-900 mt-2">
-                  ${stats.bookPurchases?.toFixed(2) || '0.00'}
+                  ₹{stats.bookPurchases?.toFixed(2) || '0.00'}
                 </p>
               </div>
               <div className="p-3 bg-blue-200 rounded-full">
@@ -348,8 +348,7 @@ const AllTransactions = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {transaction.amount > 0 ? (
                         <div className="flex items-center text-sm font-semibold text-red-600">
-                          <DollarSign className="h-4 w-4 mr-1" />
-                          {transaction.amount.toFixed(2)}
+                          ₹{transaction.amount.toFixed(2)}
                         </div>
                       ) : (
                         <span className="text-sm text-gray-400">-</span>

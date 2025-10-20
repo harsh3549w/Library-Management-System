@@ -220,7 +220,6 @@ const MyFines = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm font-semibold text-red-600">
-                        <DollarSign className="h-4 w-4 mr-1" />
                         ₹{borrow.fine.toFixed(2)}
                       </div>
                     </td>

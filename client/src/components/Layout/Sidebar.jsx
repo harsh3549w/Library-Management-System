@@ -32,6 +32,7 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'Add Book', href: '/admin/add-book', icon: Plus },
     { name: 'Add User', href: '/admin/add-user', icon: UserPlus },
+    { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
     { name: 'All Reservations', href: '/admin/all-reservations', icon: Bookmark },

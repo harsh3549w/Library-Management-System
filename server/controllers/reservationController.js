@@ -10,7 +10,7 @@ export const reserveBook = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user has unpaid fines
   if (req.user.fineBalance > 0) {
-    return next(new ErrorHandler(`Cannot reserve books. You have an outstanding fine balance of $${req.user.fineBalance.toFixed(2)}. Please pay your fines before reserving.`, 403));
+    return next(new ErrorHandler(`Cannot reserve books. You have an outstanding fine balance of ₹${req.user.fineBalance.toFixed(2)}. Please pay your fines before reserving.`, 403));
   }
 
   const book = await Book.findById(id);
@@ -157,7 +157,7 @@ export const fulfillReservation = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user has unpaid fines
   if (user.fineBalance > 0) {
-    return next(new ErrorHandler(`Cannot fulfill reservation. User has an outstanding fine balance of $${user.fineBalance.toFixed(2)}`, 403));
+    return next(new ErrorHandler(`Cannot fulfill reservation. User has an outstanding fine balance of ₹${user.fineBalance.toFixed(2)}`, 403));
   }
 
   // Use auto-allocation service instead of manual borrowing

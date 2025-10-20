@@ -76,7 +76,7 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user has unpaid fines
   if (user.fineBalance > 0) {
-    return next(new ErrorHandler(`Cannot borrow books. You have an outstanding fine balance of $${user.fineBalance.toFixed(2)}. Please pay your fines before borrowing.`, 403));
+    return next(new ErrorHandler(`Cannot borrow books. You have an outstanding fine balance of ₹${user.fineBalance.toFixed(2)}. Please pay your fines before borrowing.`, 403));
   }
   
   if (book.quantity <= 0) {
@@ -142,7 +142,7 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
 
   // Check if user has unpaid fines
   if (user.fineBalance > 0) {
-    return next(new ErrorHandler(`Cannot borrow books. You have an outstanding fine balance of $${user.fineBalance.toFixed(2)}. Please pay your fines before borrowing.`, 403));
+    return next(new ErrorHandler(`Cannot borrow books. You have an outstanding fine balance of ₹${user.fineBalance.toFixed(2)}. Please pay your fines before borrowing.`, 403));
   }
   
   if (book.quantity <= 0) {
@@ -257,7 +257,7 @@ export const returnMyBorrowedBook = catchAsyncErrors(async (req, res, next) => {
     user: user._id,
     book: borrow.book._id,
     amount: fine,
-    description: `Returned "${book.title}" by ${book.author}${fine > 0 ? ` with fine of $${fine.toFixed(2)}` : ''}`,
+    description: `Returned "${book.title}" by ${book.author}${fine > 0 ? ` with fine of ₹${fine.toFixed(2)}` : ''}`,
     metadata: {
       borrowId: borrow._id,
       returnDate: borrow.returnDate,
@@ -272,7 +272,7 @@ export const returnMyBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: fine > 0 
-      ? `Book returned successfully. Fine of $${fine.toFixed(2)} has been added to your account.` 
+      ? `Book returned successfully. Fine of ₹${fine.toFixed(2)} has been added to your account.` 
       : "Book returned successfully",
     fine: fine > 0 ? fine : 0,
     userFineBalance: user.fineBalance,
@@ -372,7 +372,7 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
     user: user._id,
     book: bookId,
     amount: fine,
-    description: `Returned "${book.title}" by ${book.author}${fine > 0 ? ` with fine of $${fine.toFixed(2)}` : ''}`,
+    description: `Returned "${book.title}" by ${book.author}${fine > 0 ? ` with fine of ₹${fine.toFixed(2)}` : ''}`,
     metadata: {
       borrowId: borrow._id,
       returnDate: borrow.returnDate,
@@ -387,7 +387,7 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: fine > 0 
-      ? `Book returned successfully. Fine of $${fine.toFixed(2)} has been added to your account.` 
+      ? `Book returned successfully. Fine of ₹${fine.toFixed(2)} has been added to your account.` 
       : "Book returned successfully",
     fine: fine > 0 ? fine : 0,
     userFineBalance: user.fineBalance
@@ -564,7 +564,7 @@ export const markFineAsPaid = catchAsyncErrors(async (req, res, next) => {
     amount: borrow.fine,
     paymentMethod: paymentMethod || 'cash',
     paymentStatus: 'completed',
-    description: `Fine payment of $${borrow.fine.toFixed(2)} for overdue book`,
+    description: `Fine payment of ₹${borrow.fine.toFixed(2)} for overdue book`,
     processedBy: req.user._id,
     metadata: {
       borrowId: borrow._id,
@@ -574,7 +574,7 @@ export const markFineAsPaid = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: `Fine of $${borrow.fine.toFixed(2)} marked as paid`,
+    message: `Fine of ₹${borrow.fine.toFixed(2)} marked as paid`,
     userFineBalance: user.fineBalance
   });
 });

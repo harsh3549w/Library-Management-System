@@ -197,8 +197,7 @@ const MyTransactions = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       {transaction.amount > 0 ? (
                         <div className="flex items-center text-sm font-semibold text-red-600">
-                          <DollarSign className="h-4 w-4 mr-1" />
-                          {transaction.amount.toFixed(2)}
+                          ₹{transaction.amount.toFixed(2)}
                         </div>
                       ) : (
                         <span className="text-sm text-gray-400">-</span>

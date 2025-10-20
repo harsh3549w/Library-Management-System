@@ -115,6 +115,7 @@ function App() {
           <Route path="my-borrowed-books" element={<BorrowedBooks />} />
           <Route path="my-reservations" element={<MyReservations />} />
           <Route path="archives" element={<Archives />} />
+          <Route path="upload-archive" element={<UploadArchive />} />
           <Route path="archive/:id" element={<ArchiveDetail />} />
           <Route path="book-suggestions" element={<BookSuggestions />} />
           <Route path="my-fines" element={<MyFines />} />

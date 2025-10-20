@@ -100,7 +100,7 @@ const ManageFines = () => {
             <div>
               <p className="text-sm font-medium text-red-600">Total Outstanding</p>
               <p className="text-3xl font-bold text-red-900 mt-2">
-                ${totalOutstandingFines.toFixed(2)}
+                ₹{totalOutstandingFines.toFixed(2)}
               </p>
             </div>
             <div className="p-3 bg-red-200 rounded-full">
@@ -114,7 +114,7 @@ const ManageFines = () => {
             <div>
               <p className="text-sm font-medium text-green-600">Total Collected</p>
               <p className="text-3xl font-bold text-green-900 mt-2">
-                ${totalPaidFines.toFixed(2)}
+                ₹{totalPaidFines.toFixed(2)}
               </p>
             </div>
             <div className="p-3 bg-green-200 rounded-full">
@@ -174,14 +174,12 @@ const ManageFines = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm font-semibold text-red-600">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        {user.fineBalance.toFixed(2)}
+                        ₹{user.fineBalance.toFixed(2)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm text-green-600">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        {user.totalFinesPaid.toFixed(2)}
+                        ₹{user.totalFinesPaid.toFixed(2)}
                       </div>
                     </td>
                   </tr>
@@ -248,8 +246,7 @@ const ManageFines = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center text-sm font-semibold text-red-600">
-                        <DollarSign className="h-4 w-4 mr-1" />
-                        {borrow.fine.toFixed(2)}
+                        ₹{borrow.fine.toFixed(2)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -323,7 +320,7 @@ const ManageFines = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Fine Amount:</span>
-                  <span className="text-lg font-bold text-red-600">${selectedBorrow.fine.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-red-600">₹{selectedBorrow.fine.toFixed(2)}</span>
                 </div>
               </div>
 

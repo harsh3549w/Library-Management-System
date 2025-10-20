@@ -207,8 +207,7 @@ const ManageSuggestions = () => {
             <form onSubmit={submitApproval} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <DollarSign className="inline h-4 w-4 mr-1" />
-                  Price *
+                  Price (₹) *
                 </label>
                 <input
                   type="number"

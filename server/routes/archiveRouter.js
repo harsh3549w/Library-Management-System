@@ -15,7 +15,7 @@ const router = express.Router();
 
 // Admin routes - MUST come before /:id route
 router.get("/stats/overview", isAuthenticated, isAuthorized("Admin"), getArchiveStats);
-router.post("/upload", isAuthenticated, isAuthorized("Admin"), uploadArchive);
+router.post("/upload", isAuthenticated, uploadArchive);
 router.delete("/delete/:id", isAuthenticated, isAuthorized("Admin"), deleteArchive);
 
 // Public/User routes

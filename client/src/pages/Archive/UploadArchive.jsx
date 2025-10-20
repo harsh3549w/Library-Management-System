@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { uploadArchive, clearSuccess, clearError } from '../../store/slices/archiveSlice'
-import { FileText, Upload, Tag, User, Calendar } from 'lucide-react'
+import { FileText, Upload, Tag, User, Calendar, CheckCircle, AlertCircle } from 'lucide-react'
 
 const UploadArchive = () => {
   const [formData, setFormData] = useState({

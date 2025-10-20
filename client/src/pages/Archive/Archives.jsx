@@ -3,13 +3,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import {
   getAllArchives,
-  downloadArchive,
+  deleteArchive,
   clearSuccess,
   clearError
 } from '../../store/slices/archiveSlice'
 import {
   FileText,
-  Download,
   Eye,
   Calendar,
   User,
@@ -18,7 +17,7 @@ import {
   Filter,
   TrendingUp,
   Upload,
-  Cloud
+  Trash2
 } from 'lucide-react'
 
 const Archives = () => {
@@ -56,10 +55,10 @@ const Archives = () => {
     dispatch(getAllArchives({ category: categoryFilter, search: searchTerm, sortBy }))
   }
 
-  const handleDownload = (archive) => {
-    dispatch(downloadArchive(archive._id))
-    // Open file in new tab
-    window.open(archive.fileUrl, '_blank')
+  const handleDelete = (archive) => {
+    if (window.confirm(`Are you sure you want to delete "${archive.title}"? This action cannot be undone.`)) {
+      dispatch(deleteArchive(archive._id))
+    }
   }
 
   const formatDate = (dateString) => {
@@ -95,14 +94,12 @@ const Archives = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Academic Archives</h1>
-          <p className="text-gray-600">Browse and download academic resources</p>
+          <p className="text-gray-600">Browse and view academic resources</p>
         </div>
-        {isAdmin && (
-          <Link to="/admin/upload-archive" className="btn-primary inline-flex items-center mt-4 sm:mt-0">
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Archive
-          </Link>
-        )}
+        <Link to="/upload-archive" className="btn-primary inline-flex items-center mt-4 sm:mt-0">
+          <Upload className="h-4 w-4 mr-2" />
+          Upload Archive
+        </Link>
       </div>
 
       {/* Success Message */}
@@ -217,18 +214,12 @@ const Archives = () => {
                           {formatDate(archive.createdAt)}
                         </div>
                         <div className="flex items-center">
-                          <Download className="h-4 w-4 mr-1" />
+                          <Eye className="h-4 w-4 mr-1" />
                           {archive.downloads} downloads
                         </div>
                         <div className="flex items-center">
                           <Eye className="h-4 w-4 mr-1" />
                           {archive.views} views
-                        </div>
-                        <div className="flex items-center">
-                          <Cloud className="h-4 w-4 mr-1 text-blue-600" />
-                          <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                            AWS S3
-                          </span>
                         </div>
                       </div>
 
@@ -259,18 +250,20 @@ const Archives = () => {
                 <div className="mt-4 md:mt-0 md:ml-6 flex gap-2">
                   <Link
                     to={`/archive/${archive._id}`}
-                    className="btn-secondary inline-flex items-center"
+                    className="btn-primary inline-flex items-center"
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     View
                   </Link>
-                  <button
-                    onClick={() => handleDownload(archive)}
-                    className="btn-primary inline-flex items-center"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(archive)}
+                      className="btn-danger inline-flex items-center"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
