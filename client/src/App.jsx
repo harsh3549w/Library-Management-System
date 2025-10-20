@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import { getUser } from './store/slices/authSlice'
 import { clearError as clearAuthError } from './store/slices/authSlice'
 import { clearError as clearBookError, clearSuccess as clearBookSuccess } from './store/slices/bookSlice'
-import { clearError as clearBorrowError, clearSuccess as clearBorrowSuccess } from './store/slices/borrowSlice'
+import { clearError as clearBorrowError } from './store/slices/borrowSlice'
 import { clearError as clearUserError, clearSuccess as clearUserSuccess } from './store/slices/userSlice'
 
 // Components
@@ -44,6 +44,7 @@ import Profile from './pages/Profile/Profile'
 import DonateBook from './pages/Donations/DonateBook'
 import MyDonations from './pages/Donations/MyDonations'
 import ManageDonations from './pages/Donations/ManageDonations'
+import Contact from './pages/Contact/Contact'
 
 function App() {
   const dispatch = useDispatch()
@@ -79,17 +80,13 @@ function App() {
     }
   }, [bookError, bookSuccess, dispatch])
 
-  // Handle borrow errors and success
+  // Handle borrow errors only (success handled by individual components)
   useEffect(() => {
     if (borrowError) {
       toast.error(borrowError)
       dispatch(clearBorrowError())
     }
-    if (borrowSuccess) {
-      toast.success('Borrow operation completed successfully!')
-      dispatch(clearBorrowSuccess())
-    }
-  }, [borrowError, borrowSuccess, dispatch])
+  }, [borrowError, dispatch])
 
   // Handle user errors and success
   useEffect(() => {
@@ -104,7 +101,13 @@ function App() {
   }, [userError, userSuccess, dispatch])
 
   return (
-    <div className="App">
+    <div className="App min-h-screen">
+      {/* Background with mint green + texture overlay */}
+      <div aria-hidden="true" className="fixed inset-0 pointer-events-none">
+        <div className="absolute bg-[#e3fff7] inset-0" />
+        <div className="absolute max-w-none object-50%-50% object-cover opacity-20 size-full bg-[url('/images/baackground.jpeg')] bg-cover bg-center bg-fixed" />
+      </div>
+      
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
@@ -131,6 +134,7 @@ function App() {
           <Route path="edit-info" element={<EditInfo />} />
           <Route path="donate-book" element={<DonateBook />} />
           <Route path="my-donations" element={<MyDonations />} />
+          <Route path="contact" element={<Contact />} />
           
           {/* Admin Routes */}
           <Route path="admin/add-book" element={<AdminRoute><AddBook /></AdminRoute>} />

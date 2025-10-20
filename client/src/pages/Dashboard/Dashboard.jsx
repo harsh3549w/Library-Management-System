@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllBooks } from '../../store/slices/bookSlice'
-import { getMyBorrowedBooks, clearError as clearBorrowError, clearSuccess as clearBorrowSuccess } from '../../store/slices/borrowSlice'
+import { getMyBorrowedBooks, clearError as clearBorrowError } from '../../store/slices/borrowSlice'
 import { getBookRecommendations } from '../../store/slices/recommendationSlice'
+import { getLibraryStats } from '../../store/slices/reportSlice'
 import ExtendDue from '../../components/ExtendDue/ExtendDue'
 import { 
   BookOpen, 
@@ -19,24 +20,18 @@ const Dashboard = () => {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
   const { books, loading: booksLoading } = useSelector((state) => state.books)
-  const { myBorrowedBooks, loading: borrowLoading, success: borrowSuccess, error: borrowError } = useSelector((state) => state.borrow)
+  const { myBorrowedBooks, loading: borrowLoading, error: borrowError } = useSelector((state) => state.borrow)
   const { recommendations, basedOn, message: recommendationMessage, loading: recommendationLoading } = useSelector((state) => state.recommendations)
+  const { libraryStats, loading: statsLoading } = useSelector((state) => state.report)
 
   useEffect(() => {
+    dispatch(getLibraryStats())
     dispatch(getAllBooks())
     dispatch(getMyBorrowedBooks())
     dispatch(getBookRecommendations())
   }, [dispatch])
 
-  // Clear success/error messages after 5 seconds
-  useEffect(() => {
-    if (borrowSuccess) {
-      const timer = setTimeout(() => {
-        dispatch(clearBorrowSuccess())
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [borrowSuccess, dispatch])
+  // Clear error messages after 5 seconds
 
   useEffect(() => {
     if (borrowError) {
@@ -49,33 +44,50 @@ const Dashboard = () => {
 
   const isAdmin = user?.role === 'Admin'
 
-  const stats = [
-    {
-      name: 'Total Books',
-      value: books.length,
-      icon: BookOpen,
-      color: 'bg-blue-500',
-      textColor: 'text-blue-600',
-    },
-    {
-      name: 'My Borrowed Books',
-      value: myBorrowedBooks.length,
-      icon: Library,
-      color: 'bg-green-500',
-      textColor: 'text-green-600',
-    },
-    ...(isAdmin ? [
-      {
-        name: 'Total Users',
-        value: 'N/A', // Will be fetched from users slice
-        icon: Users,
-        color: 'bg-purple-500',
-        textColor: 'text-purple-600',
-      },
-    ] : []),
-  ]
+  const stats = isAdmin
+    ? [
+        {
+          name: 'Total Books',
+          value: booksLoading ? '...' : books.length,
+          icon: BookOpen,
+          color: 'bg-blue-500',
+          textColor: 'text-blue-600',
+        },
+        {
+          name: 'Total Users',
+          value: statsLoading ? '...' : (libraryStats?.users?.total ?? 0),
+          icon: Users,
+          color: 'bg-purple-500',
+          textColor: 'text-purple-600',
+        },
+      ]
+    : [
+        {
+          name: 'Total Books',
+          value: booksLoading ? '...' : books.length,
+          icon: BookOpen,
+          color: 'bg-blue-500',
+          textColor: 'text-blue-600',
+        },
+        {
+          name: 'My Borrowed Books',
+          value: borrowLoading ? '...' : myBorrowedBooks.length,
+          icon: Library,
+          color: 'bg-green-500',
+          textColor: 'text-green-600',
+        },
+      ]
 
-  const recentBooks = books.slice(0, 5)
+  // Show only available books from database
+  const recentBooks = books
+    .filter(book => book._id && book.title && book.author && book.availability === true)
+    .slice(0, 5)
+
+  // Debug logging
+  console.log('Total books:', books.length)
+  console.log('Available books:', books.filter(book => book.availability === true).length)
+  console.log('Recent books (available only):', recentBooks.length)
+  console.log('First available book:', recentBooks[0])
   const recentBorrowed = myBorrowedBooks.slice(0, 5)
 
   const formatDate = (dateString) => {
@@ -96,24 +108,30 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Welcome back, {user?.name}!</p>
+      {/* Page Header with gradient accent line */}
+      <div className="relative">
+        <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#2563EB] to-[#00b894] rounded-full"></div>
+        <h1 className="text-[28px] text-gray-800">Dashboard</h1>
+        <p className="text-sm text-gray-600 mt-1">Welcome back, {user?.name || 'User'}!</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats.map((stat) => (
-          <div key={stat.name} className="card">
-            <div className="flex items-center">
-              <div className={`flex-shrink-0 p-3 rounded-lg ${stat.color}`}>
-                <stat.icon className="h-6 w-6 text-white" />
+      {/* Stats Cards - 3 Column Grid */}
+      <div className="grid grid-cols-3 gap-6">
+        {stats.map((stat, index) => (
+          <div key={stat.name} className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#2563EB] to-transparent opacity-20 rounded-bl-full"></div>
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center shadow-lg">
+                <stat.icon className="text-white" size={26} />
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-                <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
+              <div>
+                <p className="text-gray-600 text-sm">{stat.name}</p>
+                <p className="text-[28px] text-[#2563EB]">{stat.value}</p>
               </div>
+            </div>
+            <div className="mt-3 flex items-center gap-1 text-xs text-[#2563EB]">
+              <TrendingUp size={14} />
+              <span>Active collection</span>
             </div>
           </div>
         ))}
@@ -121,17 +139,21 @@ const Dashboard = () => {
 
       {/* Admin Extend Due Section */}
       {isAdmin && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
+        <>
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Admin Tools</h2>
             <ExtendDue />
           </div>
-          <div className="lg:col-span-2">
-            {/* Recent Books for Admin */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Books</h2>
-                <BookOpen className="h-5 w-5 text-gray-400" />
-              </div>
+          <div className="grid grid-cols-1 gap-6">
+             {/* Available Books for Admin */}
+             <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+               <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#2563EB] opacity-5 rounded-full"></div>
+               <div className="flex items-center justify-between mb-4 relative z-10">
+                 <h2 className="text-gray-800">Available Books</h2>
+                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#00b894] flex items-center justify-center">
+                   <BookOpen size={18} className="text-white" />
+                 </div>
+               </div>
               {booksLoading ? (
                 <div className="flex justify-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -139,37 +161,57 @@ const Dashboard = () => {
               ) : recentBooks.length > 0 ? (
                 <div className="space-y-3">
                   {recentBooks.map((book) => (
-                    <div key={book._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={book._id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg border border-white/40 hover:bg-white/40 transition-colors">
                       <div>
                         <h3 className="font-medium text-gray-900">{book.title}</h3>
                         <p className="text-sm text-gray-500">by {book.author}</p>
+                        {book.createdAt && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            Added {new Date(book.createdAt).toLocaleDateString()}
+                          </p>
+                        )}
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">
-                          {book.available ? 'Available' : 'Borrowed'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {book.available ? `${book.quantity} copies` : 'Out of stock'}
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          book.availability 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {book.availability ? 'Available' : 'Borrowed'}
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {book.quantity ? `${book.quantity} copies` : 'No quantity data'}
                         </p>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">No books available</p>
+                <div className="text-center py-8">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 text-lg font-medium">No available books</p>
+                  <p className="text-gray-400 text-sm mt-2">All books are currently borrowed</p>
+                </div>
               )}
             </div>
           </div>
-        </div>
+        </>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Books - For Non-Admin Users */}
+        {/* Available Books - For Non-Admin Users */}
         {!isAdmin && (
-          <div className="card">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Recent Books</h2>
-              <BookOpen className="h-5 w-5 text-gray-400" />
+          <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#2563EB] opacity-5 rounded-full"></div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <h2 className="text-gray-800">Available Books</h2>
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2563EB] to-[#00b894] flex items-center justify-center">
+                <BookOpen size={18} className="text-white" />
+              </div>
             </div>
             {booksLoading ? (
               <div className="flex justify-center py-4">
@@ -178,33 +220,54 @@ const Dashboard = () => {
             ) : recentBooks.length > 0 ? (
               <div className="space-y-3">
                 {recentBooks.map((book) => (
-                  <div key={book._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={book._id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg border border-white/40 hover:bg-white/40 transition-colors">
                     <div>
                       <h3 className="font-medium text-gray-900">{book.title}</h3>
                       <p className="text-sm text-gray-500">by {book.author}</p>
+                      {book.createdAt && (
+                        <p className="text-xs text-blue-600 mt-1">
+                          Added {new Date(book.createdAt).toLocaleDateString()}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-gray-900">
-                        {book.available ? 'Available' : 'Borrowed'}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {book.available ? `${book.quantity} copies` : 'Out of stock'}
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        book.availability 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {book.availability ? 'Available' : 'Borrowed'}
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {book.quantity ? `${book.quantity} copies` : 'No quantity data'}
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No books available</p>
+              <div className="text-center py-8">
+                <div className="text-gray-400 mb-4">
+                  <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 text-lg font-medium">No available books</p>
+                <p className="text-gray-400 text-sm mt-2">All books are currently borrowed</p>
+              </div>
             )}
           </div>
         )}
 
-        {/* My Borrowed Books */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">My Borrowed Books</h2>
-            <Library className="h-5 w-5 text-gray-400" />
+        {/* My Borrowed Books - hidden for Admin */}
+        {!isAdmin && (
+        <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#00b894] opacity-5 rounded-full"></div>
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <h2 className="text-gray-800">My Borrowed Books</h2>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00b894] to-[#2563EB] flex items-center justify-center">
+              <Library size={18} className="text-white" />
+            </div>
           </div>
           {borrowLoading ? (
             <div className="flex justify-center py-4">
@@ -219,7 +282,7 @@ const Dashboard = () => {
                 const isDueSoon = daysRemaining <= 3 && daysRemaining >= 0
 
                 return (
-                  <div key={borrowed._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={borrowed._id} className="flex items-center justify-between p-3 bg-white/30 rounded-lg border border-white/40">
                     <div>
                       <h3 className="font-medium text-gray-900">{borrowed.book?.title || 'Unknown Book'}</h3>
                       <p className="text-sm text-gray-500">by {borrowed.book?.author || 'Unknown Author'}</p>
@@ -247,25 +310,29 @@ const Dashboard = () => {
             <p className="text-gray-500 text-center py-4">No borrowed books</p>
           )}
         </div>
+        )}
       </div>
 
       {/* Book Recommendations Section */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-[#2563EB] to-[#00b894] opacity-5 rounded-full"></div>
+        <div className="flex items-center justify-between mb-4 relative z-10">
           <div className="flex items-center">
-            <div className="flex-shrink-0 p-2 bg-purple-100 rounded-lg mr-3">
-              <Sparkles className="h-5 w-5 text-purple-600" />
+            <div className="flex-shrink-0 p-2 bg-gradient-to-br from-[#2563EB] to-[#00b894] rounded-lg mr-3 shadow-lg">
+              <Sparkles className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Recommended for You</h2>
+              <h2 className="text-gray-800">Recommended for You</h2>
               {basedOn && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600">
                   Based on "{basedOn.book}" ({basedOn.genre})
                 </p>
               )}
             </div>
           </div>
-          <Star className="h-5 w-5 text-gray-400" />
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00b894] to-[#2563EB] flex items-center justify-center">
+            <Star size={18} className="text-white" />
+          </div>
         </div>
         
         {recommendationLoading ? (
@@ -275,7 +342,7 @@ const Dashboard = () => {
         ) : recommendations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {recommendations.map((book) => (
-              <div key={book._id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+              <div key={book._id} className="bg-white/30 rounded-lg p-4 hover:bg-white/40 transition-colors border border-white/40">
                 <div className="flex flex-col h-full">
                   <div className="flex-1">
                     <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">

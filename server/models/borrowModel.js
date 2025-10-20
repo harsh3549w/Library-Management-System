@@ -50,4 +50,9 @@ const borrowSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Indexes for better query performance
+borrowSchema.index({ "user.id": 1, returnDate: 1 });
+borrowSchema.index({ book: 1, returnDate: 1 });
+borrowSchema.index({ returnDate: 1, dueDate: 1 });
+
 export const Borrow = mongoose.model("Borrow", borrowSchema);

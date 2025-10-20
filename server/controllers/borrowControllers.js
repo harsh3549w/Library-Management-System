@@ -308,7 +308,10 @@ export const getMyBorrowedBooks = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  const borrows = await Borrow.find({ "user.id": userId }).populate("book");
+  const borrows = await Borrow.find({ 
+    "user.id": userId,
+    returnDate: null // Only get books that haven't been returned
+  }).populate("book");
 
   res.status(200).json({
     success: true,
@@ -317,7 +320,9 @@ export const getMyBorrowedBooks = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getBorrowedBooksForAdmin = catchAsyncErrors(async (req, res, next) => {
-  const borrowedBooks = await Borrow.find().populate('book');
+  const borrowedBooks = await Borrow.find({ 
+    returnDate: null // Only get books that haven't been returned
+  }).populate('book');
   res.status(200).json({
     success: true,
     borrowedBooks

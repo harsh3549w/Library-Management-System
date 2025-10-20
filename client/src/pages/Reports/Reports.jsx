@@ -36,7 +36,7 @@ const Reports = () => {
     categoryReport, 
     loading, 
     error 
-  } = useSelector((state) => state.reports)
+  } = useSelector((state) => state.report)
   
   const [selectedReport, setSelectedReport] = useState(null)
   const [borrowingPeriod, setBorrowingPeriod] = useState('monthly')
@@ -109,11 +109,12 @@ const Reports = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Reports & Analytics</h1>
-        <p className="text-gray-600">Comprehensive library statistics and insights</p>
+    <div className="p-6 space-y-6">
+      {/* Page Header with gradient accent line */}
+      <div className="relative">
+        <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#2563EB] to-[#00b894] rounded-full"></div>
+        <h1 className="text-[28px] text-gray-800">Reports & Analytics</h1>
+        <p className="text-sm text-gray-600 mt-1">Comprehensive library statistics and insights</p>
       </div>
 
       {/* Error Message */}
@@ -131,73 +132,77 @@ const Reports = () => {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Library Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Total Books */}
-              <div className="card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                <div className="flex items-center justify-between">
+              <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#2563EB] to-transparent opacity-20 rounded-bl-full"></div>
+                <div className="flex items-center justify-between relative z-10">
                   <div>
-                    <p className="text-sm font-medium text-blue-600">Total Books</p>
-                    <p className="text-3xl font-bold text-blue-900 mt-2">
+                    <p className="text-sm font-medium text-gray-600">Total Books</p>
+                    <p className="text-[28px] text-[#2563EB] mt-2">
                       {libraryStats.books.total}
                     </p>
-                    <p className="text-xs text-blue-700 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       {libraryStats.books.available} available
                     </p>
                   </div>
-                  <div className="p-3 bg-blue-200 rounded-full">
-                    <BookOpen className="h-8 w-8 text-blue-700" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center shadow-lg">
+                    <BookOpen className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </div>
 
               {/* Total Users */}
-              <div className="card bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                <div className="flex items-center justify-between">
+              <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#00b894] to-transparent opacity-20 rounded-bl-full"></div>
+                <div className="flex items-center justify-between relative z-10">
                   <div>
-                    <p className="text-sm font-medium text-green-600">Total Users</p>
-                    <p className="text-3xl font-bold text-green-900 mt-2">
+                    <p className="text-sm font-medium text-gray-600">Total Users</p>
+                    <p className="text-[28px] text-[#00b894] mt-2">
                       {libraryStats.users.total}
                     </p>
-                    <p className="text-xs text-green-700 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       {libraryStats.users.admins} admins
                     </p>
                   </div>
-                  <div className="p-3 bg-green-200 rounded-full">
-                    <Users className="h-8 w-8 text-green-700" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#00b894] to-[#2563EB] flex items-center justify-center shadow-lg">
+                    <Users className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </div>
 
               {/* Active Borrows */}
-              <div className="card bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                <div className="flex items-center justify-between">
+              <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#2563EB] to-transparent opacity-20 rounded-bl-full"></div>
+                <div className="flex items-center justify-between relative z-10">
                   <div>
-                    <p className="text-sm font-medium text-purple-600">Active Borrows</p>
-                    <p className="text-3xl font-bold text-purple-900 mt-2">
+                    <p className="text-sm font-medium text-gray-600">Active Borrows</p>
+                    <p className="text-[28px] text-[#2563EB] mt-2">
                       {libraryStats.borrows.active}
                     </p>
-                    <p className="text-xs text-purple-700 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Currently borrowed
                     </p>
                   </div>
-                  <div className="p-3 bg-purple-200 rounded-full">
-                    <Library className="h-8 w-8 text-purple-700" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center shadow-lg">
+                    <Library className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </div>
 
               {/* Overdue Books */}
-              <div className="card bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-                <div className="flex items-center justify-between">
+              <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-red-500 to-transparent opacity-20 rounded-bl-full"></div>
+                <div className="flex items-center justify-between relative z-10">
                   <div>
-                    <p className="text-sm font-medium text-red-600">Overdue Books</p>
-                    <p className="text-3xl font-bold text-red-900 mt-2">
+                    <p className="text-sm font-medium text-gray-600">Overdue Books</p>
+                    <p className="text-[28px] text-red-600 mt-2">
                       {libraryStats.borrows.overdue}
                     </p>
-                    <p className="text-xs text-red-700 mt-1">
+                    <p className="text-xs text-gray-600 mt-1">
                       Need attention
                     </p>
                   </div>
-                  <div className="p-3 bg-red-200 rounded-full">
-                    <AlertTriangle className="h-8 w-8 text-red-700" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg">
+                    <AlertTriangle className="h-8 w-8 text-white" />
                   </div>
                 </div>
               </div>

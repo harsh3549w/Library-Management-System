@@ -57,8 +57,9 @@ const ExtendDue = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center mb-6">
+    <div className="bg-white/40 backdrop-blur-md rounded-[18px] p-6 shadow-lg border border-white/50 relative overflow-hidden">
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-green-500 opacity-5 rounded-full"></div>
+      <div className="flex items-center mb-6 relative z-10">
         <div className="flex-shrink-0 p-3 bg-green-100 rounded-lg">
           <Calendar className="h-6 w-6 text-green-600" />
         </div>
@@ -80,8 +81,8 @@ const ExtendDue = () => {
                 type="email"
                 id="email"
                 name="email"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/50 backdrop-blur-sm ${
+                  errors.email ? 'border-red-500' : 'border-white/40'
                 }`}
                 placeholder="Enter user's email"
                 value={formData.email}
@@ -102,8 +103,8 @@ const ExtendDue = () => {
                 type="text"
                 id="isbn"
                 name="isbn"
-                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                  errors.isbn ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/50 backdrop-blur-sm ${
+                  errors.isbn ? 'border-red-500' : 'border-white/40'
                 }`}
                 placeholder="Enter ISBN number"
                 value={formData.isbn}
@@ -170,7 +171,7 @@ const ExtendDue = () => {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all duration-200"
           >
             {loading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

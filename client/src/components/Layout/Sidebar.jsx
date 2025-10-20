@@ -60,21 +60,21 @@ const Sidebar = ({ open, setOpen }) => {
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center h-16 px-4 border-b border-gray-200">
+      <div className="flex items-center h-20 px-6 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="h-10 w-10 bg-[#2563EB] rounded-lg flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-lg">L</span>
             </div>
           </div>
-          <div className="ml-3">
-            <h1 className="text-lg font-semibold text-gray-900">Library</h1>
+          <div className="ml-4">
+            <h1 className="text-xl font-semibold text-gray-700">Library</h1>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 py-4 space-y-1">
+      <nav className="flex-1 px-4 py-6 space-y-2">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
@@ -84,26 +84,26 @@ const Sidebar = ({ open, setOpen }) => {
               className={`sidebar-link ${isActive ? 'active' : ''}`}
               onClick={() => setOpen(false)}
             >
-              <item.icon className="mr-3 h-5 w-5" />
-              {item.name}
+              <item.icon className="h-[17px] w-[17px]" />
+              <span>{item.name}</span>
             </Link>
           )
         })}
       </nav>
 
       {/* User info */}
-      <div className="flex-shrink-0 p-4 border-t border-gray-200">
+      <div className="flex-shrink-0 p-6 border-t border-white/30">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-medium text-sm">
-                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
+              <span className="text-gray-700 font-medium text-sm">
+                {user?.name?.charAt(0)?.toUpperCase() || 'T'}
               </span>
             </div>
           </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-700">{user?.name}</p>
-            <p className="text-xs text-gray-500">{user?.role}</p>
+          <div className="ml-4">
+            <p className="text-sm font-medium text-gray-700">{user?.name || 'Test Admin'}</p>
+            <p className="text-xs text-gray-500">{user?.role || 'Admin'}</p>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@ const Sidebar = ({ open, setOpen }) => {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-white">
+              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col glass-dark">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
@@ -166,8 +166,8 @@ const Sidebar = ({ open, setOpen }) => {
       </Transition.Root>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
+        <div className="flex flex-col flex-grow glass-dark border-r border-white/30">
           <SidebarContent />
         </div>
       </div>

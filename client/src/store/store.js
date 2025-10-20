@@ -22,7 +22,7 @@ export const store = configureStore({
     reservation: reservationReducer,
     archives: archiveReducer,
     transactions: transactionReducer,
-    reports: reportReducer,
+    report: reportReducer,
     donations: donationReducer,
   },
   middleware: (getDefaultMiddleware) =>

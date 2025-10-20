@@ -41,6 +41,7 @@ const ManageDonations = () => {
   }, [error, dispatch])
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'No date available'
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -234,10 +235,10 @@ const ManageDonations = () => {
                         <BookOpen className="h-5 w-5 text-gray-400 mr-3" />
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {donation.title}
+                            {donation.title || 'No title'}
                           </div>
                           <div className="text-sm text-gray-500">
-                            by {donation.author}
+                            by {donation.author || 'Unknown author'}
                           </div>
                           {donation.isbn && (
                             <div className="text-xs text-gray-400">
@@ -252,10 +253,10 @@ const ManageDonations = () => {
                         <User className="h-4 w-4 text-gray-400 mr-2" />
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {donation.user.name}
+                            {donation.user?.name || 'Unknown User'}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {donation.user.email}
+                            {donation.user?.email || 'No email available'}
                           </div>
                         </div>
                       </div>
@@ -268,7 +269,7 @@ const ManageDonations = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(donation.status)}`}>
-                        {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                        {donation.status ? donation.status.charAt(0).toUpperCase() + donation.status.slice(1) : 'Unknown'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

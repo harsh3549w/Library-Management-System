@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { getAllBooks, deleteBook, updateBook } from '../../store/slices/bookSlice'
 import { borrowBookForSelf, clearError as clearBorrowError, clearSuccess as clearBorrowSuccess } from '../../store/slices/borrowSlice'
 import { reserveBook, clearError as clearReserveError, clearSuccess as clearReserveSuccess } from '../../store/slices/reservationSlice'
@@ -15,7 +15,8 @@ import {
   BookMarked,
   CheckCircle,
   AlertCircle,
-  Bell
+  Bell,
+  X
 } from 'lucide-react'
 
 const Books = () => {
@@ -29,6 +30,7 @@ const Books = () => {
   const [uploadError, setUploadError] = useState('')
 
   const dispatch = useDispatch()
+  const location = useLocation()
   const { books, loading } = useSelector((state) => state.books)
   const { user } = useSelector((state) => state.auth)
   const { loading: borrowLoading, success: borrowSuccess, error: borrowError, message: borrowMessage } = useSelector((state) => state.borrow)
@@ -39,6 +41,15 @@ const Books = () => {
   useEffect(() => {
     dispatch(getAllBooks())
   }, [dispatch])
+
+  // Handle URL search parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search)
+    const searchParam = urlParams.get('search')
+    if (searchParam) {
+      setSearchTerm(searchParam)
+    }
+  }, [location.search])
 
   useEffect(() => {
     if (borrowSuccess && borrowMessage) {
@@ -145,6 +156,24 @@ const Books = () => {
         )}
       </div>
 
+      {/* Search Results Indicator */}
+      {searchTerm && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <Search className="h-5 w-5 text-blue-600 mr-2" />
+            <span className="text-blue-800">
+              Showing results for "{searchTerm}" ({filteredBooks.length} books found)
+            </span>
+            <button
+              onClick={() => setSearchTerm('')}
+              className="ml-auto text-blue-600 hover:text-blue-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Success Message */}
       {borrowSuccess && borrowMessage && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
@@ -186,10 +215,18 @@ const Books = () => {
             <input
               type="text"
               placeholder="Search books..."
-              className="input-field pl-10"
+              className="input-field pl-10 pr-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Status Filter */}

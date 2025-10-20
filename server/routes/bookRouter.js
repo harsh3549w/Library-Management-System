@@ -16,6 +16,6 @@ router.delete("/admin/delete/:id", isAuthenticated, isAuthorized("Admin"), delet
 router.put("/admin/update/:id", isAuthenticated, isAuthorized("Admin"), updateBook);
 
 // Public routes
-router.get("/all", isAuthenticated, getAllBooks);
+router.get("/all", getAllBooks);
 
 export default router;

@@ -1,13 +1,28 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Menu, X, User, LogOut, Settings } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Menu, Search } from 'lucide-react'
 
-const Header = ({ user, onLogout, onMenuClick }) => {
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
+const Header = ({ onMenuClick }) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const navigate = useNavigate()
+
+
+  // Handle search functionality
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (searchTerm.trim()) {
+      navigate(`/books?search=${encodeURIComponent(searchTerm.trim())}`)
+      setSearchTerm('')
+    }
+  }
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+  }
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-4 mt-4">
+      <div className="flex items-center justify-between px-6 py-4">
         {/* Mobile menu button */}
         <button
           type="button"
@@ -18,90 +33,40 @@ const Header = ({ user, onLogout, onMenuClick }) => {
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Logo */}
-        <div className="flex-1 flex items-center justify-center lg:justify-start">
-          <Link to="/dashboard" className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">L</span>
-              </div>
-            </div>
-            <div className="ml-3">
-              <h1 className="text-xl font-semibold text-gray-900">Library Management</h1>
-            </div>
-          </Link>
+        {/* Search Bar */}
+        <div className="relative w-[280px]">
+          <form onSubmit={handleSearch} className="bg-white/60 backdrop-blur-sm h-[44px] rounded-[15px] flex items-center px-4 border border-white/50 shadow-sm">
+            <Search className="size-[20px] text-gray-600" />
+            <input
+              type="text"
+              placeholder="Search library..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="ml-3 bg-transparent border-none outline-none flex-1 text-sm text-gray-800 placeholder:text-gray-500"
+            />
+          </form>
         </div>
 
-        {/* User menu */}
-        <div className="flex items-center">
-          <div className="relative">
-            <button
-              type="button"
-              className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-            >
-              <span className="sr-only">Open user menu</span>
-              <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-medium text-sm">
-                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                </span>
-              </div>
-              <span className="ml-2 text-gray-700 hidden sm:block">{user?.name}</span>
-            </button>
+        {/* Navigation Links */}
+        <nav className="flex gap-8">
+          <Link to="/dashboard" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">Home</Link>
+          <Link to="/profile" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">About Us</Link>
+          <Link to="/books" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">E-books</Link>
+          <Link to="/contact" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">Contact Us</Link>
+        </nav>
 
-            {userMenuOpen && (
-              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
-                <div className="py-1">
-                  <div className="px-4 py-2 text-sm text-gray-700 border-b border-gray-100">
-                    <div className="font-medium">{user?.name}</div>
-                    <div className="text-gray-500">{user?.email}</div>
-                    <div className="text-xs text-blue-600 font-medium mt-1">
-                      {user?.role}
-                    </div>
-                  </div>
-                  
-                  <Link
-                    to="/profile"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <User className="mr-3 h-4 w-4" />
-                    Profile
-                  </Link>
-                  
-                  <Link
-                    to="/settings"
-                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setUserMenuOpen(false)}
-                  >
-                    <Settings className="mr-3 h-4 w-4" />
-                    Settings
-                  </Link>
-                  
-                  <button
-                    onClick={() => {
-                      onLogout()
-                      setUserMenuOpen(false)
-                    }}
-                    className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    <LogOut className="mr-3 h-4 w-4" />
-                    Sign out
-                  </button>
-                </div>
-              </div>
-            )}
+        {/* IIITDM Logo and E-Library */}
+        <div className="flex items-center gap-3">
+          <div className="bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm border border-white/50">
+            <img
+              src="/images/iiitdm-logo.jpeg"
+              alt="IIITDM Logo"
+              className="w-[50px] h-[50px] object-cover rounded-lg"
+            />
           </div>
+          <span className="text-gray-800 font-medium text-lg">E-Library</span>
         </div>
       </div>
-
-      {/* Mobile user menu overlay */}
-      {userMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setUserMenuOpen(false)}
-        />
-      )}
     </header>
   )
 }
