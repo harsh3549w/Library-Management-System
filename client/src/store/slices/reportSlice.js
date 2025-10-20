@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 
-const API_URL = 'http://localhost:4000/api/v1'
+const API_URL = '/api/v1'
 
 // Async thunks
 export const getLibraryStats = createAsyncThunk(
@@ -82,11 +82,14 @@ export const getOverdueReport = createAsyncThunk(
   'report/getOverdueReport',
   async (_, { rejectWithValue }) => {
     try {
+      console.log('Fetching overdue report from:', `${API_URL}/report/overdue`)
       const response = await axios.get(`${API_URL}/report/overdue`, {
         withCredentials: true,
       })
+      console.log('Overdue report response:', response.data)
       return response.data
     } catch (error) {
+      console.error('Error fetching overdue report:', error)
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch overdue report')
     }
   }

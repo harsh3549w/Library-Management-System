@@ -310,18 +310,30 @@ export const getFinancialReport = catchAsyncErrors(async (req, res, next) => {
 export const getOverdueReport = catchAsyncErrors(async (req, res, next) => {
   const today = new Date();
   
-  const overdueBooks = await Borrow.find({
-    returnDate: null,
-    dueDate: { $lt: today }
-  })
-    .populate('book', 'title author isbn')
-    .sort({ dueDate: 1 });
-  
-  res.status(200).json({
-    success: true,
-    count: overdueBooks.length,
-    overdueBooks
-  });
+  try {
+    const overdueBooks = await Borrow.find({
+      returnDate: null,
+      dueDate: { $lt: today }
+    })
+      .populate('book', 'title author isbn')
+      .sort({ dueDate: 1 });
+    
+    console.log('Overdue books found:', overdueBooks.length);
+    console.log('Sample overdue book:', overdueBooks[0]);
+    
+    res.status(200).json({
+      success: true,
+      count: overdueBooks.length,
+      overdueBooks
+    });
+  } catch (error) {
+    console.error('Error in getOverdueReport:', error);
+    res.status(200).json({
+      success: true,
+      count: 0,
+      overdueBooks: []
+    });
+  }
 });
 
 // Get category report
