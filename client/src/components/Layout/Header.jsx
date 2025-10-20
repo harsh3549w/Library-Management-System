@@ -1,30 +1,49 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
+import { createPortal } from 'react-dom'
 import { Menu, Search, User, LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '../../store/slices/authSlice'
 
 const Header = ({ onMenuClick }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
   const dropdownRef = useRef(null)
+  const buttonRef = useRef(null)
+
+  // Calculate dropdown position
+  const calculateDropdownPosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 8,
+        right: window.innerWidth - rect.right
+      })
+    }
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          buttonRef.current && !buttonRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false)
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    if (isProfileDropdownOpen) {
+      calculateDropdownPosition()
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, [isProfileDropdownOpen])
 
   // Handle search functionality
   const handleSearch = (e) => {
@@ -40,10 +59,20 @@ const Header = ({ onMenuClick }) => {
   }
 
   // Handle logout
-  const handleLogout = () => {
-    dispatch(logout())
-    navigate('/login')
-    setIsProfileDropdownOpen(false)
+  const handleLogout = async () => {
+    try {
+      // Try to logout from server
+      await dispatch(logout()).unwrap()
+    } catch (error) {
+      console.error('Server logout failed:', error)
+    } finally {
+      // Always clear local state and storage
+      dispatch({ type: 'auth/logout/fulfilled' })
+      localStorage.clear()
+      sessionStorage.clear()
+      navigate('/login')
+      setIsProfileDropdownOpen(false)
+    }
   }
 
   // Handle profile navigation
@@ -89,9 +118,12 @@ const Header = ({ onMenuClick }) => {
         </nav>
 
         {/* Right side - User Profile Dropdown */}
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative">
           <button
-            onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+            ref={buttonRef}
+            onClick={() => {
+              setIsProfileDropdownOpen(!isProfileDropdownOpen)
+            }}
             className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/50 shadow-sm hover:bg-white/80 transition-colors"
           >
             <User className="h-5 w-5 text-gray-600" />
@@ -100,27 +132,48 @@ const Header = ({ onMenuClick }) => {
             </span>
             <ChevronDown className="h-4 w-4 text-gray-600" />
           </button>
-
-          {/* Dropdown Menu */}
-          {isProfileDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-              <button
-                onClick={handleProfileClick}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <User className="h-4 w-4" />
-                Profile
-              </button>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </button>
-            </div>
-          )}
         </div>
+
+        {/* Dropdown Menu - Rendered as Portal */}
+        {isProfileDropdownOpen && createPortal(
+          <div 
+            ref={dropdownRef}
+            className="fixed w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-[99999]"
+            style={{ 
+              top: dropdownPosition.top,
+              right: dropdownPosition.right,
+              zIndex: 99999
+            }}
+          >
+            <div
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleProfileClick()
+              }}
+              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </div>
+            <div
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                handleLogout()
+              }}
+              className="flex items-center gap-3 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+              role="button"
+              tabIndex={0}
+            >
+              <LogOut className="h-4 w-4" />
+              Sign Out
+            </div>
+          </div>,
+          document.body
+        )}
       </div>
     </header>
   )

@@ -11,7 +11,6 @@ import {
   Library, 
   TrendingUp,
   Calendar,
-  Clock,
   Sparkles,
   Star
 } from 'lucide-react'
@@ -21,7 +20,7 @@ const Dashboard = () => {
   const { user } = useSelector((state) => state.auth)
   const { books, loading: booksLoading } = useSelector((state) => state.books)
   const { myBorrowedBooks, loading: borrowLoading, error: borrowError } = useSelector((state) => state.borrow)
-  const { recommendations, basedOn, message: recommendationMessage, loading: recommendationLoading } = useSelector((state) => state.recommendations)
+  const { recommendations, basedOn, loading: recommendationLoading } = useSelector((state) => state.recommendations)
   const { libraryStats, loading: statsLoading } = useSelector((state) => state.report)
 
   useEffect(() => {
@@ -83,11 +82,6 @@ const Dashboard = () => {
     .filter(book => book._id && book.title && book.author && book.availability === true)
     .slice(0, 5)
 
-  // Debug logging
-  console.log('Total books:', books.length)
-  console.log('Available books:', books.filter(book => book.availability === true).length)
-  console.log('Recent books (available only):', recentBooks.length)
-  console.log('First available book:', recentBooks[0])
   const recentBorrowed = myBorrowedBooks.slice(0, 5)
 
   const formatDate = (dateString) => {

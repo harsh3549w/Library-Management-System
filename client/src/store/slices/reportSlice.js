@@ -82,11 +82,9 @@ export const getOverdueReport = createAsyncThunk(
   'report/getOverdueReport',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('Fetching overdue report from:', `${API_URL}/report/overdue`)
       const response = await axios.get(`${API_URL}/report/overdue`, {
         withCredentials: true,
       })
-      console.log('Overdue report response:', response.data)
       return response.data
     } catch (error) {
       console.error('Error fetching overdue report:', error)

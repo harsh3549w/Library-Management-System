@@ -9,6 +9,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import { errorMiddleware, ErrorHandler } from "./middlewares/errorMiddlewares.js";
+import { globalErrorHandler, handleUnhandledRoutes } from "./utils/errorHandler.js";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
 import borrowRouter from "./routes/borrowRouter.js";
@@ -71,19 +72,43 @@ app.use(
   })
 );
 
-// Rate limiting
+// Rate limiting - stricter for production
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // limit each IP to 1000 requests per windowMs (increased for development)
-  message: "Too many requests from this IP, please try again later"
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 100 requests per 15 minutes in production
+  message: "Too many requests from this IP, please try again later",
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use(limiter);
 
+// Stricter rate limiting for auth routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 login attempts per 15 minutes
+  message: "Too many login attempts, please try again later",
+  skipSuccessfulRequests: true,
+});
+
+app.use("/api/v1/auth/login", authLimiter);
+
 // Security headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  crossOriginEmbedderPolicy: false
+}));
 app.use(helmet.xssFilter());
 app.use(helmet.frameguard({ action: "deny" }));
+app.use(helmet.noSniff());
+app.use(helmet.hidePoweredBy());
 
 // Request logging
 app.use(morgan("dev"));
@@ -112,11 +137,17 @@ app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/recommendations', recommendationRouter);
 app.use('/api/v1/donation', donationRouter);
 
-// 404 handler for undefined routes
-app.use((req, res, next) => {
-  const err = new ErrorHandler(`Route ${req.originalUrl} not found`, 404);
-  next(err);
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV 
+  });
 });
 
+// 404 handler for undefined routes
+app.use(handleUnhandledRoutes);
+
 // Error handling middleware (must be last)
-app.use(errorMiddleware);
+app.use(globalErrorHandler);

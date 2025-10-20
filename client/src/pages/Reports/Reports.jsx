@@ -61,12 +61,6 @@ const Reports = () => {
     }
   }, [selectedReport, loading])
 
-  // Debug overdue report data
-  useEffect(() => {
-    if (selectedReport === 'overdue' && overdueReport) {
-      console.log('Overdue Report Data:', overdueReport)
-    }
-  }, [selectedReport, overdueReport])
 
   const handleReportClick = (reportType) => {
     setSelectedReport(reportType)
