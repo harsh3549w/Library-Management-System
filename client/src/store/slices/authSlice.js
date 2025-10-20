@@ -85,6 +85,23 @@ export const resetPassword = createAsyncThunk(
   }
 )
 
+export const resetPasswordWithOTP = createAsyncThunk(
+  'auth/resetPasswordWithOTP',
+  async ({ email, otp, password, confirmPassword }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(`${API_URL}/auth/password/reset`, { 
+        email,
+        otp,
+        password, 
+        confirmPassword 
+      })
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to reset password')
+    }
+  }
+)
+
 export const updateUserInfo = createAsyncThunk(
   'auth/updateUserInfo',
   async (userData, { rejectWithValue }) => {
@@ -99,6 +116,18 @@ export const updateUserInfo = createAsyncThunk(
   }
 )
 
+export const verifyOTPAndChangePassword = createAsyncThunk(
+  'auth/verifyOTPAndChangePassword',
+  async (otpData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/verify-otp-change-password`, otpData)
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to verify OTP and change password')
+    }
+  }
+)
+
 const initialState = {
   user: null,
   isAuthenticated: false,
@@ -107,6 +136,8 @@ const initialState = {
   otpSent: false,
   passwordResetSent: false,
   verificationEmail: null,
+  requiresPasswordChange: false,
+  tempUser: null,
 }
 
 const authSlice = createSlice({
@@ -121,6 +152,10 @@ const authSlice = createSlice({
     },
     clearPasswordResetStatus: (state) => {
       state.passwordResetSent = false
+    },
+    clearPasswordChangeRequirement: (state) => {
+      state.requiresPasswordChange = false
+      state.tempUser = null
     },
   },
   extraReducers: (builder) => {
@@ -147,8 +182,15 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false
-        state.user = action.payload.user
-        state.isAuthenticated = true
+        if (action.payload.requiresPasswordChange) {
+          state.requiresPasswordChange = true
+          state.tempUser = action.payload.user
+        } else {
+          state.user = action.payload.user
+          state.isAuthenticated = true
+          state.requiresPasswordChange = false
+          state.tempUser = null
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false
@@ -207,6 +249,19 @@ const authSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
+      // Reset Password with OTP
+      .addCase(resetPasswordWithOTP.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(resetPasswordWithOTP.fulfilled, (state) => {
+        state.loading = false
+        state.passwordResetSent = false
+      })
+      .addCase(resetPasswordWithOTP.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
       // Update User Info
       .addCase(updateUserInfo.pending, (state) => {
         state.loading = true
@@ -221,8 +276,23 @@ const authSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
+      // Verify OTP and Change Password
+      .addCase(verifyOTPAndChangePassword.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(verifyOTPAndChangePassword.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = true
+        state.requiresPasswordChange = false
+        state.tempUser = null
+      })
+      .addCase(verifyOTPAndChangePassword.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
   },
 })
 
-export const { clearError, clearOTPStatus, clearPasswordResetStatus } = authSlice.actions
+export const { clearError, clearOTPStatus, clearPasswordResetStatus, clearPasswordChangeRequirement } = authSlice.actions
 export default authSlice.reducer

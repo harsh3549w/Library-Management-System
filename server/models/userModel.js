@@ -63,6 +63,18 @@ const userSchema = new mongoose.Schema(
     verificationCodeExpires: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+    
+    // Track first-time login
+    hasLoggedIn: {
+      type: Boolean,
+      default: false,
+    },
+    
+    // Track if user needs to change password on first login
+    needsPasswordChange: {
+      type: Boolean,
+      default: false,
+    },
   },
   { 
     timestamps: true,

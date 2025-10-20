@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, AlertCircle } from 'lucide-react'
-import { login } from '../../store/slices/authSlice'
+import { login, clearPasswordChangeRequirement } from '../../store/slices/authSlice'
 import bgImage from './rectangle-1.png.jpeg'
 import './style.css'
 import iiitdmLogo from './iiitdm-logo.jpeg'
@@ -22,11 +22,20 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' })
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { loading, isAuthenticated, error } = useSelector((s) => s.auth)
+  const { loading, isAuthenticated, error, requiresPasswordChange, tempUser } = useSelector((s) => s.auth)
 
   useEffect(() => {
     if (isAuthenticated) navigate('/dashboard')
-  }, [isAuthenticated, navigate])
+    if (requiresPasswordChange && tempUser) {
+      navigate('/first-time-login-otp', { 
+        state: { 
+          email: tempUser.email,
+          message: 'Password change required for first-time login. Please verify OTP and set a new password.' 
+        } 
+      })
+      dispatch(clearPasswordChangeRequirement())
+    }
+  }, [isAuthenticated, navigate, requiresPasswordChange, tempUser, dispatch])
 
   const handleChange = (e) => {
     const { name, value } = e.target

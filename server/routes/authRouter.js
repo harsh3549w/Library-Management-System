@@ -6,6 +6,7 @@ import {
     getUser,
     forgotPassword,
     resetPassword,
+    verifyOTPAndChangePassword,
     updateUserInfo
 } from "../controllers/authController.js";
 import { isAuthenticated } from "../middlewares/authMiddleware.js";
@@ -17,6 +18,7 @@ router.get("/logout", isAuthenticated, logout);
 router.get("/me", isAuthenticated, getUser);
 router.put("/update-info", isAuthenticated, updateUserInfo);
 router.post("/password/forgot", forgotPassword);
-router.put("/password/reset/:token", resetPassword);
+router.put("/password/reset", resetPassword);
+router.post("/verify-otp-change-password", verifyOTPAndChangePassword);
 
 export default router;

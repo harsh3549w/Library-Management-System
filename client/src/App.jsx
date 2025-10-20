@@ -18,6 +18,8 @@ import Login from './pages/Auth/Login'
 import VerifyOTP from './pages/Auth/VerifyOTP'
 import ForgotPassword from './pages/Auth/ForgotPassword'
 import ResetPassword from './pages/Auth/ResetPassword'
+import ResetPasswordOTP from './pages/Auth/ResetPasswordOTP'
+import FirstTimeLoginOTP from './pages/Auth/FirstTimeLoginOTP'
 import Dashboard from './pages/Dashboard/Dashboard'
 import Books from './pages/Books/Books'
 import AddBook from './pages/Books/AddBook'
@@ -109,6 +111,8 @@ function App() {
         <Route path="/verify-otp" element={!isAuthenticated ? <VerifyOTP /> : <Navigate to="/dashboard" />} />
         <Route path="/forgot-password" element={!isAuthenticated ? <ForgotPassword /> : <Navigate to="/dashboard" />} />
         <Route path="/reset-password/:token" element={!isAuthenticated ? <ResetPassword /> : <Navigate to="/dashboard" />} />
+        <Route path="/reset-password-otp" element={!isAuthenticated ? <ResetPasswordOTP /> : <Navigate to="/dashboard" />} />
+        <Route path="/first-time-login-otp" element={!isAuthenticated ? <FirstTimeLoginOTP /> : <Navigate to="/dashboard" />} />
 
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>

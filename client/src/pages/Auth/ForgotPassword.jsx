@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { forgotPassword } from '../../store/slices/authSlice'
 import { BookOpen, Mail } from 'lucide-react'
@@ -9,6 +9,7 @@ const ForgotPassword = () => {
   const [errors, setErrors] = useState({})
 
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const { loading, passwordResetSent } = useSelector((state) => state.auth)
 
   const validateEmail = () => {
@@ -35,6 +36,14 @@ const ForgotPassword = () => {
     e.preventDefault()
     if (validateEmail()) {
       dispatch(forgotPassword(email))
+        .unwrap()
+        .then(() => {
+          // Navigate to OTP verification page with email
+          navigate('/reset-password-otp', { state: { email } })
+        })
+        .catch((error) => {
+          console.error('Forgot password failed:', error)
+        })
     }
   }
 
@@ -49,9 +58,9 @@ const ForgotPassword = () => {
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
               Check your email
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              We've sent a password reset link to {email}
-            </p>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            We've sent an OTP to {email}
+          </p>
           </div>
           <div className="text-center">
             <Link
@@ -77,7 +86,7 @@ const ForgotPassword = () => {
             Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your email address and we'll send you a link to reset your password
+            Enter your email address and we'll send you an OTP to reset your password
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -111,7 +120,7 @@ const ForgotPassword = () => {
               {loading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               ) : (
-                'Send reset link'
+                'Send OTP'
               )}
             </button>
           </div>
