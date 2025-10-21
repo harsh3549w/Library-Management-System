@@ -31,6 +31,8 @@ export const app = express();
 
 // Trust proxy - important for AWS/production environments
 app.set('trust proxy', 1);
+
+const requiredEnvVars = ["PORT", "MONGO_URI", "JWT_SECRET_KEY", "FRONTEND_URL"];
 for (const varName of requiredEnvVars) {
   if (!process.env[varName]) {
     console.error(`Missing required environment variable: ${varName}`);
