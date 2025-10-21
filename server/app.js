@@ -29,8 +29,8 @@ import { processAllocationQueue } from './services/autoAllocationService.js';
 
 export const app = express();
 
-
-const requiredEnvVars = ["PORT", "MONGO_URI", "JWT_SECRET_KEY", "FRONTEND_URL"];
+// Trust proxy - important for AWS/production environments
+app.set('trust proxy', 1);
 for (const varName of requiredEnvVars) {
   if (!process.env[varName]) {
     console.error(`Missing required environment variable: ${varName}`);
@@ -79,6 +79,10 @@ const limiter = rateLimit({
   message: "Too many requests from this IP, please try again later",
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req, res) => {
+    // Use X-Forwarded-For header if available (for proxies), otherwise use IP
+    return req.ip;
+  }
 });
 
 app.use(limiter);
