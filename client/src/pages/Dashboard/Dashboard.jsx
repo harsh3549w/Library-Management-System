@@ -24,11 +24,14 @@ const Dashboard = () => {
   const { libraryStats, loading: statsLoading } = useSelector((state) => state.report)
 
   useEffect(() => {
-    dispatch(getLibraryStats())
+    // Only fetch library stats for admin users
+    if (user?.role === 'Admin') {
+      dispatch(getLibraryStats())
+    }
     dispatch(getAllBooks())
     dispatch(getMyBorrowedBooks())
     dispatch(getBookRecommendations())
-  }, [dispatch])
+  }, [dispatch, user])
 
   // Clear error messages after 5 seconds
 
