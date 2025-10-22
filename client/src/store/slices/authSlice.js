@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
+import axiosInstance from '../../utils/axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'
 
@@ -23,6 +24,10 @@ export const login = createAsyncThunk(
       const response = await axios.post(`${API_URL}/auth/login`, credentials, {
         withCredentials: true,
       })
+      // Store token in localStorage
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token)
+      }
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Login failed')
@@ -34,11 +39,13 @@ export const logout = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await axios.get(`${API_URL}/auth/logout`, {
-        withCredentials: true,
-      })
+      await axiosInstance.get('/auth/logout')
+      // Clear token from localStorage
+      localStorage.removeItem('token')
       return null
     } catch (error) {
+      // Clear token even if logout request fails
+      localStorage.removeItem('token')
       return rejectWithValue(error.response?.data?.message || 'Logout failed')
     }
   }
@@ -48,9 +55,7 @@ export const getUser = createAsyncThunk(
   'auth/getUser',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${API_URL}/auth/me`, {
-        withCredentials: true,
-      })
+      const response = await axiosInstance.get('/auth/me')
       return response.data
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to get user')

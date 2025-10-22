@@ -4,9 +4,16 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/userModel.js";
 
 export const isAuthenticated = catchAsyncErrors(async (req, res, next) => {
-    const { token } = req.cookies;
+    // Check for token in cookies or Authorization header
+    let token = req.cookies.token;
+    
+    // If no token in cookies, check Authorization header
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+        token = req.headers.authorization.split(' ')[1];
+    }
+    
     console.log("Auth middleware - token:", token ? "present" : "missing");
-    console.log("Auth middleware - cookies:", req.cookies);
+    console.log("Auth middleware - source:", req.cookies.token ? "cookie" : req.headers.authorization ? "header" : "none");
     
     if (!token) {
         return next(new ErrorHandler("Please login to access", 401));
