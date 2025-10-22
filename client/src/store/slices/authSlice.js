@@ -143,6 +143,7 @@ const initialState = {
   verificationEmail: null,
   requiresPasswordChange: false,
   tempUser: null,
+  isLoggingOut: false,
 }
 
 const authSlice = createSlice({
@@ -187,6 +188,7 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false
+        state.isLoggingOut = false  // Reset on successful login
         if (action.payload.requiresPasswordChange) {
           state.requiresPasswordChange = true
           state.tempUser = action.payload.user
@@ -204,15 +206,20 @@ const authSlice = createSlice({
       // Logout
       .addCase(logout.pending, (state) => {
         state.loading = true
+        state.isLoggingOut = true
       })
       .addCase(logout.fulfilled, (state) => {
         state.loading = false
         state.user = null
         state.isAuthenticated = false
+        state.isLoggingOut = true  // Keep true to prevent re-auth
       })
       .addCase(logout.rejected, (state, action) => {
         state.loading = false
+        state.user = null
+        state.isAuthenticated = false
         state.error = action.payload
+        state.isLoggingOut = true  // Still logout even if server fails
       })
       // Get User
       .addCase(getUser.pending, (state) => {

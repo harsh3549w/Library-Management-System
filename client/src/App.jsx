@@ -48,17 +48,17 @@ import Contact from './pages/Contact/Contact'
 
 function App() {
   const dispatch = useDispatch()
-  const { isAuthenticated, user, error: authError } = useSelector((state) => state.auth)
+  const { isAuthenticated, user, error: authError, isLoggingOut } = useSelector((state) => state.auth)
   const { error: bookError, success: bookSuccess } = useSelector((state) => state.books)
   const { error: borrowError, success: borrowSuccess } = useSelector((state) => state.borrow)
   const { error: userError, success: userSuccess } = useSelector((state) => state.users)
 
   useEffect(() => {
-    // Check if user is authenticated on app load
-    if (!isAuthenticated) {
+    // Check if user is authenticated on app load, but not if we're logging out
+    if (!isAuthenticated && !isLoggingOut) {
       dispatch(getUser())
     }
-  }, [dispatch, isAuthenticated])
+  }, [dispatch, isAuthenticated, isLoggingOut])
 
   // Handle auth errors
   useEffect(() => {
