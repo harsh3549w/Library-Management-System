@@ -4,6 +4,7 @@ config({ path: "./config/config.env" });
 import mongoose from "mongoose";
 import { User } from "./models/userModel.js";
 import { Borrow } from "./models/borrowModel.js";
+import { Book } from "./models/bookModel.js";
 
 const checkFines = async () => {
   try {
