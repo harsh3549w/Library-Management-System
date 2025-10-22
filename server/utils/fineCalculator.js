@@ -3,9 +3,8 @@ export const calculateFine = (dueDate) => {
   const today = new Date();
   
   if (today > dueDate) {
-    // For testing: treat every 10 minutes as 1 day for fine calculation
-    const lateMinutes = Math.ceil((today - dueDate) / (1000 * 60));
-    const lateDays = Math.ceil(lateMinutes / 10); // Every 10 minutes = 1 day for testing
+    // Calculate actual days overdue
+    const lateDays = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
     const fine = lateDays * finePerDay;
     return fine;
   }
