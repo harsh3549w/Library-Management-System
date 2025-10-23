@@ -97,9 +97,11 @@ app.use(limiter);
 // Stricter rate limiting for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 login attempts per 15 minutes
+  max: 20, // 20 login attempts per 15 minutes (increased from 5)
   message: "Too many login attempts, please try again later",
-  skipSuccessfulRequests: true,
+  skipSuccessfulRequests: true, // Don't count successful logins
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 app.use("/api/v1/auth/login", authLimiter);
