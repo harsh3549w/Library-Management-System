@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "MERN_STACK_LIBRARY_MANAGEMENT",
       // Production optimizations
       maxPoolSize: 10, // Maintain up to 10 socket connections
       serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
@@ -13,7 +14,7 @@ export const connectDB = async () => {
       bufferCommands: false, // Disable mongoose buffering
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected to MERN_STACK_LIBRARY_MANAGEMENT: ${conn.connection.host}`);
     
     // Handle connection events
     mongoose.connection.on('error', (err) => {

@@ -140,3 +140,8 @@ print_status "🎉 Your Library Management System backend is now deployed on AWS
 print_status "Access your API at: http://your-ec2-ip"
 print_status "Health check: http://your-ec2-ip/health"
 
+
+
+
+
+

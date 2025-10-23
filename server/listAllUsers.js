@@ -6,10 +6,14 @@ import { User } from "./models/userModel.js";
 
 const listUsers = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to database\n");
+    // Connect to MERN_STACK_LIBRARY_MANAGEMENT database specifically
+    const dbUri = process.env.MONGO_URI.replace('/?', '/MERN_STACK_LIBRARY_MANAGEMENT?');
+    await mongoose.connect(dbUri);
+    console.log("Connected to MERN_STACK_LIBRARY_MANAGEMENT database");
+    console.log("Database:", mongoose.connection.name);
+    console.log("");
 
-    // Get all users
+    // Get all users from MERN_STACK_LIBRARY_MANAGEMENT database
     const allUsers = await User.find({}).select('name email role fineBalance totalFinesPaid');
     
     console.log(`=== ALL USERS (${allUsers.length}) ===\n`);
@@ -42,4 +46,5 @@ const listUsers = async () => {
 };
 
 listUsers();
+
 

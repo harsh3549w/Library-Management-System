@@ -8,8 +8,10 @@ import { Book } from "./models/bookModel.js";
 
 const checkUser = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to database");
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "MERN_STACK_LIBRARY_MANAGEMENT"
+    });
+    console.log("Connected to MERN_STACK_LIBRARY_MANAGEMENT database");
 
     // Check specific user
     const email = "dhruvsing2003@gmail.com";
@@ -78,4 +80,5 @@ const checkUser = async () => {
 };
 
 checkUser();
+
 

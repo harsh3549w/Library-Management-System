@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getMyBorrowedBooks, renewBook, returnBorrowedBook, updateOverdueFines, clearError, clearSuccess } from '../../store/slices/borrowSlice'
 import { 
@@ -15,6 +15,8 @@ import {
 const BorrowedBooks = () => {
   const dispatch = useDispatch()
   const { myBorrowedBooks, loading, error, success, message } = useSelector((state) => state.borrow)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [confirmAction, setConfirmAction] = useState(null)
 
   useEffect(() => {
     // First update overdue fines, then get borrowed books
@@ -40,16 +42,32 @@ const BorrowedBooks = () => {
     }
   }, [error, dispatch])
 
-  const handleRenew = (borrowId) => {
-    if (window.confirm('Are you sure you want to renew this book? This will extend the due date by 10 minutes.')) {
-      dispatch(renewBook(borrowId))
-    }
+  const handleRenew = (borrowId, bookTitle) => {
+    setConfirmAction({
+      type: 'renew',
+      borrowId,
+      bookTitle,
+      message: 'This will extend the due date by 10 minutes.',
+      confirmText: 'Yes, Renew',
+      action: () => {
+        dispatch(renewBook(borrowId))
+      }
+    })
+    setShowConfirmModal(true)
   }
 
-  const handleReturn = (borrowId) => {
-    if (window.confirm('Are you sure you want to return this book? This action cannot be undone.')) {
-      dispatch(returnBorrowedBook(borrowId))
-    }
+  const handleReturn = (borrowId, bookTitle) => {
+    setConfirmAction({
+      type: 'return',
+      borrowId,
+      bookTitle,
+      message: 'Are you sure you want to return this book? This action cannot be undone.',
+      confirmText: 'Yes, Return',
+      action: () => {
+        dispatch(returnBorrowedBook(borrowId))
+      }
+    })
+    setShowConfirmModal(true)
   }
 
   const canRenew = (borrowed) => {
@@ -260,7 +278,7 @@ const BorrowedBooks = () => {
                           <div className="flex flex-col gap-2">
                             {renewalAllowed && (
                               <button
-                                onClick={() => handleRenew(borrowed._id)}
+                                onClick={() => handleRenew(borrowed._id, borrowed.book.title)}
                                 disabled={loading}
                                 className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                               >
@@ -269,7 +287,7 @@ const BorrowedBooks = () => {
                               </button>
                             )}
                             <button
-                              onClick={() => handleReturn(borrowed._id)}
+                              onClick={() => handleReturn(borrowed._id, borrowed.book.title)}
                               disabled={loading}
                               className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                             >
@@ -329,6 +347,44 @@ const BorrowedBooks = () => {
           </div>
         </div>
       </div>
+
+      {/* Custom Confirmation Modal */}
+      {showConfirmModal && confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowConfirmModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className={`p-6 ${confirmAction.type === 'renew' ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : 'bg-gradient-to-r from-green-500 to-emerald-500'} text-white`}>
+              <h3 className="text-xl font-semibold">
+                {confirmAction.type === 'renew' ? 'Confirm Renewal' : 'Confirm Return'}
+              </h3>
+              <p className="text-sm opacity-90 mt-1">{confirmAction.bookTitle}</p>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">{confirmAction.message}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    confirmAction.action()
+                    setShowConfirmModal(false)
+                  }}
+                  className={`flex-1 px-4 py-2 rounded-lg text-white transition-colors ${
+                    confirmAction.type === 'renew' 
+                      ? 'bg-indigo-600 hover:bg-indigo-700' 
+                      : 'bg-green-600 hover:bg-green-700'
+                  }`}
+                >
+                  {confirmAction.confirmText}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

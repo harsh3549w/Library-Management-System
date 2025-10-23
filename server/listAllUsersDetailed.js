@@ -6,12 +6,14 @@ import { User } from "./models/userModel.js";
 
 const listUsers = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log("Connected to database");
+    // Connect to MERN_STACK_LIBRARY_MANAGEMENT database specifically
+    const dbUri = process.env.MONGO_URI.replace('/?', '/MERN_STACK_LIBRARY_MANAGEMENT?');
+    await mongoose.connect(dbUri);
+    console.log("Connected to MERN_STACK_LIBRARY_MANAGEMENT database");
     console.log("Database:", mongoose.connection.name);
     console.log("");
 
-    // Get ALL users (including unverified)
+    // Get ALL users from MERN_STACK_LIBRARY_MANAGEMENT database (including unverified)
     const allUsers = await User.find({}).select('name email role fineBalance totalFinesPaid accountVerified createdAt').sort({ createdAt: -1 });
     
     console.log(`=== ALL USERS (${allUsers.length}) - INCLUDING UNVERIFIED ===\n`);
@@ -56,4 +58,5 @@ const listUsers = async () => {
 };
 
 listUsers();
+
 
