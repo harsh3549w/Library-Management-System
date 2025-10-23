@@ -55,10 +55,12 @@ function App() {
 
   useEffect(() => {
     // Check if user is authenticated on app load, but not if we're logging out
-    if (!isAuthenticated && !isLoggingOut) {
+    // Only try once on mount if there's a token in localStorage
+    const token = localStorage.getItem('token')
+    if (!isAuthenticated && !isLoggingOut && token) {
       dispatch(getUser())
     }
-  }, [dispatch, isAuthenticated, isLoggingOut])
+  }, [dispatch]) // Only run once on mount
 
   // Handle auth errors
   useEffect(() => {
