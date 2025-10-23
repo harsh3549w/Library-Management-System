@@ -3,82 +3,98 @@ import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
 import { Book } from "../models/bookModel.js";
 import { Borrow } from "../models/borrowModel.js";
 
-// Get book recommendations based on user's latest borrowed book genre
+// Get book recommendations based on user's borrowing history (genre, author, random)
 export const getBookRecommendations = catchAsyncErrors(async (req, res, next) => {
     const userId = req.user._id;
 
     try {
-        // Get user's latest borrowed book
-        const latestBorrow = await Borrow.findOne({
-            "user.id": userId,
-            returnDate: null // Only active borrows
+        // Get user's borrowing history
+        const userBorrows = await Borrow.find({
+            "user.id": userId
         })
         .populate('book')
-        .sort({ borrowDate: -1 }); // Get the most recent borrow
+        .sort({ borrowDate: -1 })
+        .limit(10); // Look at last 10 borrows
 
-        if (!latestBorrow || !latestBorrow.book) {
-            // If user has no borrowed books, return popular books
-            const popularBooks = await Book.find({ availability: true })
-                .sort({ createdAt: -1 })
-                .limit(4);
+        const borrowedBookIds = userBorrows.map(b => b.book?._id).filter(Boolean);
+        let recommendedBooks = [];
+        let recommendationBasis = [];
+
+        if (userBorrows.length > 0 && userBorrows[0].book) {
+            const latestBook = userBorrows[0].book;
             
-            return res.status(200).json({
-                success: true,
-                recommendations: popularBooks,
-                message: "Popular books recommendation"
-            });
-        }
-
-        const latestBook = latestBorrow.book;
-        const userGenre = latestBook.genre;
-
-        if (!userGenre) {
-            // If latest book has no genre, return popular books
-            const popularBooks = await Book.find({ availability: true })
-                .sort({ createdAt: -1 })
-                .limit(4);
-            
-            return res.status(200).json({
-                success: true,
-                recommendations: popularBooks,
-                message: "Popular books recommendation"
-            });
-        }
-
-        // Find books from the same genre, excluding the user's current borrowed book
-        const recommendedBooks = await Book.find({
-            genre: userGenre,
-            availability: true,
-            _id: { $ne: latestBook._id } // Exclude the book user already has
-        })
-        .sort({ createdAt: -1 })
-        .limit(4);
-
-        // If we don't have enough books from the same genre, fill with popular books
-        if (recommendedBooks.length < 4) {
-            const additionalBooks = await Book.find({
-                availability: true,
-                _id: { 
-                    $nin: [
-                        latestBook._id,
-                        ...recommendedBooks.map(book => book._id)
-                    ]
+            // Step 1: Find books by same author (excluding already borrowed)
+            if (latestBook.author) {
+                const authorBooks = await Book.find({
+                    author: latestBook.author,
+                    availability: true,
+                    _id: { $nin: borrowedBookIds }
+                })
+                .limit(2);
+                recommendedBooks.push(...authorBooks);
+                if (authorBooks.length > 0) {
+                    recommendationBasis.push(`author: ${latestBook.author}`);
                 }
-            })
-            .sort({ createdAt: -1 })
-            .limit(4 - recommendedBooks.length);
+            }
 
-            recommendedBooks.push(...additionalBooks);
+            // Step 2: Find books from same genre (excluding already borrowed and already recommended)
+            if (latestBook.genre && recommendedBooks.length < 4) {
+                const genreBooks = await Book.find({
+                    genre: latestBook.genre,
+                    availability: true,
+                    _id: { 
+                        $nin: [
+                            ...borrowedBookIds,
+                            ...recommendedBooks.map(b => b._id)
+                        ]
+                    }
+                })
+                .limit(4 - recommendedBooks.length);
+                recommendedBooks.push(...genreBooks);
+                if (genreBooks.length > 0) {
+                    recommendationBasis.push(`genre: ${latestBook.genre}`);
+                }
+            }
+        }
+
+        // Step 3: Fill remaining slots with random available books
+        if (recommendedBooks.length < 4) {
+            const randomBooks = await Book.aggregate([
+                {
+                    $match: {
+                        availability: true,
+                        _id: {
+                            $nin: [
+                                ...borrowedBookIds,
+                                ...recommendedBooks.map(b => b._id)
+                            ]
+                        }
+                    }
+                },
+                { $sample: { size: 4 - recommendedBooks.length } }
+            ]);
+            recommendedBooks.push(...randomBooks);
+            if (randomBooks.length > 0) {
+                recommendationBasis.push('random selection');
+            }
+        }
+
+        // If still no books, just get any available books
+        if (recommendedBooks.length === 0) {
+            recommendedBooks = await Book.find({ availability: true })
+                .limit(4);
+            recommendationBasis = ['popular books'];
         }
 
         res.status(200).json({
             success: true,
             recommendations: recommendedBooks,
-            basedOn: {
-                book: latestBook.title,
-                genre: userGenre
-            },
-            message: `Books similar to "${latestBook.title}"`
+            basedOn: recommendationBasis.length > 0 
+                ? recommendationBasis.join(', ') 
+                : 'popular books',
+            message: userBorrows.length > 0 && userBorrows[0].book
+                ? `Recommendations based on "${userBorrows[0].book.title}"`
+                : "Popular books for you"
         });
 
     } catch (error) {

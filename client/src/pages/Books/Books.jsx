@@ -28,6 +28,10 @@ const Books = () => {
   const [coverPreview, setCoverPreview] = useState('')
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
+  const [borrowingBookId, setBorrowingBookId] = useState(null)
+  const [reservingBookId, setReservingBookId] = useState(null)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [confirmAction, setConfirmAction] = useState(null)
 
   const dispatch = useDispatch()
   const location = useLocation()
@@ -87,16 +91,38 @@ const Books = () => {
     }
   }, [reserveError, dispatch])
 
-  const handleBorrowBook = (bookId) => {
-    if (window.confirm('Are you sure you want to borrow this book?')) {
-      dispatch(borrowBookForSelf(bookId))
-    }
+  const handleBorrowBook = (bookId, bookTitle) => {
+    setConfirmAction({
+      type: 'borrow',
+      bookId,
+      bookTitle,
+      message: 'Are you sure you want to borrow this book?',
+      confirmText: 'Yes, Borrow',
+      action: () => {
+        setBorrowingBookId(bookId)
+        dispatch(borrowBookForSelf(bookId)).finally(() => {
+          setBorrowingBookId(null)
+        })
+      }
+    })
+    setShowConfirmModal(true)
   }
 
-  const handleReserveBook = (bookId) => {
-    if (window.confirm('Reserve this book? You will be notified when it becomes available.')) {
-      dispatch(reserveBook(bookId))
-    }
+  const handleReserveBook = (bookId, bookTitle) => {
+    setConfirmAction({
+      type: 'reserve',
+      bookId,
+      bookTitle,
+      message: 'Reserve this book? You will be notified when it becomes available.',
+      confirmText: 'Yes, Reserve',
+      action: () => {
+        setReservingBookId(bookId)
+        dispatch(reserveBook(bookId)).finally(() => {
+          setReservingBookId(null)
+        })
+      }
+    })
+    setShowConfirmModal(true)
   }
 
   // Filter and search books
@@ -354,20 +380,20 @@ const Books = () => {
                         {isAvailable(book) ? (
                           <button 
                             className="flex-1 btn-primary text-sm py-2 flex items-center justify-center gap-2"
-                            onClick={() => handleBorrowBook(book._id)}
-                            disabled={borrowLoading}
+                            onClick={() => handleBorrowBook(book._id, book.title)}
+                            disabled={borrowingBookId === book._id}
                           >
                             <BookMarked className="h-4 w-4" />
-                            <span>{borrowLoading ? 'Borrowing...' : 'Borrow'}</span>
+                            <span>{borrowingBookId === book._id ? 'Borrowing...' : 'Borrow'}</span>
                           </button>
                         ) : (
                           <button 
                             className="flex-1 bg-orange-600 hover:bg-orange-700 text-white text-sm py-2 flex items-center justify-center gap-2 rounded-lg transition-colors disabled:opacity-50"
-                            onClick={() => handleReserveBook(book._id)}
-                            disabled={reserveLoading}
+                            onClick={() => handleReserveBook(book._id, book.title)}
+                            disabled={reservingBookId === book._id}
                           >
                             <Bell className="h-4 w-4" />
-                            <span>{reserveLoading ? 'Reserving...' : 'Reserve'}</span>
+                            <span>{reservingBookId === book._id ? 'Reserving...' : 'Reserve'}</span>
                           </button>
                         )}
                       </>
@@ -523,8 +549,46 @@ const Books = () => {
             </div>
           </div>
         </div>
-      </div>
-    )}
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && confirmAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setShowConfirmModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className={`p-6 ${confirmAction.type === 'borrow' ? 'bg-gradient-to-r from-blue-500 to-indigo-500' : 'bg-gradient-to-r from-orange-500 to-amber-500'} text-white`}>
+              <h3 className="text-xl font-semibold">
+                {confirmAction.type === 'borrow' ? 'Confirm Borrow' : 'Confirm Reservation'}
+              </h3>
+              <p className="text-sm opacity-90 mt-1">{confirmAction.bookTitle}</p>
+            </div>
+            <div className="p-6">
+              <p className="text-gray-700 mb-6">{confirmAction.message}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    confirmAction.action()
+                    setShowConfirmModal(false)
+                  }}
+                  className={`flex-1 px-4 py-2 rounded-lg text-white transition-colors ${
+                    confirmAction.type === 'borrow' 
+                      ? 'bg-blue-600 hover:bg-blue-700' 
+                      : 'bg-orange-600 hover:bg-orange-700'
+                  }`}
+                >
+                  {confirmAction.confirmText}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
