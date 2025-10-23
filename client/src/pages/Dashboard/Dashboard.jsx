@@ -322,7 +322,12 @@ const Dashboard = () => {
               <h2 className="text-gray-800">Recommended for You</h2>
               {basedOn && (
                 <p className="text-sm text-gray-600">
-                  Based on "{basedOn.book}" ({basedOn.genre})
+                  Based on {basedOn}
+                </p>
+              )}
+              {!basedOn && recommendations.length > 0 && (
+                <p className="text-sm text-gray-600">
+                  Popular books for you
                 </p>
               )}
             </div>
@@ -339,33 +344,31 @@ const Dashboard = () => {
         ) : recommendations.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {recommendations.map((book) => (
-              <div key={book._id} className="bg-white/30 rounded-lg p-4 hover:bg-white/40 transition-colors border border-white/40">
-                <div className="flex flex-col h-full">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
-                      {book.title}
-                    </h3>
-                    <p className="text-xs text-gray-500 mb-2 line-clamp-1">
-                      by {book.author}
-                    </p>
-                    {book.genre && (
-                      <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full mb-2">
-                        {book.genre}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500">
-                      {book.quantity} copies
+              <div key={book._id} className="bg-white/30 rounded-lg p-4 hover:bg-white/40 transition-colors border border-white/40 flex flex-col">
+                <div className="flex-1 flex flex-col">
+                  <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 min-h-[40px]">
+                    {book.title}
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-2 line-clamp-1">
+                    by {book.author}
+                  </p>
+                  {book.genre && (
+                    <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full mb-2 w-fit">
+                      {book.genre}
                     </span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      book.availability 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      {book.availability ? 'Available' : 'Borrowed'}
-                    </span>
-                  </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between mt-auto pt-2">
+                  <span className="text-xs text-gray-500">
+                    {book.quantity} copies
+                  </span>
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    book.availability 
+                      ? 'bg-green-100 text-green-700' 
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {book.availability ? 'Available' : 'Borrowed'}
+                  </span>
                 </div>
               </div>
             ))}
