@@ -345,12 +345,12 @@ const Books = () => {
               {/* Book Details */}
               <div className="p-4 flex flex-col flex-1">
                 <div className="space-y-3 flex-1 flex flex-col">
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-h-[88px]">
                     <h3 className="font-semibold text-gray-900 line-clamp-2 text-lg min-h-[56px]">{book.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-1">by {book.author}</p>
+                    <p className="text-sm text-gray-600 line-clamp-1 min-h-[20px]">by {book.author}</p>
                   </div>
                   
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between text-sm min-h-[28px]">
                     <div className="flex items-center space-x-2">
                       {book.genre && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
@@ -363,13 +363,13 @@ const Books = () => {
                     </span>
                   </div>
 
-                  <div className="text-xs text-gray-500 space-y-0.5 min-h-[32px]">
+                  <div className="text-xs text-gray-500 space-y-0.5 min-h-[40px]">
                     {book.isbn && <p className="truncate">ISBN: {book.isbn}</p>}
                     {book.publicationYear && <p>Published: {book.publicationYear}</p>}
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-gray-200 mt-auto">
+                <div className="pt-3 border-t border-gray-200 mt-auto min-h-[56px]">
                   <div className="flex space-x-2">
                     <button className="flex-1 btn-secondary text-sm py-2 flex items-center justify-center gap-2" onClick={() => setDetailBook(book)}>
                       <Eye className="h-4 w-4" />
