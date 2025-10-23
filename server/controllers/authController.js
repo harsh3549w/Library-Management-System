@@ -53,7 +53,19 @@ export const login = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Invalid email or password", 400));
     }
     
-    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    // Ensure password exists in database
+    if (!user.password) {
+        console.log("User has no password set:", email);
+        return next(new ErrorHandler("Account configuration error. Please contact admin.", 500));
+    }
+    
+    let isPasswordMatched = false;
+    try {
+        isPasswordMatched = await bcrypt.compare(password, user.password);
+    } catch (bcryptError) {
+        console.error("Bcrypt error for user:", email, bcryptError);
+        return next(new ErrorHandler("Invalid email or password", 400));
+    }
     
     if (!isPasswordMatched) {
         console.log("Password mismatch for user:", email);
