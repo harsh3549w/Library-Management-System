@@ -91,6 +91,25 @@ const MyFines = () => {
                 <p className="text-3xl font-bold text-red-900 mt-2">
                   ₹{myFines.fineBalance?.toFixed(2) || '0.00'}
                 </p>
+                {myFines.fineBalance > 0 && (
+                  <button
+                    onClick={() => {
+                      setSelectedBorrow({
+                        _id: 'total_balance',
+                        fine: myFines.fineBalance,
+                        book: {
+                          title: 'Outstanding Fine Balance',
+                          author: 'Multiple Books'
+                        }
+                      })
+                      setShowPayment(true)
+                    }}
+                    className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  >
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay Now
+                  </button>
+                )}
               </div>
               <div className="p-3 bg-red-200 rounded-full">
                 <DollarSign className="h-8 w-8 text-red-700" />
