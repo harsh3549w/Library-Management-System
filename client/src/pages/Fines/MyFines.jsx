@@ -17,6 +17,8 @@ const MyFines = () => {
   const { user } = useSelector((state) => state.auth)
   const [showPayment, setShowPayment] = useState(false)
   const [selectedBorrow, setSelectedBorrow] = useState(null)
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
+  const [paymentMessage, setPaymentMessage] = useState('')
 
   useEffect(() => {
     // First update overdue fines, then get fines
@@ -64,6 +66,17 @@ const MyFines = () => {
         <h1 className="text-2xl font-bold text-gray-900">My Fines</h1>
         <p className="text-gray-600">View and manage your library fines</p>
       </div>
+
+      {/* Payment Success Message */}
+      {paymentSuccess && paymentMessage && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-4 flex items-start shadow-lg animate-pulse">
+          <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 mr-3" />
+          <div className="flex-1">
+            <p className="text-green-900 font-semibold text-lg">{paymentMessage}</p>
+            <p className="text-green-700 text-sm mt-1">Your payment has been processed successfully!</p>
+          </div>
+        </div>
+      )}
 
       {/* Success Message */}
       {success && message && (
@@ -312,10 +325,15 @@ const MyFines = () => {
           onSuccess={(successMessage) => {
             setShowPayment(false)
             setSelectedBorrow(null)
+            setPaymentSuccess(true)
+            setPaymentMessage(successMessage || 'Payment successful!')
             // Refresh fines data
             dispatch(getMyFines())
-            // Show success message
-            alert(successMessage || 'Payment successful!')
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+              setPaymentSuccess(false)
+              setPaymentMessage('')
+            }, 5000)
           }}
         />
       )}

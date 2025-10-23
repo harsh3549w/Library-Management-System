@@ -293,9 +293,9 @@ const Books = () => {
       ) : sortedBooks.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedBooks.map((book) => (
-            <div key={book._id} className="card hover:shadow-lg transition-all duration-200 overflow-hidden p-0">
+            <div key={book._id} className="card hover:shadow-lg transition-all duration-200 overflow-hidden p-0 flex flex-col h-full">
               {/* Book Cover Image */}
-              <div className="relative h-64 bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden">
+              <div className="relative h-64 bg-gradient-to-br from-blue-50 to-indigo-100 overflow-hidden flex-shrink-0">
                 {book.coverImage?.url ? (
                   <img
                     src={book.coverImage.url}
@@ -343,33 +343,33 @@ const Books = () => {
               </div>
 
               {/* Book Details */}
-              <div className="p-4 space-y-3">
-                <div className="space-y-1">
-                  <h3 className="font-semibold text-gray-900 line-clamp-2 text-lg">{book.title}</h3>
-                  <p className="text-sm text-gray-600">by {book.author}</p>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-2">
-                    {book.genre && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
-                        {book.genre}
-                      </span>
-                    )}
+              <div className="p-4 flex flex-col flex-1">
+                <div className="space-y-3 flex-1 flex flex-col">
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-gray-900 line-clamp-2 text-lg min-h-[56px]">{book.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-1">by {book.author}</p>
                   </div>
-                  <span className="text-gray-600 font-medium">
-                    {book.quantity} {book.quantity !== 1 ? 'copies' : 'copy'}
-                  </span>
-                </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center space-x-2">
+                      {book.genre && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                          {book.genre}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-gray-600 font-medium">
+                      {book.quantity} {book.quantity !== 1 ? 'copies' : 'copy'}
+                    </span>
+                  </div>
 
-                {(book.isbn || book.publicationYear) && (
-                  <div className="text-xs text-gray-500 space-y-0.5">
-                    {book.isbn && <p>ISBN: {book.isbn}</p>}
+                  <div className="text-xs text-gray-500 space-y-0.5 min-h-[32px]">
+                    {book.isbn && <p className="truncate">ISBN: {book.isbn}</p>}
                     {book.publicationYear && <p>Published: {book.publicationYear}</p>}
                   </div>
-                )}
+                </div>
 
-                <div className="pt-3 border-t border-gray-200">
+                <div className="pt-3 border-t border-gray-200 mt-auto">
                   <div className="flex space-x-2">
                     <button className="flex-1 btn-secondary text-sm py-2 flex items-center justify-center gap-2" onClick={() => setDetailBook(book)}>
                       <Eye className="h-4 w-4" />
