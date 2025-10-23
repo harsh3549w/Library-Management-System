@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { getUser } from './store/slices/authSlice'
 import { clearError as clearAuthError } from './store/slices/authSlice'
 import { clearError as clearBookError, clearSuccess as clearBookSuccess } from './store/slices/bookSlice'
@@ -104,6 +105,9 @@ function App() {
 
   return (
     <div className="App min-h-screen">
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
+      
       {/* Background with mint green + texture overlay */}
       <div aria-hidden="true" className="fixed inset-0 pointer-events-none">
         <div className="absolute bg-[#e3fff7] inset-0" />
