@@ -82,35 +82,35 @@ const Header = ({ onMenuClick }) => {
   }
 
   return (
-    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-4 mt-4">
-      <div className="flex items-center justify-between px-6 py-4">
+    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-2 sm:mx-4 mt-4">
+      <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-2 sm:gap-4">
 
         {/* Mobile menu button */}
         <button
           type="button"
-          className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+          className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 flex-shrink-0"
           onClick={onMenuClick}
         >
           <span className="sr-only">Open sidebar</span>
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Search Bar */}
-        <div className="relative w-[280px]">
-          <form onSubmit={handleSearch} className="bg-white/60 backdrop-blur-sm h-[44px] rounded-[15px] flex items-center px-4 border border-white/50 shadow-sm">
-            <Search className="size-[20px] text-gray-600" />
+        {/* Search Bar - Responsive width */}
+        <div className="relative flex-1 max-w-md">
+          <form onSubmit={handleSearch} className="bg-white/60 backdrop-blur-sm h-[40px] sm:h-[44px] rounded-[15px] flex items-center px-3 sm:px-4 border border-white/50 shadow-sm">
+            <Search className="size-[18px] sm:size-[20px] text-gray-600 flex-shrink-0" />
             <input
               type="text"
-              placeholder="Search library..."
+              placeholder="Search..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="ml-3 bg-transparent border-none outline-none flex-1 text-sm text-gray-800 placeholder:text-gray-500"
+              className="ml-2 sm:ml-3 bg-transparent border-none outline-none flex-1 text-sm text-gray-800 placeholder:text-gray-500 min-w-0"
             />
           </form>
         </div>
 
-        {/* Navigation Links */}
-        <nav className="flex gap-8">
+        {/* Navigation Links - Hidden on mobile */}
+        <nav className="hidden xl:flex gap-6 lg:gap-8">
           <Link to="/dashboard" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">Home</Link>
           <Link to="/profile" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">About Us</Link>
           <Link to="/books" className="text-gray-800 hover:text-gray-900 transition-colors text-sm font-medium">E-books</Link>
@@ -118,16 +118,16 @@ const Header = ({ onMenuClick }) => {
         </nav>
 
         {/* Right side - User Profile Dropdown */}
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <button
             ref={buttonRef}
             onClick={() => {
               setIsProfileDropdownOpen(!isProfileDropdownOpen)
             }}
-            className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/50 shadow-sm hover:bg-white/80 transition-colors"
+            className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-lg px-2 sm:px-4 py-2 border border-white/50 shadow-sm hover:bg-white/80 transition-colors"
           >
             <User className="h-5 w-5 text-gray-600" />
-            <span className="text-gray-800 font-medium text-sm">
+            <span className="hidden sm:block text-gray-800 font-medium text-sm truncate max-w-[120px]">
               {user?.name || user?.email || 'User'}
             </span>
             <ChevronDown className="h-4 w-4 text-gray-600" />
