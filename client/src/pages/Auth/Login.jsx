@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, AlertCircle } from 'lucide-react'
 import { login, clearPasswordChangeRequirement } from '../../store/slices/authSlice'
 import './style.css'
-import iiitdmLogo from './iiitdm-logo.jpeg'
+import iiitdmLogo from './iiitdm-logo.webp'
 
 // IIITDM logo component
 const IIITDMLogo = () => (
@@ -52,8 +52,15 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col sm:block items-center justify-start sm:justify-center relative px-4 pt-8 pb-8 sm:py-6">
-      {/* Background overlay */}
-      <div className="absolute inset-0 bg-[#e3fff7]" />
+      {/* Blurred background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: 'url(/images/baackground.webp)',
+          filter: 'blur(8px)',
+          transform: 'scale(1.1) rotate(180deg)'
+        }}
+      />
       <div className="absolute inset-0 bg-page-overlay" />
 
       {/* Logo - positioned absolutely on desktop, in flow on mobile */}
