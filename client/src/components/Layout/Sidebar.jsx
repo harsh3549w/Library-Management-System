@@ -69,6 +69,8 @@ const Sidebar = ({ open, setOpen }) => {
                 alt="IIITDM Logo"
                 className="w-full h-full object-cover rounded-lg"
                 style={{ border: 'none', outline: 'none' }}
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>

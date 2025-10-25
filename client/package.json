@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "optimize-images": "node optimize-images.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.0.0",
@@ -16,6 +17,7 @@
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "lucide-react": "^0.469.0",
+    "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.3.1",
@@ -36,6 +38,7 @@
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
     "postcss": "^8.4.49",
+    "sharp": "^0.33.5",
     "tailwindcss": "^3.4.17",
     "terser": "^5.44.0",
     "vite": "^6.0.5"

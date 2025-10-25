@@ -26,6 +26,10 @@ export default defineConfig({
           ui: ['lucide-react', '@headlessui/react'],
         }
       }
-    }
-  }
+    },
+    // Enable image optimization
+    assetsInlineLimit: 4096, // Inline assets smaller than 4kb as base64
+  },
+  // Optimize asset handling
+  assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg', '**/*.webp'],
 })

@@ -14,6 +14,8 @@ const IIITDMLogo = () => (
       src={iiitdmLogo}
       alt="IIITDM Logo"
       className="w-28 h-28 bg-white/90 backdrop-blur-sm rounded-full border-2 border-gray-400 shadow-lg object-cover"
+      loading="eager"
+      decoding="async"
     />
   </div>
 )
