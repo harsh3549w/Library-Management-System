@@ -85,9 +85,6 @@ server/validateAWSCredentials.js
 server/seedDatabase.js
 server/uploadStaticImages.js
 
-# Cloudinary config (contains URLs, but better to keep out of git)
-client/src/config/cloudinaryUrls.js
-
 # Uploads and temp files
 /tmp/
 uploads/
