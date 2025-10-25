@@ -3,11 +3,12 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'react-toastify'
 import { SpeedInsights } from '@vercel/speed-insights/react'
-import { getUser } from './store/slices/authSlice'
+import { getUser, logout } from './store/slices/authSlice'
 import { clearError as clearAuthError } from './store/slices/authSlice'
 import { clearError as clearBookError, clearSuccess as clearBookSuccess } from './store/slices/bookSlice'
 import { clearError as clearBorrowError } from './store/slices/borrowSlice'
 import { clearError as clearUserError, clearSuccess as clearUserSuccess } from './store/slices/userSlice'
+import { setLogoutDispatch } from './utils/axios'
 
 // Components
 import Layout from './components/Layout/Layout'
@@ -54,6 +55,11 @@ function App() {
   const { error: bookError, success: bookSuccess } = useSelector((state) => state.books)
   const { error: borrowError, success: borrowSuccess } = useSelector((state) => state.borrow)
   const { error: userError, success: userSuccess } = useSelector((state) => state.users)
+
+  // Set up logout dispatch for axios interceptor (avoids circular dependency)
+  useEffect(() => {
+    setLogoutDispatch(() => dispatch(logout()))
+  }, [dispatch])
 
   useEffect(() => {
     // Check if user is authenticated on app load, but not if we're logging out
