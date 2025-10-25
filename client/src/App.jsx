@@ -111,7 +111,7 @@ function App() {
       {/* Background with mint green + texture overlay */}
       <div aria-hidden="true" className="fixed inset-0 pointer-events-none">
         <div className="absolute bg-[#e3fff7] inset-0" />
-        <div className="absolute max-w-none object-50%-50% object-cover opacity-20 size-full bg-[url('/images/baackground.jpeg')] bg-cover bg-center bg-fixed" />
+        <div className="absolute max-w-none object-50%-50% object-cover opacity-20 size-full bg-[url('https://res.cloudinary.com/ds5kihtow/image/upload/v1761400418/library-static/background.webp')] bg-cover bg-center bg-fixed" />
       </div>
       
       <Routes>

@@ -83,11 +83,21 @@ server/testS3Integration.js
 server/test*.js
 server/validateAWSCredentials.js
 server/seedDatabase.js
+server/uploadStaticImages.js
+
+# Cloudinary config (contains URLs, but better to keep out of git)
+client/src/config/cloudinaryUrls.js
 
 # Uploads and temp files
 /tmp/
 uploads/
 *.tmp
+
+# Static images now hosted on Cloudinary
+client/public/images/baackground.jpeg
+client/public/images/baackground.webp
+client/public/images/iiitdm-logo.jpeg
+client/public/images/iiitdm-logo.webp
 
 # Cache
 .cache/

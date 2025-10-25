@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { login, clearPasswordChangeRequirement } from '../../store/slices/authSlice'
+import { CLOUDINARY_IMAGES } from '../../config/cloudinaryUrls'
 import './style.css'
-import iiitdmLogo from './iiitdm-logo.webp'
 
 // IIITDM logo component
 const IIITDMLogo = () => (
@@ -12,7 +12,7 @@ const IIITDMLogo = () => (
     {/* White background for better contrast - only on desktop */}
     <div className="hidden sm:block absolute inset-0 bg-white rounded-full" />
     <img
-      src={iiitdmLogo}
+      src={CLOUDINARY_IMAGES.logo}
       alt="IIITDM Logo"
       className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
       loading="eager"
