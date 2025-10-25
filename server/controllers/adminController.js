@@ -1,6 +1,6 @@
 import { User } from '../models/userModel.js';
 import { AppError } from '../utils/errorHandler.js';
-import catchAsyncErrors from '../middlewares/catchAsyncErrors.js';
+import { catchAsyncErrors } from '../middlewares/catchAsyncErrors.js';
 import { sendEmail } from '../utils/emailService.js';
 
 // Batch register users - Admin only
