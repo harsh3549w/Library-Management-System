@@ -1,8 +1,5 @@
 .frame {
-  background-image: url('./rectangle-1.png.jpeg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-color: #e3fff7;
   min-height: 100vh;
   width: 100vw;
   position: relative;

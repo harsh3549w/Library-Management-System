@@ -3,14 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, Lock, AlertCircle } from 'lucide-react'
 import { login, clearPasswordChangeRequirement } from '../../store/slices/authSlice'
-import bgImage from './rectangle-1.png.jpeg'
 import './style.css'
 import iiitdmLogo from './iiitdm-logo.jpeg'
 
-// Updated IIITDM logo component to use the uploaded image
+// IIITDM logo component
 const IIITDMLogo = () => (
   <div className="relative">
-    {/* Solid background to hide any logo in background image - only on desktop */}
+    {/* White background for better contrast - only on desktop */}
     <div className="hidden sm:block absolute inset-0 bg-white rounded-full" />
     <img
       src={iiitdmLogo}
@@ -53,15 +52,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col sm:block items-center justify-start sm:justify-center relative px-4 pt-8 pb-8 sm:py-6">
-      {/* Blurred background */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: `url(${bgImage})`,
-          filter: 'blur(8px)',
-          transform: 'scale(1.1)' // Slight scale to hide blur edges
-        }}
-      />
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-[#e3fff7]" />
       <div className="absolute inset-0 bg-page-overlay" />
 
       {/* Logo - positioned absolutely on desktop, in flow on mobile */}
