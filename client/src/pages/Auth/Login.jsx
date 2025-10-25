@@ -58,7 +58,7 @@ const Login = () => {
         style={{ 
           backgroundImage: 'url(/images/baackground.webp)',
           filter: 'blur(8px)',
-          transform: 'scale(1.1) rotate(180deg)'
+          transform: 'scale(1.1)'
         }}
       />
       <div className="absolute inset-0 bg-page-overlay" />
