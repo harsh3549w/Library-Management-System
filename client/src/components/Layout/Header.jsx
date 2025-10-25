@@ -82,7 +82,7 @@ const Header = ({ onMenuClick }) => {
   }
 
   return (
-    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-2 sm:mx-4 mt-4 sticky top-4 z-50">
+    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/70 rounded-2xl mx-2 sm:mx-4 mt-4 sticky top-4 z-50">
       <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 gap-2 sm:gap-4">
 
         {/* Mobile menu button */}

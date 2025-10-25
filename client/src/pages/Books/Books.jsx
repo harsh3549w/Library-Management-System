@@ -164,7 +164,7 @@ const Books = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -424,7 +424,7 @@ const Books = () => {
       )}
     {/* Details Modal */}
     {detailBook && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => { setDetailBook(null); setCoverFile(null); setCoverPreview(''); setUploadError('') }}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray/40 backdrop-blur-sm p-4" onClick={() => { setDetailBook(null); setCoverFile(null); setCoverPreview(''); setUploadError('') }}>
         <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
           <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-5 text-white flex items-start justify-between">
             <div>
