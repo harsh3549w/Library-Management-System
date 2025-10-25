@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllBooks } from '../../store/slices/bookSlice'
 import { getMyBorrowedBooks, clearError as clearBorrowError } from '../../store/slices/borrowSlice'
 import { getBookRecommendations } from '../../store/slices/recommendationSlice'
 import { getLibraryStats } from '../../store/slices/reportSlice'
+import { getAllUsers } from '../../store/slices/userSlice'
 import ExtendDue from '../../components/ExtendDue/ExtendDue'
 import { 
   BookOpen, 
@@ -12,7 +13,11 @@ import {
   TrendingUp,
   Calendar,
   Sparkles,
-  Star
+  Star,
+  X,
+  Mail,
+  User as UserIcon,
+  Hash
 } from 'lucide-react'
 
 const Dashboard = () => {
@@ -22,6 +27,9 @@ const Dashboard = () => {
   const { myBorrowedBooks, loading: borrowLoading, error: borrowError } = useSelector((state) => state.borrow)
   const { recommendations, basedOn, loading: recommendationLoading } = useSelector((state) => state.recommendations)
   const { libraryStats, loading: statsLoading } = useSelector((state) => state.report)
+  const { users, loading: usersLoading } = useSelector((state) => state.users)
+  
+  const [showUsersModal, setShowUsersModal] = useState(false)
 
   useEffect(() => {
     // Only fetch library stats for admin users
@@ -103,6 +111,11 @@ const Dashboard = () => {
     return diffDays
   }
 
+  const handleShowUsers = () => {
+    setShowUsersModal(true)
+    dispatch(getAllUsers())
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header with gradient accent line */}
@@ -115,7 +128,13 @@ const Dashboard = () => {
       {/* Stats Cards - Responsive Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {stats.map((stat, index) => (
-          <div key={stat.name} className="bg-white/40 backdrop-blur-md rounded-[18px] p-4 sm:p-6 shadow-lg border border-white/50 relative overflow-hidden">
+          <div 
+            key={stat.name} 
+            className={`bg-white/40 backdrop-blur-md rounded-[18px] p-4 sm:p-6 shadow-lg border border-white/50 relative overflow-hidden ${
+              isAdmin && stat.name === 'Total Users' ? 'cursor-pointer hover:shadow-xl transition-shadow' : ''
+            }`}
+            onClick={isAdmin && stat.name === 'Total Users' ? handleShowUsers : undefined}
+          >
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#2563EB] to-transparent opacity-20 rounded-bl-full"></div>
             <div className="flex items-center gap-3 sm:gap-4 relative z-10">
               <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] flex items-center justify-center shadow-lg flex-shrink-0">
@@ -128,7 +147,7 @@ const Dashboard = () => {
             </div>
             <div className="mt-2 sm:mt-3 flex items-center gap-1 text-xs text-[#2563EB]">
               <TrendingUp size={14} />
-              <span>Active collection</span>
+              <span>{isAdmin && stat.name === 'Total Users' ? 'Click to view all' : 'Active collection'}</span>
             </div>
           </div>
         ))}
@@ -373,6 +392,112 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Users Modal */}
+      {showUsersModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={() => setShowUsersModal(false)}>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-indigo-500 to-blue-500 p-6 text-white flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold">All Registered Users</h2>
+                <p className="text-sm opacity-90 mt-1">Total: {users.length} users</p>
+              </div>
+              <button 
+                onClick={() => setShowUsersModal(false)}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+              {usersLoading ? (
+                <div className="flex justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                </div>
+              ) : users.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Name
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Email
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Roll Number
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Role
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {users.map((userItem, index) => (
+                        <tr key={userItem._id || index} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <UserIcon className="h-5 w-5 text-indigo-600" />
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {userItem.name}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <Mail className="h-4 w-4 mr-2 text-gray-400" />
+                              {userItem.email}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center text-sm text-gray-900">
+                              <Hash className="h-4 w-4 mr-2 text-gray-400" />
+                              {userItem.rollNumber || 'N/A'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              userItem.role === 'Admin' 
+                                ? 'bg-purple-100 text-purple-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {userItem.role || 'User'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Users className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No Users Found</h3>
+                  <p className="text-gray-500">No registered users in the system.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-200">
+              <button
+                onClick={() => setShowUsersModal(false)}
+                className="btn-secondary"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )
