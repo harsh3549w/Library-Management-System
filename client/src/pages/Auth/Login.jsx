@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
-import { User, Lock, AlertCircle } from 'lucide-react'
+import { User, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { login, clearPasswordChangeRequirement } from '../../store/slices/authSlice'
 import './style.css'
 import iiitdmLogo from './iiitdm-logo.webp'
@@ -23,6 +23,7 @@ const IIITDMLogo = () => (
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' })
+  const [showPassword, setShowPassword] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { loading, isAuthenticated, error, requiresPasswordChange, tempUser } = useSelector((s) => s.auth)
@@ -87,7 +88,7 @@ const Login = () => {
             <div className="bg-login-input border-2 border-gray-400/30 rounded-3xl h-14 sm:h-16 flex items-center px-4 sm:px-6 transition-all duration-200 hover:border-gray-400/50 focus-within:border-gray-400/70">
               <Lock className="w-5 h-5 text-login-text-primary mr-3 sm:mr-4 flex-shrink-0" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
@@ -95,6 +96,18 @@ const Login = () => {
                 className="bg-transparent border-none text-login-text-primary placeholder:text-login-text-secondary text-sm sm:text-base font-normal focus:outline-none p-0 h-auto w-full"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="ml-2 text-login-text-primary hover:text-gray-600 focus:outline-none transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
           </div>
 
