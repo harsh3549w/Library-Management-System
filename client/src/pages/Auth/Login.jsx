@@ -9,11 +9,11 @@ import iiitdmLogo from './iiitdm-logo.jpeg'
 
 // Updated IIITDM logo component to use the uploaded image - responsive positioning
 const IIITDMLogo = () => (
-  <div className="absolute top-6 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 z-10">
+  <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 z-10">
     <img
       src={iiitdmLogo}
       alt="IIITDM Logo"
-      className="w-20 h-20 sm:w-28 sm:h-28 bg-white/90 backdrop-blur-sm rounded-full border-2 border-gray-400 shadow-lg object-cover"
+      className="w-24 h-24 sm:w-28 sm:h-28 bg-white/90 backdrop-blur-sm rounded-full border-2 border-gray-400 shadow-lg object-cover"
       loading="eager"
       decoding="async"
     />
@@ -50,7 +50,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative px-4 py-24 sm:py-6">
+    <div className="min-h-screen w-full flex items-center justify-center relative px-4 pt-32 pb-8 sm:py-6">
       {/* Blurred background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -64,8 +64,8 @@ const Login = () => {
 
       <IIITDMLogo />
 
-      <div className="relative z-10 w-full max-w-[450px] min-h-[420px] bg-login-card backdrop-blur-md border-2 border-login-card rounded-3xl shadow-2xl p-6 sm:p-8">
-        <form onSubmit={handleSubmit} className="h-full flex flex-col justify-center space-y-5 sm:space-y-6">
+      <div className="relative z-10 w-full max-w-[450px] bg-login-card backdrop-blur-md border-2 border-login-card rounded-3xl shadow-2xl p-6 sm:p-8">
+        <form onSubmit={handleSubmit} className="flex flex-col justify-center space-y-5 sm:space-y-6 py-4">
           <div className="relative">
             <div className="bg-login-input border-2 border-gray-400/30 rounded-3xl h-14 sm:h-16 flex items-center px-4 sm:px-6 transition-all duration-200 hover:border-gray-400/50 focus-within:border-gray-400/70">
               <User className="w-5 h-5 text-login-text-primary mr-3 sm:mr-4 flex-shrink-0" />
