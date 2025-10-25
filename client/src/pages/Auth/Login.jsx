@@ -10,10 +10,12 @@ import iiitdmLogo from './iiitdm-logo.jpeg'
 // Updated IIITDM logo component to use the uploaded image - responsive positioning
 const IIITDMLogo = () => (
   <div className="absolute top-4 sm:top-6 left-1/2 -translate-x-1/2 sm:left-auto sm:right-6 sm:translate-x-0 z-10">
+    {/* Solid background to hide any logo in background image */}
+    <div className="absolute inset-0 bg-white rounded-full -z-10" />
     <img
       src={iiitdmLogo}
       alt="IIITDM Logo"
-      className="w-24 h-24 sm:w-28 sm:h-28 bg-white/90 backdrop-blur-sm rounded-full border-2 border-gray-400 shadow-lg object-cover"
+      className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
       loading="eager"
       decoding="async"
     />
@@ -56,7 +58,7 @@ const Login = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: `url(${bgImage})`,
-          filter: 'blur(4px)',
+          filter: 'blur(8px)',
           transform: 'scale(1.1)' // Slight scale to hide blur edges
         }}
       />
