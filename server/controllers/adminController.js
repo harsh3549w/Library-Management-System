@@ -2,6 +2,7 @@ import { User } from '../models/userModel.js';
 import { AppError } from '../utils/errorHandler.js';
 import { catchAsyncErrors } from '../middlewares/catchAsyncErrors.js';
 import { sendEmail } from '../utils/emailService.js';
+import bcrypt from 'bcrypt';
 
 // Batch register users - Admin only
 export const batchRegisterUsers = catchAsyncErrors(async (req, res, next) => {
@@ -31,16 +32,21 @@ export const batchRegisterUsers = catchAsyncErrors(async (req, res, next) => {
         continue;
       }
 
+      // Hash password before storing
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
       // Create new user
       const user = await User.create({
         name: userData.name,
         email: userData.email,
-        password: userData.password,
+        password: hashedPassword,
         phone: userData.phone || '0000000000',
         address: userData.address || 'IIIT Kurnool',
         role: userData.role || 'User',
         rollNumber: userData.rollNumber,
-        isFirstLogin: true // Mark as first time login
+        accountVerified: true, // Auto-verify admin-created accounts
+        hasLoggedIn: false, // First time login
+        needsPasswordChange: true // Force password change on first login
       });
 
       // Send welcome email with temporary password

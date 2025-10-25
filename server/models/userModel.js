@@ -24,6 +24,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    address: {
+      type: String,
+      trim: true,
+    },
+
+    rollNumber: {
+      type: String,
+      trim: true,
+      sparse: true, // Allow multiple null values but unique non-null values
+    },
+
     password: {
       type: String,
       required: [true, "Please provide a password"],
