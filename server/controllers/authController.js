@@ -296,8 +296,8 @@ export const verifyOTPAndChangePassword = catchAsyncErrors(async (req, res, next
 export const updateUserInfo = catchAsyncErrors(async (req, res, next) => {
     const { name, email, phone, currentPassword, newPassword } = req.body;
     
-    // Get current user
-    const user = await User.findById(req.user._id);
+    // Get current user - include password field if password update is requested
+    const user = await User.findById(req.user._id).select('+password');
     if (!user) {
         return next(new ErrorHandler("User not found", 404));
     }
