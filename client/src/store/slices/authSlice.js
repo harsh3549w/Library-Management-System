@@ -133,10 +133,13 @@ export const verifyOTPAndChangePassword = createAsyncThunk(
   }
 )
 
+// Check if there's a token on initial load to set proper loading state
+const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+
 const initialState = {
   user: null,
   isAuthenticated: false,
-  loading: false,
+  loading: !!token, // Set loading to true if there's a token
   error: null,
   otpSent: false,
   passwordResetSent: false,
