@@ -112,11 +112,11 @@ const BatchRegister = () => {
       }
 
       // Call API
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/v1/admin/batch-register`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api/v1'}/admin/batch-register`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ users })
       })
