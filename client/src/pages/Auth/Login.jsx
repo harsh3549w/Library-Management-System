@@ -55,11 +55,7 @@ const Login = () => {
       {/* Blurred background image */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: 'url(/images/baackground.webp)',
-          filter: 'blur(8px)',
-          transform: 'scale(1.1)'
-        }}
+       
       />
       <div className="absolute inset-0 bg-page-overlay" />
 
