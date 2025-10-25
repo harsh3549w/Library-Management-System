@@ -38,7 +38,7 @@ export const batchRegisterUsers = catchAsyncErrors(async (req, res, next) => {
         email: userData.email,
         password: userData.password,
         phone: userData.phone || '0000000000',
-        address: userData.address || 'IIIT Kottayam',
+        address: userData.address || 'IIIT Kurnool',
         role: userData.role || 'User',
         rollNumber: userData.rollNumber,
         isFirstLogin: true // Mark as first time login
@@ -48,7 +48,7 @@ export const batchRegisterUsers = catchAsyncErrors(async (req, res, next) => {
       try {
         await sendEmail({
           email: user.email,
-          subject: '🎓 Welcome to IIIT Kottayam Library - Account Created',
+          subject: '🎓 Welcome to IIIT Kurnool Library - Account Created',
           message: `Dear Student,
 
 Your library account has been successfully created!
@@ -63,8 +63,6 @@ Your library account has been successfully created!
 3. Complete your profile information
 4. Update your contact details
 
-⚠️ For security reasons, please change your password immediately after your first login.
-
 📖 You can now:
 • Browse and borrow books
 • Reserve books
@@ -74,10 +72,10 @@ Your library account has been successfully created!
 
 If you have any questions or need assistance, please contact the library administration.
 
-Welcome to the IIIT Kottayam Library family!
+Welcome to the IIIT Kurnool Library family!
 
 Best regards,
-IIIT Kottayam Library Team`
+IIIT Kurnool Library Team`
         });
         console.log(`Welcome email sent to ${user.email}`);
       } catch (emailError) {

@@ -106,7 +106,7 @@ const BatchRegister = () => {
           name: `Student ${rollNumber}`,
           rollNumber,
           phone: '0000000000', // Dummy phone
-          address: 'IIIT Kottayam', // Dummy address
+          address: 'IIIT Kurnool', // Dummy address
           role: 'User'
         })
       }
