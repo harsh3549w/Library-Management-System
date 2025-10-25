@@ -4,7 +4,6 @@ import { config } from "dotenv";
 config({ path: "./config/config.env" });
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import morgan from "morgan";
 import fileUpload from "express-fileupload";
@@ -78,33 +77,6 @@ app.use(
     credentials: true,
   })
 );
-
-// Rate limiting - stricter for production
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 100 requests per 15 minutes in production
-  message: "Too many requests from this IP, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false,
-  keyGenerator: (req, res) => {
-    // Use X-Forwarded-For header if available (for proxies), otherwise use IP
-    return req.ip;
-  }
-});
-
-app.use(limiter);
-
-// Stricter rate limiting for auth routes
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 login attempts per 15 minutes (increased from 5)
-  message: "Too many login attempts, please try again later",
-  skipSuccessfulRequests: true, // Don't count successful logins
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use("/api/v1/auth/login", authLimiter);
 
 // Security headers
 app.use(helmet({
