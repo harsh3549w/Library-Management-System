@@ -1,5 +1,4 @@
 import { User } from '../models/userModel.js';
-import { sendToken } from '../utils/jwtToken.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import catchAsyncErrors from '../middlewares/catchAsyncErrors.js';
 import { sendEmail } from '../utils/emailService.js';
