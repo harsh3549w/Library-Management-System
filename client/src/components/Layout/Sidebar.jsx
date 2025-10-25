@@ -85,7 +85,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 pb-2 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
@@ -105,7 +105,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
 
       {/* User info */}
       {!isCollapsed && (
-        <div className="flex-shrink-0 p-6 border-t border-white/30">
+        <div className="flex-shrink-0 p-4 sm:p-6 border-t border-white/30 bg-white/5">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -114,8 +114,8 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
                 </span>
               </div>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-700">{user?.name || 'Test Admin'}</p>
+            <div className="ml-4 overflow-hidden">
+              <p className="text-sm font-medium text-gray-700 truncate">{user?.name || 'Test Admin'}</p>
               <p className="text-xs text-gray-500">{user?.role || 'Admin'}</p>
             </div>
           </div>
@@ -123,7 +123,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
       )}
 
       {isCollapsed && (
-        <div className="flex-shrink-0 p-4 border-t border-white/30 flex justify-center">
+        <div className="flex-shrink-0 p-4 border-t border-white/30 flex justify-center bg-white/5">
           <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
             <span className="text-gray-700 font-medium text-sm">
               {user?.name?.charAt(0)?.toUpperCase() || 'T'}
@@ -161,7 +161,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col glass-dark">
+              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col h-full glass-dark">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"

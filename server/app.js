@@ -9,7 +9,6 @@ import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import { errorMiddleware, ErrorHandler } from "./middlewares/errorMiddlewares.js";
 import { globalErrorHandler, handleUnhandledRoutes } from "./utils/errorHandler.js";
-import { generalLimiter } from "./middlewares/rateLimiter.js";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
 import borrowRouter from "./routes/borrowRouter.js";
@@ -107,9 +106,6 @@ app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: "/tmp/"
 }));
-
-// Rate limiting - Apply to all API routes
-app.use('/api/', generalLimiter);
 
 // Routes
 app.use("/api/v1/auth", authRouter);
