@@ -7,15 +7,15 @@ import bgImage from './rectangle-1.png.jpeg'
 import './style.css'
 import iiitdmLogo from './iiitdm-logo.jpeg'
 
-// Updated IIITDM logo component to use the uploaded image - responsive positioning
+// Updated IIITDM logo component to use the uploaded image
 const IIITDMLogo = () => (
-  <div className="mb-8 sm:absolute sm:top-6 sm:right-6 flex justify-center sm:block">
+  <div className="relative">
     {/* Solid background to hide any logo in background image - only on desktop */}
-    <div className="hidden sm:block absolute inset-0 bg-white rounded-full -z-10" />
+    <div className="hidden sm:block absolute inset-0 bg-white rounded-full" />
     <img
       src={iiitdmLogo}
       alt="IIITDM Logo"
-      className="w-24 h-24 sm:w-28 sm:h-28 sm:bg-white rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
+      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
       loading="eager"
       decoding="async"
     />
@@ -64,10 +64,13 @@ const Login = () => {
       />
       <div className="absolute inset-0 bg-page-overlay" />
 
-      {/* Container for centered logo and form on mobile */}
-      <div className="relative z-10 w-full max-w-[450px] flex flex-col items-center">
+      {/* Logo - positioned absolutely on desktop, in flow on mobile */}
+      <div className="sm:absolute sm:top-6 sm:right-6 sm:z-20 relative z-10 w-full max-w-[450px] flex justify-center sm:w-auto sm:max-w-none mb-8 sm:mb-0">
         <IIITDMLogo />
+      </div>
 
+      {/* Container for centered form */}
+      <div className="relative z-10 w-full max-w-[450px]">
         <div className="w-full bg-login-card backdrop-blur-md border-2 border-login-card rounded-3xl shadow-2xl p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="flex flex-col justify-center space-y-5 sm:space-y-6 py-4">
           <div className="relative">
@@ -121,7 +124,7 @@ const Login = () => {
             </Link>
           </div>
         </form>
-        </div>
+      </div>
       </div>
     </div>
   )
