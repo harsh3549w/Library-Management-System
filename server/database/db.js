@@ -4,13 +4,14 @@ export const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI, {
       dbName: "MERN_STACK_LIBRARY_MANAGEMENT",
-      // Production optimizations
-      maxPoolSize: 10, // Maintain up to 10 socket connections
+      // Production optimizations for high-load scenarios
+      maxPoolSize: 50, // Maintain up to 50 socket connections for high traffic
+      minPoolSize: 10, // Always keep at least 10 connections ready
       serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
       socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
       bufferCommands: false, // Disable mongoose buffering
     });
-    console.log("Database connected successfully ✅");
+    console.log("Database connected successfully ✅ (Pool: 10-50 connections)");
     
     // Handle connection events
     mongoose.connection.on('error', (err) => {

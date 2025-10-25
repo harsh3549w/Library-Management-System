@@ -62,7 +62,11 @@ bookSchema.pre('save', function(next) {
   next();
 });
 
-// Index for ISBN lookups
-bookSchema.index({ isbn: 1 });
+// Performance indexes for high-traffic scenarios
+bookSchema.index({ isbn: 1 }); // ISBN lookups
+bookSchema.index({ createdAt: -1 }); // Sort by newest books
+bookSchema.index({ title: 'text', author: 'text' }); // Full-text search on title and author
+bookSchema.index({ genre: 1 }); // Filter by genre
+bookSchema.index({ availability: 1 }); // Filter by availability
 
 export const Book = mongoose.model("Book", bookSchema);
