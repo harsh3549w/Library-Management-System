@@ -320,16 +320,6 @@ const Dashboard = () => {
             </div>
             <div>
               <h2 className="text-gray-800">Recommended for You</h2>
-              {basedOn && (
-                <p className="text-sm text-gray-600">
-                  Based on {basedOn}
-                </p>
-              )}
-              {!basedOn && recommendations.length > 0 && (
-                <p className="text-sm text-gray-600">
-                  Popular books for you
-                </p>
-              )}
             </div>
           </div>
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00b894] to-[#2563EB] flex items-center justify-center">

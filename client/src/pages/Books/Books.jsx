@@ -287,11 +287,11 @@ const Books = () => {
 
       {/* Books Grid */}
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="flex justify-center py-12 mt-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : sortedBooks.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
           {sortedBooks.map((book) => (
             <div key={book._id} className="card hover:shadow-lg transition-all duration-200 overflow-hidden p-0 flex flex-col h-full">
               {/* Book Cover Image */}
@@ -405,7 +405,7 @@ const Books = () => {
           ))}
         </div>
       ) : (
-        <div className="card text-center py-12">
+        <div className="card text-center py-12 mt-6">
           <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">No books found</h3>
           <p className="text-gray-500">

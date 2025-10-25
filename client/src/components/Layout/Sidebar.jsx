@@ -22,7 +22,7 @@ import {
   Gift
 } from 'lucide-react'
 
-const Sidebar = ({ open, setOpen }) => {
+const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
   const location = useLocation()
   const { user } = useSelector((state) => state.auth)
   const isAdmin = user?.role === 'Admin'
@@ -57,13 +57,13 @@ const Sidebar = ({ open, setOpen }) => {
     { name: 'Edit Info', href: '/edit-info', icon: Edit },
   ]
 
-  const SidebarContent = () => (
+  const SidebarContent = ({ isCollapsed = false }) => (
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center h-20 px-6 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center">
           <div className="flex-shrink-0">
-            <div className="h-16 w-16 bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm">
+            <div className={`${isCollapsed ? 'h-12 w-12' : 'h-16 w-16'} bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm transition-all duration-300`}>
               <img
                 src="/images/iiitdm-logo.jpeg"
                 alt="IIITDM Logo"
@@ -74,9 +74,11 @@ const Sidebar = ({ open, setOpen }) => {
               />
             </div>
           </div>
-          <div className="ml-4">
-            <h1 className="text-xl font-semibold text-gray-700">E-Library</h1>
-          </div>
+          {!isCollapsed && (
+            <div className="ml-4">
+              <h1 className="text-xl font-semibold text-gray-700">E-Library</h1>
+            </div>
+          )}
         </Link>
       </div>
 
@@ -88,32 +90,45 @@ const Sidebar = ({ open, setOpen }) => {
             <Link
               key={item.name}
               to={item.href}
-              className={`sidebar-link ${isActive ? 'active' : ''}`}
+              className={`sidebar-link ${isActive ? 'active' : ''} ${isCollapsed ? 'justify-center' : ''}`}
               onClick={() => setOpen(false)}
+              title={isCollapsed ? item.name : ''}
             >
               <item.icon className="h-[17px] w-[17px]" />
-              <span>{item.name}</span>
+              {!isCollapsed && <span>{item.name}</span>}
             </Link>
           )
         })}
       </nav>
 
       {/* User info */}
-      <div className="flex-shrink-0 p-6 border-t border-white/30">
-        <div className="flex items-center">
-          <div className="flex-shrink-0">
-            <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-gray-700 font-medium text-sm">
-                {user?.name?.charAt(0)?.toUpperCase() || 'T'}
-              </span>
+      {!isCollapsed && (
+        <div className="flex-shrink-0 p-6 border-t border-white/30">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
+                <span className="text-gray-700 font-medium text-sm">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'T'}
+                </span>
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-700">{user?.name || 'Test Admin'}</p>
+              <p className="text-xs text-gray-500">{user?.role || 'Admin'}</p>
             </div>
           </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-700">{user?.name || 'Test Admin'}</p>
-            <p className="text-xs text-gray-500">{user?.role || 'Admin'}</p>
+        </div>
+      )}
+
+      {isCollapsed && (
+        <div className="flex-shrink-0 p-4 border-t border-white/30 flex justify-center">
+          <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
+            <span className="text-gray-700 font-medium text-sm">
+              {user?.name?.charAt(0)?.toUpperCase() || 'T'}
+            </span>
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 
@@ -173,9 +188,9 @@ const Sidebar = ({ open, setOpen }) => {
       </Transition.Root>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
+      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col transition-all duration-300 ${desktopOpen ? 'lg:w-80' : 'lg:w-20'}`}>
         <div className="flex flex-col flex-grow glass-dark border-r border-white/30">
-          <SidebarContent />
+          <SidebarContent isCollapsed={!desktopOpen} />
         </div>
       </div>
     </>

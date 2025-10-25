@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { Menu, Search, User, LogOut, ChevronDown } from 'lucide-react'
 import { logout } from '../../store/slices/authSlice'
 
-const Header = ({ onMenuClick }) => {
+const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
@@ -82,7 +82,7 @@ const Header = ({ onMenuClick }) => {
   }
 
   return (
-    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/70 rounded-2xl mx-2 sm:mx-4 mt-4 sticky top-4 z-50">
+    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/70 rounded-2xl mx-2 sm:mx-4 my-4">
       <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 gap-2 sm:gap-4">
 
         {/* Mobile menu button */}
@@ -93,6 +93,17 @@ const Header = ({ onMenuClick }) => {
           aria-label="Open menu"
         >
           <span className="sr-only">Open sidebar</span>
+          <Menu className="h-6 w-6" />
+        </button>
+
+        {/* Desktop menu button */}
+        <button
+          type="button"
+          className="hidden lg:inline-flex items-center justify-center p-2.5 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 flex-shrink-0 transition-colors"
+          onClick={onDesktopMenuClick}
+          aria-label="Toggle sidebar"
+        >
+          <span className="sr-only">Toggle sidebar</span>
           <Menu className="h-6 w-6" />
         </button>
 
