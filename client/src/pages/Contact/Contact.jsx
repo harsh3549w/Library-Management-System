@@ -57,7 +57,7 @@ const Contact = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800">Library Administrator</h2>
-              <p className="text-gray-600">IIITDM Kurnool E-Library</p>
+              <p className="text-gray-600">IIIT Kurnool E-Library</p>
             </div>
           </div>
 

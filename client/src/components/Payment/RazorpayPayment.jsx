@@ -45,7 +45,7 @@ export const RazorpayPayment = ({ borrow, onClose, onSuccess }) => {
         key: key,
         amount: amount * 100, // Convert to paise
         currency: currency,
-        name: 'Library Management System',
+        name: 'E-Library',
         description: `Fine payment for "${bookTitle}"`,
         order_id: orderId,
         config: {
