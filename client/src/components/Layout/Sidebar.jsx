@@ -19,7 +19,8 @@ import {
   PieChart,
   UserPlus,
   Edit,
-  Gift
+  Gift,
+  Users
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
@@ -33,6 +34,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'Add Book', href: '/admin/add-book', icon: Plus },
     { name: 'Add User', href: '/admin/add-user', icon: UserPlus },
+    { name: 'Batch Register', href: '/admin/batch-register', icon: Users },
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },

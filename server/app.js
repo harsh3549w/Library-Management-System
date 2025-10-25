@@ -23,7 +23,8 @@ import reportRouter from './routes/reportRouter.js';
 import paymentRouter from './routes/paymentRouter.js';
 import recommendationRouter from './routes/recommendationRouter.js';
 import donationRouter from './routes/donationRouter.js';
-import { notifyUsers, notifyOverdueBooks } from './services/notifyUsers.js';
+import adminRouter from './routes/adminRoutes.js';
+import { notifyOverdueBooks } from './services/notifyUsers.js';
 import { expireOldReservations } from './services/reservationService.js';
 import { processAllocationQueue } from './services/autoAllocationService.js';
 
@@ -40,9 +41,8 @@ for (const varName of requiredEnvVars) {
   }
 }
 
-// Initialize notification services
+// Initialize notification services (only overdue books, daily emails removed)
 if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
-  notifyUsers();
   notifyOverdueBooks();
 } else {
   console.warn('Notification services disabled - missing email configuration');
@@ -149,6 +149,7 @@ app.use('/api/v1/report', reportRouter);
 app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/recommendations', recommendationRouter);
 app.use('/api/v1/donation', donationRouter);
+app.use('/api/v1/admin', adminRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

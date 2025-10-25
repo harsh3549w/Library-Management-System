@@ -40,6 +40,7 @@ import MyTransactions from './pages/Transactions/MyTransactions'
 import AllTransactions from './pages/Transactions/AllTransactions'
 import Reports from './pages/Reports/Reports'
 import AddUser from './pages/Users/AddUser'
+import BatchRegister from './pages/Admin/BatchRegister'
 import EditInfo from './pages/Users/EditInfo'
 import Profile from './pages/Profile/Profile'
 import DonateBook from './pages/Donations/DonateBook'
@@ -153,6 +154,7 @@ function App() {
           <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
           <Route path="admin/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
+          <Route path="admin/batch-register" element={<AdminRoute><BatchRegister /></AdminRoute>} />
           <Route path="admin/manage-donations" element={<AdminRoute><ManageDonations /></AdminRoute>} />
         </Route>
 

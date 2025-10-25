@@ -3,24 +3,8 @@ import { User } from "../models/userModel.js";
 import { Borrow } from "../models/borrowModel.js";
 import { sendEmail } from "../utils/emailService.js";
 
-export const notifyUsers = () => {
-  // Daily notifications at 9am
-  cron.schedule("0 9 * * *", async () => {
-    try {
-      const users = await User.find({});
-      
-      for (const user of users) {
-        await sendEmail({
-          email: user.email,
-          subject: "Daily Notification",
-          message: "This is your daily notification from the library system"
-        });
-      }
-    } catch (error) {
-      console.error("Notification error:", error);
-    }
-  });
-};
+// Removed daily notification feature as requested
+// Users no longer receive daily emails
 
 export const notifyOverdueBooks = () => {
   // Check every 5 minutes for testing (10-minute due dates)
