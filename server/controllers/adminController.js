@@ -1,5 +1,5 @@
 import { User } from '../models/userModel.js';
-import ErrorHandler from '../utils/errorHandler.js';
+import { AppError } from '../utils/errorHandler.js';
 import catchAsyncErrors from '../middlewares/catchAsyncErrors.js';
 import { sendEmail } from '../utils/emailService.js';
 
@@ -8,11 +8,11 @@ export const batchRegisterUsers = catchAsyncErrors(async (req, res, next) => {
   const { users } = req.body;
 
   if (!users || !Array.isArray(users) || users.length === 0) {
-    return next(new ErrorHandler('Please provide users array', 400));
+    return next(new AppError('Please provide users array', 400));
   }
 
   if (users.length > 100) {
-    return next(new ErrorHandler('Cannot register more than 100 users at once', 400));
+    return next(new AppError('Cannot register more than 100 users at once', 400));
   }
 
   const createdUsers = [];
