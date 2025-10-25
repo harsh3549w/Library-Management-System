@@ -2,6 +2,7 @@ import { BookSuggestion } from "../models/bookSuggestionModel.js";
 import { Book } from "../models/bookModel.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import { ErrorHandler } from "../middlewares/errorMiddlewares.js";
+import { sendEmail } from "../utils/emailService.js";
 
 // Create a new book suggestion
 export const createSuggestion = catchAsyncErrors(async (req, res, next) => {
@@ -151,6 +152,38 @@ export const approveSuggestion = catchAsyncErrors(async (req, res, next) => {
   suggestion.adminNotes = adminNotes || '';
   await suggestion.save();
 
+  // Send approval email to suggester
+  try {
+    await sendEmail({
+      email: suggestion.suggestedBy.email,
+      subject: '✅ Book Suggestion Approved - IIIT Kurnool Library',
+      message: `Dear ${suggestion.suggestedBy.name},
+
+Great news! Your book suggestion has been approved and added to our library.
+
+📚 Book Details:
+Title: ${suggestion.title}
+Author: ${suggestion.author}
+Category: ${suggestion.category}
+
+✅ Status: APPROVED
+📅 Approved On: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+💰 Price: ₹${price}
+📦 Quantity Added: ${quantity} ${quantity > 1 ? 'copies' : 'copy'}
+
+${adminNotes ? `📝 Admin Notes:\n${adminNotes}\n\n` : ''}Thank you for your valuable contribution to our library! This book is now available for all students and faculty to borrow.
+
+You can search for it in the Books section of the library system.
+
+Best regards,
+IIIT Kurnool Library Team`
+    });
+    console.log(`Approval email sent to ${suggestion.suggestedBy.email}`);
+  } catch (emailError) {
+    console.error(`Failed to send approval email to ${suggestion.suggestedBy.email}:`, emailError.message);
+    // Don't fail the approval if email fails
+  }
+
   res.status(200).json({
     success: true,
     message: "Suggestion approved and book added to library",
@@ -178,6 +211,44 @@ export const rejectSuggestion = catchAsyncErrors(async (req, res, next) => {
   suggestion.rejectedAt = new Date();
   suggestion.adminNotes = adminNotes || 'Rejected by admin';
   await suggestion.save();
+
+  // Send rejection email to suggester
+  try {
+    await sendEmail({
+      email: suggestion.suggestedBy.email,
+      subject: '📋 Book Suggestion Update - IIIT Kurnool Library',
+      message: `Dear ${suggestion.suggestedBy.name},
+
+Thank you for your book suggestion. After careful consideration, we regret to inform you that your suggestion has not been approved at this time.
+
+📚 Book Details:
+Title: ${suggestion.title}
+Author: ${suggestion.author}
+Category: ${suggestion.category}
+
+❌ Status: NOT APPROVED
+📅 Reviewed On: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+📝 Reason:
+${adminNotes || 'The suggestion does not meet our current acquisition criteria.'}
+
+We appreciate your interest in improving our library collection. Please feel free to submit other suggestions in the future. We consider various factors including:
+• Budget constraints
+• Collection development policies
+• Availability from vendors
+• Relevance to curriculum
+• Existing collection duplicates
+
+Your participation in building our library is valued!
+
+Best regards,
+IIIT Kurnool Library Team`
+    });
+    console.log(`Rejection email sent to ${suggestion.suggestedBy.email}`);
+  } catch (emailError) {
+    console.error(`Failed to send rejection email to ${suggestion.suggestedBy.email}:`, emailError.message);
+    // Don't fail the rejection if email fails
+  }
 
   res.status(200).json({
     success: true,
