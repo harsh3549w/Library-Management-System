@@ -91,10 +91,9 @@ uploads/
 *.tmp
 
 # Static images now hosted on Cloudinary
-client/public/images/baackground.jpeg
-client/public/images/baackground.webp
-client/public/images/iiitdm-logo.jpeg
-client/public/images/iiitdm-logo.webp
+*.jpg
+*.jpeg
+*.webp
 
 # Cache
 .cache/
