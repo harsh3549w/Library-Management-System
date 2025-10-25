@@ -3,10 +3,10 @@
 
 export const CLOUDINARY_IMAGES = {
   // Background image for the app
-  background: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761400418/library-static/background.webp',
+  background: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761401615/library-static/background.jpg',
   
   // IIITDM Logo
-  logo: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761400422/library-static/iiitdm-logo.webp',
+  logo: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761401617/library-static/iiitdm-logo.webp',
 };
 
 // Helper function to get optimized image URL with transformations

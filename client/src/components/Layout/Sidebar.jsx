@@ -65,7 +65,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
           <div className="flex-shrink-0">
             <div className={`${isCollapsed ? 'h-12 w-12' : 'h-16 w-16'} bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm transition-all duration-300`}>
               <img
-                src="https://res.cloudinary.com/ds5kihtow/image/upload/v1761400422/library-static/iiitdm-logo.webp"
+                src="https://res.cloudinary.com/ds5kihtow/image/upload/v1761401617/library-static/iiitdm-logo.webp"
                 alt="IIITDM Logo"
                 className="w-full h-full object-cover rounded-lg"
                 style={{ border: 'none', outline: 'none' }}
