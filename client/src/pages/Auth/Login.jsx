@@ -50,7 +50,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative px-4 pt-32 pb-8 sm:py-6">
+    <div className="min-h-screen w-full flex items-center justify-center relative px-4 pt-28 pb-8 sm:py-6">
       {/* Blurred background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
