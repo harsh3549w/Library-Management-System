@@ -10,12 +10,12 @@ import iiitdmLogo from './iiitdm-logo.jpeg'
 // Updated IIITDM logo component to use the uploaded image - responsive positioning
 const IIITDMLogo = () => (
   <div className="mb-8 sm:absolute sm:top-6 sm:right-6 flex justify-center sm:block">
-    {/* Solid background to hide any logo in background image */}
-    <div className="absolute inset-0 bg-white rounded-full -z-10" />
+    {/* Solid background to hide any logo in background image - only on desktop */}
+    <div className="hidden sm:block absolute inset-0 bg-white rounded-full -z-10" />
     <img
       src={iiitdmLogo}
       alt="IIITDM Logo"
-      className="w-24 h-24 sm:w-28 sm:h-28 bg-white rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
+      className="w-24 h-24 sm:w-28 sm:h-28 sm:bg-white rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
       loading="eager"
       decoding="async"
     />
@@ -52,7 +52,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center relative px-4 py-8 sm:py-6">
+    <div className="min-h-screen w-full flex items-start sm:items-center justify-center relative px-4 pt-16 pb-8 sm:py-6">
       {/* Blurred background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
