@@ -52,7 +52,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex items-start sm:items-center justify-center relative px-4 pt-16 pb-8 sm:py-6">
+    <div className="min-h-screen w-full flex flex-col sm:block items-center justify-start sm:justify-center relative px-4 pt-8 pb-8 sm:py-6">
       {/* Blurred background */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -65,12 +65,12 @@ const Login = () => {
       <div className="absolute inset-0 bg-page-overlay" />
 
       {/* Logo - positioned absolutely on desktop, in flow on mobile */}
-      <div className="sm:absolute sm:top-6 sm:right-6 sm:z-20 relative z-10 w-full max-w-[450px] flex justify-center sm:w-auto sm:max-w-none mb-8 sm:mb-0">
+      <div className="sm:absolute sm:top-6 sm:right-6 relative z-10 mb-6 sm:mb-0">
         <IIITDMLogo />
       </div>
 
       {/* Container for centered form */}
-      <div className="relative z-10 w-full max-w-[450px]">
+      <div className="relative z-10 w-full max-w-[450px] sm:absolute sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
         <div className="w-full bg-login-card backdrop-blur-md border-2 border-login-card rounded-3xl shadow-2xl p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="flex flex-col justify-center space-y-5 sm:space-y-6 py-4">
           <div className="relative">
