@@ -17,7 +17,8 @@ import {
   Filter,
   TrendingUp,
   Upload,
-  Trash2
+  Trash2,
+  Globe
 } from 'lucide-react'
 
 const Archives = () => {
@@ -96,10 +97,16 @@ const Archives = () => {
           <h1 className="text-2xl font-bold text-gray-900">Academic Archives</h1>
           <p className="text-gray-600">Browse and view academic resources</p>
         </div>
-        <Link to="/upload-archive" className="btn-primary inline-flex items-center mt-4 sm:mt-0">
-          <Upload className="h-4 w-4 mr-2" />
-          Upload Archive
-        </Link>
+        <div className="flex gap-2 mt-4 sm:mt-0">
+          <Link to="/ebook-resources" className="btn-secondary inline-flex items-center">
+            <Globe className="h-4 w-4 mr-2" />
+            Free E-Books
+          </Link>
+          <Link to="/upload-archive" className="btn-primary inline-flex items-center">
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Archive
+          </Link>
+        </div>
       </div>
 
       {/* Success Message */}
