@@ -41,13 +41,13 @@ import MyTransactions from './pages/Transactions/MyTransactions'
 import AllTransactions from './pages/Transactions/AllTransactions'
 import Reports from './pages/Reports/Reports'
 import AddUser from './pages/Users/AddUser'
-import BatchRegister from './pages/Admin/BatchRegister'
 import EditInfo from './pages/Users/EditInfo'
 import Profile from './pages/Profile/Profile'
 import DonateBook from './pages/Donations/DonateBook'
 import MyDonations from './pages/Donations/MyDonations'
 import ManageDonations from './pages/Donations/ManageDonations'
 import Contact from './pages/Contact/Contact'
+import EbookResources from './pages/Resources/EbookResources'
 
 function App() {
   const dispatch = useDispatch()
@@ -147,6 +147,7 @@ function App() {
           <Route path="edit-info" element={<EditInfo />} />
           <Route path="donate-book" element={<DonateBook />} />
           <Route path="my-donations" element={<MyDonations />} />
+          <Route path="ebook-resources" element={<EbookResources />} />
           <Route path="contact" element={<Contact />} />
           
           {/* Admin Routes */}
@@ -160,7 +161,6 @@ function App() {
           <Route path="admin/reports" element={<AdminRoute><Reports /></AdminRoute>} />
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
           <Route path="admin/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
-          <Route path="admin/batch-register" element={<AdminRoute><BatchRegister /></AdminRoute>} />
           <Route path="admin/manage-donations" element={<AdminRoute><ManageDonations /></AdminRoute>} />
         </Route>
 

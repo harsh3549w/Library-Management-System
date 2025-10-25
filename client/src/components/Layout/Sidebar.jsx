@@ -20,7 +20,8 @@ import {
   UserPlus,
   Edit,
   Gift,
-  Users
+  Users,
+  Globe
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
@@ -33,10 +34,10 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'Add Book', href: '/admin/add-book', icon: Plus },
-    { name: 'Add User', href: '/admin/add-user', icon: UserPlus },
-    { name: 'Batch Register', href: '/admin/batch-register', icon: Users },
+    { name: 'Add Users', href: '/admin/add-user', icon: UserPlus },
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
+    { name: 'E-Book Resources', href: '/ebook-resources', icon: Globe },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
     { name: 'All Reservations', href: '/admin/all-reservations', icon: Bookmark },
     { name: 'Manage Fines', href: '/admin/manage-fines', icon: DollarSign },
@@ -53,6 +54,8 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
     { name: 'My Fines', href: '/my-fines', icon: DollarSign },
     { name: 'My Transactions', href: '/my-transactions', icon: Receipt },
     { name: 'Archives', href: '/archives', icon: FileText },
+    { name: 'Upload Archive', href: '/upload-archive', icon: Upload },
+    { name: 'E-Book Resources', href: '/ebook-resources', icon: Globe },
     { name: 'Book Suggestions', href: '/book-suggestions', icon: ThumbsUp },
     { name: 'Donate Book', href: '/donate-book', icon: Gift },
     { name: 'My Donations', href: '/my-donations', icon: BookOpen },
@@ -60,9 +63,9 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
   ]
 
   const SidebarContent = ({ isCollapsed = false }) => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-h-0">
       {/* Logo */}
-      <div className="flex items-center h-20 px-6 border-b border-white/30">
+      <div className="flex items-center flex-shrink-0 h-20 px-6 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center">
           <div className="flex-shrink-0">
             <div className={`${isCollapsed ? 'h-12 w-12' : 'h-16 w-16'} bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm transition-all duration-300`}>
@@ -85,7 +88,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 pb-2 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+      <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
         {navigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
@@ -105,8 +108,8 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
 
       {/* User info */}
       {!isCollapsed && (
-        <div className="flex-shrink-0 p-4 sm:p-6 border-t border-white/30 bg-white/5">
-          <div className="flex items-center">
+        <div className="flex-shrink-0 p-4 pb-6 sm:p-6 border-t border-white/30 bg-white/5" style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}>
+          <div className="flex items-center min-h-[60px]">
             <div className="flex-shrink-0">
               <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center">
                 <span className="text-gray-700 font-medium text-sm">
@@ -151,7 +154,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
             <div className="fixed inset-0 bg-gray-600 bg-opacity-75" />
           </Transition.Child>
 
-          <div className="fixed inset-0 flex">
+          <div className="fixed inset-0 flex z-40">
             <Transition.Child
               as={Fragment}
               enter="transition ease-in-out duration-300 transform"
@@ -161,7 +164,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col h-full glass-dark">
+              <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col h-screen glass-dark overflow-hidden">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
