@@ -11,7 +11,6 @@ import {
 } from '../../store/slices/archiveSlice'
 import {
   FileText,
-  Download,
   Eye,
   Calendar,
   User,
@@ -185,11 +184,6 @@ const ArchiveDetail = () => {
             <div className="flex items-center">
               <span className="font-medium text-gray-700 mr-2">Size:</span>
               <span className="text-gray-600">{formatFileSize(currentArchive.fileSize)}</span>
-            </div>
-            <div className="flex items-center">
-              <Download className="h-4 w-4 text-gray-600 mr-2" />
-              <span className="font-medium text-gray-700 mr-2">Downloads:</span>
-              <span className="text-gray-600">{currentArchive.downloads}</span>
             </div>
             <div className="flex items-center">
               <Eye className="h-4 w-4 text-gray-600 mr-2" />

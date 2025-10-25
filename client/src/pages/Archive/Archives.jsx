@@ -168,7 +168,6 @@ const Archives = () => {
             >
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest First</option>
-              <option value="popular">Most Downloaded</option>
               <option value="views">Most Viewed</option>
             </select>
           </div>
@@ -212,10 +211,6 @@ const Archives = () => {
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 mr-1" />
                           {formatDate(archive.createdAt)}
-                        </div>
-                        <div className="flex items-center">
-                          <Eye className="h-4 w-4 mr-1" />
-                          {archive.downloads} downloads
                         </div>
                         <div className="flex items-center">
                           <Eye className="h-4 w-4 mr-1" />
