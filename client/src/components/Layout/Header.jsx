@@ -82,29 +82,34 @@ const Header = ({ onMenuClick }) => {
   }
 
   return (
-    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-2 sm:mx-4 mt-4">
-      <div className="flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 gap-2 sm:gap-4">
+    <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/50 rounded-2xl mx-2 sm:mx-4 mt-4 sticky top-4 z-50">
+      <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 gap-2 sm:gap-4">
 
         {/* Mobile menu button */}
         <button
           type="button"
-          className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 flex-shrink-0"
+          className="lg:hidden inline-flex items-center justify-center p-2.5 rounded-xl text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 flex-shrink-0 active:bg-gray-200 transition-colors touch-manipulation"
           onClick={onMenuClick}
+          aria-label="Open menu"
         >
           <span className="sr-only">Open sidebar</span>
           <Menu className="h-6 w-6" />
         </button>
 
-        {/* Search Bar - Responsive width */}
+        {/* Search Bar - Optimized for mobile */}
         <div className="relative flex-1 max-w-md">
-          <form onSubmit={handleSearch} className="bg-white/60 backdrop-blur-sm h-[40px] sm:h-[44px] rounded-[15px] flex items-center px-3 sm:px-4 border border-white/50 shadow-sm">
-            <Search className="size-[18px] sm:size-[20px] text-gray-600 flex-shrink-0" />
+          <form onSubmit={handleSearch} className="bg-white/70 backdrop-blur-sm h-[44px] sm:h-[48px] rounded-xl sm:rounded-2xl flex items-center px-3 sm:px-4 border border-white/50 shadow-sm transition-all touch-manipulation">
+            <Search className="h-5 w-5 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
             <input
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="ml-2 sm:ml-3 bg-transparent border-none outline-none flex-1 text-sm text-gray-800 placeholder:text-gray-500 min-w-0"
+              className="ml-2 sm:ml-3 bg-transparent border-none outline-none flex-1 text-[15px] sm:text-sm text-gray-800 placeholder:text-gray-500 min-w-0 py-2"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
             />
           </form>
         </div>
@@ -124,7 +129,8 @@ const Header = ({ onMenuClick }) => {
             onClick={() => {
               setIsProfileDropdownOpen(!isProfileDropdownOpen)
             }}
-            className="flex items-center gap-2 bg-white/60 backdrop-blur-sm rounded-lg px-2 sm:px-4 py-2 border border-white/50 shadow-sm hover:bg-white/80 transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm rounded-xl px-2.5 sm:px-4 py-2.5 border border-white/50 shadow-sm hover:bg-white/80 transition-colors active:bg-white/90 touch-manipulation min-h-[44px]"
+            aria-label="User menu"
           >
             <User className="h-5 w-5 text-gray-600" />
             <span className="hidden sm:block text-gray-800 font-medium text-sm truncate max-w-[120px]">
