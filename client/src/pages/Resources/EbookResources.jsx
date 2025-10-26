@@ -6,6 +6,7 @@ const EbookResources = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   const ebookResources = [
+    // Indian Government Resources
     {
       name: 'National Digital Library of India (NDLI)',
       url: 'https://ndl.iitkgp.ac.in/',
@@ -20,21 +21,6 @@ const EbookResources = () => {
       description: 'National Programme on Technology Enhanced Learning. Free online courses and e-books on engineering and sciences.',
       category: 'Educational',
       icon: '📚',
-      popular: true
-    },
-    {
-      name: 'Project Gutenberg',
-      url: 'https://www.gutenberg.org/',
-      description: 'Over 70,000 free eBooks. Download and read classic literature and historical documents.',
-      category: 'Classic Literature',
-      icon: '📖'
-    },
-    {
-      name: 'Open Library',
-      url: 'https://openlibrary.org/',
-      description: 'Internet Archive\'s open library with millions of free books to borrow or download.',
-      category: 'General',
-      icon: '🌐',
       popular: true
     },
     {
@@ -59,64 +45,6 @@ const EbookResources = () => {
       icon: '🔬'
     },
     {
-      name: 'Internet Archive',
-      url: 'https://archive.org/',
-      description: 'Non-profit library of millions of free books, movies, software, music, and more.',
-      category: 'General',
-      icon: '📦',
-      popular: true
-    },
-    {
-      name: 'Google Books',
-      url: 'https://books.google.co.in/',
-      description: 'Search and preview millions of books. Many available for free full-text reading.',
-      category: 'General',
-      icon: '🔍'
-    },
-    {
-      name: 'Free Programming Books',
-      url: 'https://github.com/EbookFoundation/free-programming-books',
-      description: 'Comprehensive list of free programming books, courses, and resources.',
-      category: 'Technology',
-      icon: '💻',
-      popular: true
-    },
-    {
-      name: 'Bookboon',
-      url: 'https://bookboon.com/',
-      description: 'Free textbooks for students and professionals in business, engineering, and IT.',
-      category: 'Professional',
-      icon: '📊'
-    },
-    {
-      name: 'Directory of Open Access Books (DOAB)',
-      url: 'https://www.doabooks.org/',
-      description: 'Academic peer-reviewed books from open access publishers.',
-      category: 'Academic',
-      icon: '📘'
-    },
-    {
-      name: 'Manybooks',
-      url: 'https://manybooks.net/',
-      description: 'Over 50,000 free eBooks in various formats. Fiction and non-fiction.',
-      category: 'General',
-      icon: '📚'
-    },
-    {
-      name: 'Open Textbook Library',
-      url: 'https://open.umn.edu/opentextbooks/',
-      description: 'Free peer-reviewed textbooks for college courses.',
-      category: 'Educational',
-      icon: '📓'
-    },
-    {
-      name: 'arXiv.org',
-      url: 'https://arxiv.org/',
-      description: 'Free distribution service for scholarly articles in physics, mathematics, computer science, and more.',
-      category: 'Research',
-      icon: '🔬'
-    },
-    {
       name: 'e-PG Pathshala',
       url: 'https://epgp.inflibnet.ac.in/',
       description: 'E-content for postgraduate courses in social sciences, arts, and humanities.',
@@ -131,11 +59,344 @@ const EbookResources = () => {
       icon: '🇮🇳'
     },
     {
+      name: 'e-Pathshala',
+      url: 'https://epathshala.nic.in/',
+      description: 'Joint initiative of MHRD, NCERT and CIET. Digital textbooks and resources for students.',
+      category: 'Educational',
+      icon: '📱'
+    },
+    
+    // Classic Literature & General
+    {
+      name: 'Project Gutenberg',
+      url: 'https://www.gutenberg.org/',
+      description: 'Over 70,000 free eBooks. Download and read classic literature and historical documents.',
+      category: 'Classic Literature',
+      icon: '📖',
+      popular: true
+    },
+    {
+      name: 'Open Library',
+      url: 'https://openlibrary.org/',
+      description: 'Internet Archive\'s open library with millions of free books to borrow or download.',
+      category: 'General',
+      icon: '🌐',
+      popular: true
+    },
+    {
+      name: 'Internet Archive',
+      url: 'https://archive.org/',
+      description: 'Non-profit library of millions of free books, movies, software, music, and more.',
+      category: 'General',
+      icon: '📦',
+      popular: true
+    },
+    {
+      name: 'Manybooks',
+      url: 'https://manybooks.net/',
+      description: 'Over 50,000 free eBooks in various formats. Fiction and non-fiction.',
+      category: 'General',
+      icon: '📚'
+    },
+    {
+      name: 'Feedbooks',
+      url: 'https://www.feedbooks.com/publicdomain',
+      description: 'Thousands of public domain books and original works from independent authors.',
+      category: 'Classic Literature',
+      icon: '📕'
+    },
+    {
+      name: 'Standard Ebooks',
+      url: 'https://standardebooks.org/',
+      description: 'High-quality, carefully formatted public domain ebooks.',
+      category: 'Classic Literature',
+      icon: '✨'
+    },
+    
+    // Technology & Programming
+    {
+      name: 'Free Programming Books',
+      url: 'https://github.com/EbookFoundation/free-programming-books',
+      description: 'Comprehensive list of free programming books, courses, and resources.',
+      category: 'Technology',
+      icon: '💻',
+      popular: true
+    },
+    {
+      name: 'O\'Reilly Open Books',
+      url: 'https://www.oreilly.com/openbook/',
+      description: 'Free technology and programming books from O\'Reilly Media.',
+      category: 'Technology',
+      icon: '🐘'
+    },
+    {
+      name: 'Microsoft Docs',
+      url: 'https://docs.microsoft.com/',
+      description: 'Free documentation, tutorials, and e-books on Microsoft technologies.',
+      category: 'Technology',
+      icon: '🪟'
+    },
+    {
+      name: 'GoalKicker',
+      url: 'https://goalkicker.com/',
+      description: 'Free programming books compiled from Stack Overflow Documentation.',
+      category: 'Technology',
+      icon: '🎯'
+    },
+    
+    // Academic & Research
+    {
+      name: 'arXiv.org',
+      url: 'https://arxiv.org/',
+      description: 'Free distribution service for scholarly articles in physics, mathematics, computer science, and more.',
+      category: 'Research',
+      icon: '🔬'
+    },
+    {
+      name: 'Directory of Open Access Books (DOAB)',
+      url: 'https://www.doabooks.org/',
+      description: 'Academic peer-reviewed books from open access publishers.',
+      category: 'Academic',
+      icon: '📘'
+    },
+    {
+      name: 'Open Textbook Library',
+      url: 'https://open.umn.edu/opentextbooks/',
+      description: 'Free peer-reviewed textbooks for college courses.',
+      category: 'Educational',
+      icon: '📓'
+    },
+    {
+      name: 'OpenStax',
+      url: 'https://openstax.org/',
+      description: 'Free peer-reviewed, openly licensed college textbooks.',
+      category: 'Educational',
+      icon: '📗'
+    },
+    {
+      name: 'MIT OpenCourseWare',
+      url: 'https://ocw.mit.edu/',
+      description: 'Free course materials from MIT. Lecture notes, exams, and textbooks.',
+      category: 'Academic',
+      icon: '🎓'
+    },
+    {
+      name: 'PLOS (Public Library of Science)',
+      url: 'https://plos.org/',
+      description: 'Open access scientific journals and research articles.',
+      category: 'Research',
+      icon: '🧬'
+    },
+    {
+      name: 'JSTOR Open Content',
+      url: 'https://about.jstor.org/oa-and-free/',
+      description: 'Free access to thousands of scholarly articles and books.',
+      category: 'Academic',
+      icon: '📚'
+    },
+    
+    // Professional & Business
+    {
+      name: 'Bookboon',
+      url: 'https://bookboon.com/',
+      description: 'Free textbooks for students and professionals in business, engineering, and IT.',
+      category: 'Professional',
+      icon: '📊'
+    },
+    {
+      name: 'FreeTechBooks',
+      url: 'https://www.freetechbooks.com/',
+      description: 'Free technology books covering programming, computer science, engineering.',
+      category: 'Technology',
+      icon: '💾'
+    },
+    
+    // Search Engines & Aggregators
+    {
+      name: 'Google Books',
+      url: 'https://books.google.co.in/',
+      description: 'Search and preview millions of books. Many available for free full-text reading.',
+      category: 'General',
+      icon: '🔍'
+    },
+    {
       name: 'PDF Drive',
       url: 'https://www.pdfdrive.com/',
       description: 'Search engine for PDF files with millions of free books.',
       category: 'General',
       icon: '📄'
+    },
+    {
+      name: 'Z-Library',
+      url: 'https://z-lib.org/',
+      description: 'One of the world\'s largest online libraries with millions of books and articles.',
+      category: 'General',
+      icon: '📚'
+    },
+    {
+      name: 'Library Genesis',
+      url: 'http://libgen.rs/',
+      description: 'Search engine for scientific articles and books. Millions of files available.',
+      category: 'Academic',
+      icon: '🔬'
+    },
+    
+    // Language Learning
+    {
+      name: 'Duolingo Stories',
+      url: 'https://www.duolingo.com/stories',
+      description: 'Free short stories for language learning in multiple languages.',
+      category: 'Language',
+      icon: '🗣️'
+    },
+    {
+      name: 'BBC Languages',
+      url: 'http://www.bbc.co.uk/languages/',
+      description: 'Free resources for learning over 40 languages.',
+      category: 'Language',
+      icon: '🌍'
+    },
+    
+    // Children & Young Adults
+    {
+      name: 'International Children\'s Digital Library',
+      url: 'http://en.childrenslibrary.org/',
+      description: 'Free digital library of outstanding children\'s books from around the world.',
+      category: 'Children',
+      icon: '👶'
+    },
+    {
+      name: 'Storyline Online',
+      url: 'https://www.storylineonline.net/',
+      description: 'Videos of celebrated actors reading children\'s books aloud.',
+      category: 'Children',
+      icon: '🎭'
+    },
+    
+    // Science & Math
+    {
+      name: 'Khan Academy',
+      url: 'https://www.khanacademy.org/',
+      description: 'Free educational resources covering math, science, and more.',
+      category: 'Educational',
+      icon: '🧮'
+    },
+    {
+      name: 'NASA eBooks',
+      url: 'https://www.nasa.gov/ebooks/',
+      description: 'Free e-books from NASA about space, science, and technology.',
+      category: 'Science',
+      icon: '🚀'
+    },
+    {
+      name: 'BioMed Central',
+      url: 'https://www.biomedcentral.com/',
+      description: 'Open access research articles in biology and medicine.',
+      category: 'Science',
+      icon: '🧪'
+    },
+    
+    // History & Politics
+    {
+      name: 'Library of Congress Digital Collections',
+      url: 'https://www.loc.gov/collections/',
+      description: 'Free access to millions of historical items including books, photos, and manuscripts.',
+      category: 'History',
+      icon: '🏛️'
+    },
+    {
+      name: 'Digital Public Library of America',
+      url: 'https://dp.la/',
+      description: 'Access to millions of photographs, books, maps, and materials from libraries and museums.',
+      category: 'History',
+      icon: '🗽'
+    },
+    
+    // Religion & Philosophy
+    {
+      name: 'Sacred Texts',
+      url: 'https://www.sacred-texts.com/',
+      description: 'Freely available religious and spiritual texts from world traditions.',
+      category: 'Religion',
+      icon: '🕉️'
+    },
+    {
+      name: 'Early Church Texts',
+      url: 'http://www.earlychurchtexts.com/',
+      description: 'Free access to early Christian writings and texts.',
+      category: 'Religion',
+      icon: '✝️'
+    },
+    
+    // Fiction & Entertainment
+    {
+      name: 'Smashwords',
+      url: 'https://www.smashwords.com/books/category/1/newest/0/free/any',
+      description: 'Platform for independent authors. Many free fiction and non-fiction titles.',
+      category: 'Fiction',
+      icon: '✍️'
+    },
+    {
+      name: 'Wattpad',
+      url: 'https://www.wattpad.com/',
+      description: 'World\'s largest community for readers and writers. Millions of free stories.',
+      category: 'Fiction',
+      icon: '📝'
+    },
+    
+    // Comics & Graphic Novels
+    {
+      name: 'Digital Comic Museum',
+      url: 'https://digitalcomicmuseum.com/',
+      description: 'Public domain Golden Age comics available for free download.',
+      category: 'Comics',
+      icon: '💥'
+    },
+    {
+      name: 'Comic Book Plus',
+      url: 'https://comicbookplus.com/',
+      description: 'Free and legal public domain comic books.',
+      category: 'Comics',
+      icon: '📰'
+    },
+    
+    // Audiobooks
+    {
+      name: 'LibriVox',
+      url: 'https://librivox.org/',
+      description: 'Free public domain audiobooks read by volunteers.',
+      category: 'Audiobooks',
+      icon: '🎧'
+    },
+    {
+      name: 'Loyal Books',
+      url: 'http://www.loyalbooks.com/',
+      description: 'Free audiobooks and e-books of classic literature.',
+      category: 'Audiobooks',
+      icon: '🔊'
+    },
+    
+    // International Libraries
+    {
+      name: 'Europeana',
+      url: 'https://www.europeana.eu/',
+      description: 'Digital platform for European cultural heritage with millions of items.',
+      category: 'International',
+      icon: '🇪🇺'
+    },
+    {
+      name: 'World Digital Library',
+      url: 'https://www.wdl.org/',
+      description: 'Cultural materials from libraries around the world.',
+      category: 'International',
+      icon: '🌏'
+    },
+    {
+      name: 'Project MUSE',
+      url: 'https://muse.jhu.edu/',
+      description: 'Leading provider of digital humanities and social science content.',
+      category: 'Academic',
+      icon: '🎨'
     }
   ];
 
