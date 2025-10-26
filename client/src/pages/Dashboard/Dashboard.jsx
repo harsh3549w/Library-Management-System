@@ -6,6 +6,7 @@ import { getBookRecommendations } from '../../store/slices/recommendationSlice'
 import { getLibraryStats } from '../../store/slices/reportSlice'
 import { getAllUsers } from '../../store/slices/userSlice'
 import ExtendDue from '../../components/ExtendDue/ExtendDue'
+import { CLOUDINARY_IMAGES } from '../../config/cloudinaryUrls'
 import { 
   BookOpen, 
   Users, 
@@ -122,9 +123,10 @@ const Dashboard = () => {
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
           <img 
-            src="/images/dashboard-logo.jpeg" 
+            src={CLOUDINARY_IMAGES.dashboardLogo} 
             alt="Dashboard Logo" 
             className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg shadow-lg object-cover border-2 border-white/50"
+            loading="eager"
           />
         </div>
         {/* Page Header with gradient accent line */}

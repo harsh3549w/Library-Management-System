@@ -7,6 +7,9 @@ export const CLOUDINARY_IMAGES = {
   
   // IIITDM Logo
   logo: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761401617/library-static/iiitdm-logo.webp',
+  
+  // Dashboard Logo (left corner)
+  dashboardLogo: 'https://res.cloudinary.com/ds5kihtow/image/upload/v1761458537/library-static/dashboard-logo.jpg',
 };
 
 // Helper function to get optimized image URL with transformations
