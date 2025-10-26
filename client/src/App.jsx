@@ -66,7 +66,12 @@ function App() {
     // Only try once on mount if there's a token in localStorage
     const token = localStorage.getItem('token')
     if (!isAuthenticated && !isLoggingOut && token) {
-      dispatch(getUser())
+      // Try to auto-authenticate with stored token
+      // If it fails (expired token), user will silently be redirected to login
+      dispatch(getUser()).catch(() => {
+        // Silent fail - token was invalid/expired
+        // No error shown to user, they just see login page
+      })
     }
   }, [dispatch]) // Only run once on mount
 

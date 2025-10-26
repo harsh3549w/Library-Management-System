@@ -68,7 +68,6 @@ const Login = () => {
       {/* Container for centered form */}
       <div className="relative z-10 w-full max-w-[450px] sm:absolute sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2">
         <div className="w-full bg-login-card backdrop-blur-md border-2 border-login-card rounded-3xl shadow-2xl p-6 sm:p-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-login-text-primary text-center mb-6">E Library</h1>
           <form onSubmit={handleSubmit} className="flex flex-col justify-center space-y-5 sm:space-y-6 py-4">
           <div className="relative">
             <div className="bg-login-input border-2 border-gray-400/30 rounded-3xl h-14 sm:h-16 flex items-center px-4 sm:px-6 transition-all duration-200 hover:border-gray-400/50 focus-within:border-gray-400/70">

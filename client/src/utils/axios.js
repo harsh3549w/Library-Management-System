@@ -34,12 +34,20 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Unauthorized - clear token
-      localStorage.removeItem('token')
+      // Unauthorized - token expired or invalid
+      const token = localStorage.getItem('token')
       
-      // Dispatch logout if available (avoids circular dependency)
-      if (dispatchLogout) {
-        dispatchLogout()
+      // Only clear and redirect if we had a token (prevents multiple logout calls)
+      if (token) {
+        localStorage.removeItem('token')
+        
+        // Only dispatch logout if the request was not to /auth/me (auto-login check)
+        // This prevents showing "login failed" error when auto-login fails silently
+        const isAutoLoginCheck = error.config?.url?.includes('/auth/me')
+        
+        if (dispatchLogout && !isAutoLoginCheck) {
+          dispatchLogout()
+        }
       }
     }
     return Promise.reject(error)

@@ -237,6 +237,8 @@ const authSlice = createSlice({
         state.loading = false
         state.user = null
         state.isAuthenticated = false
+        // Don't set error for getUser failures (silent fail for auto-login)
+        // The user will just see the login page without a confusing error message
       })
       // Forgot Password
       .addCase(forgotPassword.pending, (state) => {
