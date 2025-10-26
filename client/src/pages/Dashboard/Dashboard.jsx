@@ -118,11 +118,21 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header with gradient accent line */}
-      <div className="relative">
-        <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#2563EB] to-[#00b894] rounded-full"></div>
-        <h1 className="text-[28px] text-gray-800">Dashboard</h1>
-        <p className="text-sm text-gray-600 mt-1">Welcome back, {user?.name || 'User'}!</p>
+      {/* Dashboard Logo in top-left corner with header */}
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0">
+          <img 
+            src="/images/dashboard-logo.jpeg" 
+            alt="Dashboard Logo" 
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg shadow-lg object-cover border-2 border-white/50"
+          />
+        </div>
+        {/* Page Header with gradient accent line */}
+        <div className="relative flex-1">
+          <div className="absolute -left-2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#2563EB] to-[#00b894] rounded-full"></div>
+          <h1 className="text-[28px] text-gray-800">Dashboard</h1>
+          <p className="text-sm text-gray-600 mt-1">Welcome back, {user?.name || 'User'}!</p>
+        </div>
       </div>
 
       {/* Stats Cards - Responsive Grid */}

@@ -9,6 +9,7 @@ import morgan from "morgan";
 import fileUpload from "express-fileupload";
 import { errorMiddleware, ErrorHandler } from "./middlewares/errorMiddlewares.js";
 import { globalErrorHandler, handleUnhandledRoutes } from "./utils/errorHandler.js";
+import { generalLimiter, paymentLimiter, adminLimiter } from "./middleware/rateLimiter.js";
 import authRouter from "./routes/authRouter.js";
 import bookRouter from "./routes/bookRouter.js";
 import borrowRouter from "./routes/borrowRouter.js";
@@ -107,8 +108,15 @@ app.use(fileUpload({
   tempFileDir: "/tmp/"
 }));
 
-// Routes
-app.use("/api/v1/auth", authRouter);
+// Apply general rate limiter to all API routes
+app.use('/api/', generalLimiter);
+
+// Routes with specific rate limiters
+app.use("/api/v1/auth", authRouter); // Auth routes have their own limiters
+app.use("/api/v1/payment", paymentLimiter, paymentRouter); // Payment-specific rate limit
+app.use('/api/v1/admin', adminLimiter, adminRouter); // Admin-specific rate limit
+
+// Other routes (protected by general limiter)
 app.use("/api/v1/book", bookRouter);
 app.use("/api/v1/borrow", borrowRouter);
 app.use("/api/v1/users", userRouter);
@@ -118,10 +126,8 @@ app.use('/api/v1/reservation', reservationRouter);
 app.use('/api/v1/archive', archiveRouter);
 app.use('/api/v1/transaction', transactionRouter);
 app.use('/api/v1/report', reportRouter);
-app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/recommendations', recommendationRouter);
 app.use('/api/v1/donation', donationRouter);
-app.use('/api/v1/admin', adminRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
