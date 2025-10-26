@@ -83,7 +83,7 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
 
   return (
     <header className="bg-white/40 backdrop-blur-md shadow-lg border border-white/70 rounded-2xl mx-2 sm:mx-4 my-4">
-      <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 gap-2 sm:gap-4">
+      <div className="flex items-center justify-between px-2 sm:px-6 py-2 sm:py-4 sm:gap-2">
 
         {/* Mobile menu button */}
         <button
@@ -93,7 +93,7 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
           aria-label="Open menu"
         >
           <span className="sr-only">Open sidebar</span>
-          <Menu className="h-6 w-6" />
+          <Menu className="h-4 w-4" />
         </button>
 
         {/* Desktop menu button */}
@@ -108,15 +108,15 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
         </button>
 
         {/* Search Bar - Optimized for mobile */}
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 w-[80%] md:max-w-md ">
           <form onSubmit={handleSearch} className="bg-white/70 backdrop-blur-sm h-[44px] sm:h-[48px] rounded-xl sm:rounded-2xl flex items-center px-3 sm:px-4 border border-white/50 shadow-sm transition-all touch-manipulation">
-            <Search className="h-5 w-5 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
+            <Search className="h-4 w-2sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
             <input
               type="text"
               placeholder="Search..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="ml-2 sm:ml-3 bg-transparent border-none outline-none flex-1 text-[15px] sm:text-sm text-gray-800 placeholder:text-gray-500 min-w-0 py-2"
+              className="ml-2 w-5 sm:ml-3 bg-transparent border-none outline-none flex-1 text-[15px] sm:text-sm text-gray-800 placeholder:text-gray-500 min-w-0 py-2"
               autoComplete="off"
               autoCorrect="off"
               autoCapitalize="off"
@@ -143,7 +143,7 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
             className="flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm rounded-xl px-2.5 sm:px-4 py-2.5 border border-white/50 shadow-sm hover:bg-white/80 transition-colors active:bg-white/90 touch-manipulation min-h-[44px]"
             aria-label="User menu"
           >
-            <User className="h-5 w-5 text-gray-600" />
+            <User className="h-4 w-4 text-gray-600" />
             <span className="hidden sm:block text-gray-800 font-medium text-sm truncate max-w-[120px]">
               {user?.name || user?.email || 'User'}
             </span>
