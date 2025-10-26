@@ -14,7 +14,7 @@ const IIITDMLogo = () => (
     <img
       src={CLOUDINARY_IMAGES.logo}
       alt="IIITDM Logo"
-      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-gray-400 shadow-lg object-cover relative z-10"
+      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-gray-400 shadow-lg object-contain relative z-10"
       loading="eager"
       decoding="async"
     />
