@@ -10,6 +10,7 @@ import archiveReducer from './slices/archiveSlice'
 import transactionReducer from './slices/transactionSlice'
 import reportReducer from './slices/reportSlice'
 import donationReducer from './slices/donationSlice'
+import inventoryReducer from './slices/inventorySlice'
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     transactions: transactionReducer,
     report: reportReducer,
     donations: donationReducer,
+    inventory: inventoryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

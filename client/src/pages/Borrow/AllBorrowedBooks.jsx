@@ -1,18 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { getBorrowedBooksForAdmin } from '../../store/slices/borrowSlice'
+import { getBorrowedBooksForAdmin, adminReturnBorrowedBook } from '../../store/slices/borrowSlice'
 import { 
   Library, 
   Calendar, 
   Clock,
   AlertTriangle,
   CheckCircle,
-  User
+  User,
+  Search as SearchIcon
 } from 'lucide-react'
 
 const AllBorrowedBooks = () => {
   const dispatch = useDispatch()
   const { allBorrowedBooks, loading } = useSelector((state) => state.borrow)
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [returningId, setReturningId] = useState(null)
 
   useEffect(() => {
     dispatch(getBorrowedBooksForAdmin())
@@ -66,6 +70,21 @@ const AllBorrowedBooks = () => {
     }
   }
 
+  const handleAdminReturn = async (borrowed) => {
+    if (!borrowed?.book?._id || !borrowed?.user?.email) return
+    const payload = {
+      bookId: borrowed.book._id,
+      email: borrowed.user.email,
+      borrowId: borrowed._id,
+    }
+    try {
+      setReturningId(borrowed._id)
+      await dispatch(adminReturnBorrowedBook(payload))
+    } finally {
+      setReturningId(null)
+    }
+  }
+
 
   const stats = [
     {
@@ -80,22 +99,24 @@ const AllBorrowedBooks = () => {
       icon: AlertTriangle,
       color: 'bg-red-500',
     },
-    {
-      name: 'Due Soon',
-      value: allBorrowedBooks.filter(book => {
-        const days = getDaysRemaining(book.dueDate)
-        return days <= 3 && days >= 0
-      }).length,
-      icon: Clock,
-      color: 'bg-yellow-500',
-    },
-    {
-      name: 'On Time',
-      value: allBorrowedBooks.filter(book => getDaysRemaining(book.dueDate) > 3).length,
-      icon: CheckCircle,
-      color: 'bg-green-500',
-    },
   ]
+
+  const filteredBorrowed = allBorrowedBooks.filter((b) => {
+    if (!searchQuery) return true
+    const q = searchQuery.toLowerCase()
+    const title = b.book?.title?.toLowerCase() || ''
+    const author = b.book?.author?.toLowerCase() || ''
+    const isbn = b.book?.isbn?.toLowerCase() || ''
+    const email = b.user?.email?.toLowerCase() || ''
+    const name = b.user?.name?.toLowerCase() || ''
+    return (
+      title.includes(q) ||
+      author.includes(q) ||
+      isbn.includes(q) ||
+      email.includes(q) ||
+      name.includes(q)
+    )
+  })
 
   return (
     <div className="space-y-6">
@@ -105,8 +126,47 @@ const AllBorrowedBooks = () => {
         <p className="text-gray-600">Manage all borrowed books across the library</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Search (full-width, above widgets) */}
+      <div className="card p-4">
+        <div className="flex items-center gap-3 w-full flex-wrap">
+          <div className="flex-1 min-w-[260px]">
+            <div className="bg-white/70 backdrop-blur-sm h-[44px] sm:h-[48px] rounded-xl sm:rounded-2xl flex items-center px-3 sm:px-4 border border-white/50 shadow-sm">
+              <SearchIcon className="h-4 sm:h-5 w-4 sm:w-5 text-gray-600 flex-shrink-0" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); setSearchQuery(searchInput.trim()) } }}
+                placeholder="Search by title, author, ISBN, borrower name or email"
+                className="ml-2 sm:ml-3 bg-transparent border-none outline-none flex-1 text-[15px] sm:text-sm text-gray-800 placeholder:text-gray-500 min-w-0 py-2"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setSearchQuery(searchInput.trim())}
+              className="inline-flex items-center px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
+            >
+              Search
+            </button>
+            {searchQuery && (
+              <button
+                onClick={() => { setSearchInput(''); setSearchQuery('') }}
+                className="inline-flex items-center px-4 py-2 rounded-md bg-gray-100 text-gray-700 text-sm hover:bg-gray-200"
+              >
+                Reset
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats (keep large size; don't shrink) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
         {stats.map((stat) => (
           <div key={stat.name} className="card">
             <div className="flex items-center">
@@ -127,7 +187,7 @@ const AllBorrowedBooks = () => {
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-      ) : allBorrowedBooks.length > 0 ? (
+      ) : filteredBorrowed.length > 0 ? (
         <div className="card">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
@@ -157,7 +217,7 @@ const AllBorrowedBooks = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {allBorrowedBooks.map((borrowed) => {
+                {filteredBorrowed.map((borrowed) => {
                   // Skip if book data is missing
                   if (!borrowed.book || !borrowed.user) return null;
                   
@@ -219,7 +279,15 @@ const AllBorrowedBooks = () => {
                         {borrowed.fine ? `₹${borrowed.fine.toFixed(2)}` : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <span className="text-gray-500">-</span>
+                        <button
+                          onClick={() => handleAdminReturn(borrowed)}
+                          disabled={loading || returningId === borrowed._id}
+                          className={`inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white ${
+                            loading || returningId === borrowed._id ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'
+                          } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+                        >
+                          {loading || returningId === borrowed._id ? 'Returning…' : 'Mark Returned'}
+                        </button>
                       </td>
                     </tr>
                   )

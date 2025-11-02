@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { getAllBooks, deleteBook, updateBook } from '../../store/slices/bookSlice'
 import { borrowBookForSelf, clearError as clearBorrowError, clearSuccess as clearBorrowSuccess } from '../../store/slices/borrowSlice'
 import { reserveBook, clearError as clearReserveError, clearSuccess as clearReserveSuccess } from '../../store/slices/reservationSlice'
@@ -35,6 +35,7 @@ const Books = () => {
 
   const dispatch = useDispatch()
   const location = useLocation()
+  const navigate = useNavigate()
   const { books, loading } = useSelector((state) => state.books)
   const { user } = useSelector((state) => state.auth)
   const { loading: borrowLoading, success: borrowSuccess, error: borrowError, message: borrowMessage } = useSelector((state) => state.borrow)
@@ -109,6 +110,23 @@ const Books = () => {
   }
 
   const handleReserveBook = (bookId, bookTitle) => {
+    // If user has outstanding fines, block reservation with a popup (same pattern as borrow)
+    const outstanding = Number(user?.fineBalance || 0)
+    if (outstanding > 0) {
+      setConfirmAction({
+        type: 'reserve',
+        bookId,
+        bookTitle,
+        message: `You have an outstanding fine balance of ₹${outstanding.toFixed(2)}. Please pay your fines before reserving a book.`,
+        confirmText: 'View My Fines',
+        action: () => {
+          navigate('/my-fines')
+        }
+      })
+      setShowConfirmModal(true)
+      return
+    }
+
     setConfirmAction({
       type: 'reserve',
       bookId,

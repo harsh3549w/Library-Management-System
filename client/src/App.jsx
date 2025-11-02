@@ -48,6 +48,7 @@ import MyDonations from './pages/Donations/MyDonations'
 import ManageDonations from './pages/Donations/ManageDonations'
 import Contact from './pages/Contact/Contact'
 import EbookResources from './pages/Resources/EbookResources'
+import MissingStolen from './pages/Inventory/MissingStolen'
 
 function App() {
   const dispatch = useDispatch()
@@ -167,6 +168,7 @@ function App() {
           <Route path="admin/manage-suggestions" element={<AdminRoute><ManageSuggestions /></AdminRoute>} />
           <Route path="admin/add-user" element={<AdminRoute><AddUser /></AdminRoute>} />
           <Route path="admin/manage-donations" element={<AdminRoute><ManageDonations /></AdminRoute>} />
+          <Route path="admin/missing-stolen" element={<AdminRoute><MissingStolen /></AdminRoute>} />
         </Route>
 
         {/* Catch all route */}

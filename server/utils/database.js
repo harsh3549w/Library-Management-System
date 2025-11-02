@@ -53,8 +53,8 @@ export const createIndexes = async () => {
     await db.collection('books').createIndex({ title: 1 });
     await db.collection('books').createIndex({ author: 1 });
     await db.collection('books').createIndex({ genre: 1 });
-    await db.collection('books').createIndex({ availability: 1 });
-    await db.collection('books').createIndex({ isbn: 1 }, { unique: true, sparse: true });
+  await db.collection('books').createIndex({ availability: 1 });
+  // Avoid creating a duplicate ISBN index; the unique sparse index is already defined by the Mongoose schema
     
     // Borrow indexes
     await db.collection('borrows').createIndex({ userId: 1 });

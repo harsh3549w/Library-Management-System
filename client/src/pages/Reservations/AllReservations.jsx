@@ -88,7 +88,7 @@ const AllReservations = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">All Reservations</h1>
+  <h1 className="text-2xl font-bold text-gray-900">Reservations</h1>
         <p className="text-gray-600">Manage book reservations across the library</p>
       </div>
 
@@ -115,7 +115,7 @@ const AllReservations = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="input-field flex-1 max-w-xs"
           >
-            <option value="all">All Reservations</option>
+            <option value="all">Reservations</option>
             <option value="active">Active</option>
             <option value="fulfilled">Fulfilled</option>
             <option value="expired">Expired</option>

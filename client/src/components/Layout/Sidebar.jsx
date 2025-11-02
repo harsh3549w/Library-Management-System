@@ -21,7 +21,8 @@ import {
   Edit,
   Gift,
   Users,
-  Globe
+  Globe,
+  AlertTriangle
 } from 'lucide-react'
 
 const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
@@ -38,7 +39,8 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
-    { name: 'All Reservations', href: '/admin/all-reservations', icon: Bookmark },
+  { name: 'Reservations', href: '/admin/all-reservations', icon: Bookmark },
+    { name: 'Missing/Stolen', href: '/admin/missing-stolen', icon: AlertTriangle },
     { name: 'Manage Fines', href: '/admin/manage-fines', icon: DollarSign },
     { name: 'All Transactions', href: '/admin/all-transactions', icon: Receipt },
     { name: 'Reports', href: '/admin/reports', icon: PieChart },

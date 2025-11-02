@@ -63,7 +63,8 @@ bookSchema.pre('save', function(next) {
 });
 
 // Performance indexes for high-traffic scenarios
-bookSchema.index({ isbn: 1 }); // ISBN lookups
+// Note: Unique ISBN index is already created via the schema field (unique: true, sparse: true)
+// so we avoid defining a duplicate plain index on { isbn: 1 } to prevent duplicate index warnings.
 bookSchema.index({ createdAt: -1 }); // Sort by newest books
 bookSchema.index({ title: 'text', author: 'text' }); // Full-text search on title and author
 bookSchema.index({ genre: 1 }); // Filter by genre

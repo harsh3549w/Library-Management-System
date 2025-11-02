@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
+import dns from "dns";
 
 export const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
+  const connectOnce = async (uri) => {
+    await mongoose.connect(uri, {
       dbName: "MERN_STACK_LIBRARY_MANAGEMENT",
       // Production optimizations for high-load scenarios
       maxPoolSize: 50, // Maintain up to 50 socket connections for high traffic
@@ -28,9 +29,39 @@ export const connectDB = async () => {
       console.log('MongoDB connection closed through app termination');
       process.exit(0);
     });
-    
+  };
+
+  const primaryUri = process.env.MONGO_URI;
+  const fallbackDirectUri = process.env.MONGO_URI_DIRECT || process.env.MONGO_URI_STANDARD;
+
+  try {
+    await connectOnce(primaryUri);
   } catch (err) {
-    console.error(`Database connection failed ❌: ${err}`);
+    const msg = String(err?.message || err);
+    const isSrvDnsIssue = /querySrv|ENOTFOUND|ECONNREFUSED/i.test(msg);
+    console.error(`Database connection failed ❌: ${msg}`);
+    if (isSrvDnsIssue) {
+      console.warn("Retrying MongoDB connection using public DNS resolvers (8.8.8.8, 1.1.1.1)…");
+      try {
+        dns.setServers(["8.8.8.8", "1.1.1.1", "9.9.9.9"]);
+        await connectOnce(primaryUri);
+        return;
+      } catch (retryErr) {
+        console.error(`Retry after setting public DNS failed ❌: ${retryErr}`);
+      }
+      // If SRV lookups are blocked, try a standard (non-SRV) connection string if provided
+      if (fallbackDirectUri) {
+        console.warn("Attempting fallback connection using MONGO_URI_DIRECT/MONGO_URI_STANDARD…");
+        try {
+          await connectOnce(fallbackDirectUri);
+          return;
+        } catch (directErr) {
+          console.error(`Fallback direct connection failed ❌: ${directErr}`);
+        }
+      } else {
+        console.warn("No MONGO_URI_DIRECT/MONGO_URI_STANDARD provided for non-SRV fallback.");
+      }
+    }
     process.exit(1); // Exit process with failure
   }
 };

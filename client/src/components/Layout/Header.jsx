@@ -17,31 +17,38 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
 
   // Calculate dropdown position
   const calculateDropdownPosition = () => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect()
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 8,
-        right: window.innerWidth - rect.right
-      })
-    }
+    if (!buttonRef.current) return
+    const rect = buttonRef.current.getBoundingClientRect()
+    // The dropdown is position: fixed, so use viewport coordinates (no scrollY)
+    setDropdownPosition({
+      top: rect.bottom + 8,
+      right: Math.max(0, window.innerWidth - rect.right)
+    })
   }
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
           buttonRef.current && !buttonRef.current.contains(event.target)) {
         setIsProfileDropdownOpen(false)
       }
+    }
+    const handleScrollOrResize = () => {
+      if (isProfileDropdownOpen) calculateDropdownPosition()
     }
 
     if (isProfileDropdownOpen) {
       calculateDropdownPosition()
       document.addEventListener('mousedown', handleClickOutside)
+      window.addEventListener('scroll', handleScrollOrResize, { passive: true })
+      window.addEventListener('resize', handleScrollOrResize)
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
+      window.removeEventListener('scroll', handleScrollOrResize)
+      window.removeEventListener('resize', handleScrollOrResize)
     }
   }, [isProfileDropdownOpen])
 
@@ -138,7 +145,12 @@ const Header = ({ onMenuClick, onDesktopMenuClick, desktopSidebarOpen }) => {
           <button
             ref={buttonRef}
             onClick={() => {
-              setIsProfileDropdownOpen(!isProfileDropdownOpen)
+              const next = !isProfileDropdownOpen
+              setIsProfileDropdownOpen(next)
+              if (next) {
+                // Position immediately on open
+                setTimeout(calculateDropdownPosition, 0)
+              }
             }}
             className="flex items-center gap-1.5 sm:gap-2 bg-white/70 backdrop-blur-sm rounded-xl px-2.5 sm:px-4 py-2.5 border border-white/50 shadow-sm hover:bg-white/80 transition-colors active:bg-white/90 touch-manipulation min-h-[44px]"
             aria-label="User menu"

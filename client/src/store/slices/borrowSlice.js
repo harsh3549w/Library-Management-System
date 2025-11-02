@@ -63,6 +63,24 @@ export const returnBorrowedBook = createAsyncThunk(
   }
 )
 
+// Admin: mark a borrowed book as returned
+export const adminReturnBorrowedBook = createAsyncThunk(
+  'borrow/adminReturnBorrowedBook',
+  async ({ bookId, email, borrowId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${API_URL}/borrow/return-borrowed-book/${bookId}`,
+        { email },
+        { withCredentials: true }
+      )
+      // Attach borrowId so reducer can update local state
+      return { ...response.data, borrowId }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to return book (admin)')
+    }
+  }
+)
+
 export const renewBook = createAsyncThunk(
   'borrow/renewBook',
   async (borrowId, { rejectWithValue }) => {
@@ -241,6 +259,23 @@ const borrowSlice = createSlice({
         state.message = action.payload.message
       })
       .addCase(returnBorrowedBook.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
+      // Admin Return Borrowed Book
+      .addCase(adminReturnBorrowedBook.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(adminReturnBorrowedBook.fulfilled, (state, action) => {
+        state.loading = false
+        state.success = true
+        state.message = action.payload.message
+        if (action.payload.borrowId) {
+          state.allBorrowedBooks = state.allBorrowedBooks.filter(b => b._id !== action.payload.borrowId)
+        }
+      })
+      .addCase(adminReturnBorrowedBook.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })

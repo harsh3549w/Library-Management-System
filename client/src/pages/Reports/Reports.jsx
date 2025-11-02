@@ -41,6 +41,21 @@ const Reports = () => {
   const [selectedReport, setSelectedReport] = useState(null)
   const [borrowingPeriod, setBorrowingPeriod] = useState('monthly')
   const [modalLoading, setModalLoading] = useState(false)
+  const [financialMonth, setFinancialMonth] = useState(() => {
+    const now = new Date()
+    // YYYY-MM format for <input type="month">
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  })
+
+  const getMonthRange = (ym) => {
+    // ym is in YYYY-MM
+    const [y, m] = ym.split('-').map(Number)
+    const start = new Date(y, m - 1, 1)
+    const end = new Date(y, m, 0) // last day of month
+    // Use ISO date strings without time (backend accepts dates)
+    const toISODate = (d) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())).toISOString()
+    return { startDate: toISODate(start), endDate: toISODate(end) }
+  }
 
   useEffect(() => {
     dispatch(getLibraryStats())
@@ -77,7 +92,10 @@ const Reports = () => {
         dispatch(getUserActivityReport())
         break
       case 'financial':
-        dispatch(getFinancialReport())
+        {
+          const { startDate, endDate } = getMonthRange(financialMonth)
+          dispatch(getFinancialReport({ startDate, endDate }))
+        }
         break
       case 'overdue':
         dispatch(getOverdueReport())
@@ -503,6 +521,22 @@ const Reports = () => {
 
                 {selectedReport === 'financial' && financialReport && (
                   <div className="space-y-6">
+                    {/* Month Filter */}
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm font-medium text-gray-700">Month:</label>
+                      <input
+                        type="month"
+                        className="input-field w-[200px]"
+                        value={financialMonth}
+                        onChange={(e) => {
+                          const ym = e.target.value
+                          setFinancialMonth(ym)
+                          setModalLoading(true)
+                          const { startDate, endDate } = getMonthRange(ym)
+                          dispatch(getFinancialReport({ startDate, endDate }))
+                        }}
+                      />
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="card">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">Fine Revenue</h3>
