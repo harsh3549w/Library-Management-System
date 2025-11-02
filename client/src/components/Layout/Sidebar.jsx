@@ -36,6 +36,7 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
     { name: 'Books', href: '/books', icon: BookOpen },
     { name: 'Add Book', href: '/admin/add-book', icon: Plus },
     { name: 'Add Users', href: '/admin/add-user', icon: UserPlus },
+    { name: 'Batch Register', href: '/admin/batch-register', icon: Users },
     { name: 'Archives', href: '/archives', icon: FileText },
     { name: 'Upload Archive', href: '/admin/upload-archive', icon: Upload },
     { name: 'All Borrowed Books', href: '/admin/all-borrowed-books', icon: UserCheck },
@@ -68,11 +69,11 @@ const Sidebar = ({ open, setOpen, desktopOpen, setDesktopOpen }) => {
       <div className="flex items-center flex-shrink-0 h-20 px-6 border-b border-white/30">
         <Link to="/dashboard" className="flex items-center">
           <div className="flex-shrink-0">
-            <div className={`${isCollapsed ? 'h-12 w-12' : 'h-16 w-16'} bg-white/60 backdrop-blur-sm rounded-lg p-2 shadow-sm transition-all duration-300`}>
+            <div className={`${isCollapsed ? 'h-12 w-12' : 'h-16 w-16'} bg-white/80 backdrop-blur-sm rounded-lg p-2 shadow-sm transition-all duration-300`}>
               <img
                 src="https://res.cloudinary.com/ds5kihtow/image/upload/v1761401617/library-static/iiitdm-logo.webp"
                 alt="IIITDM Logo"
-                className="w-full h-full object-cover rounded-lg"
+                className="w-full h-full object-contain"
                 style={{ border: 'none', outline: 'none' }}
                 loading="lazy"
                 decoding="async"

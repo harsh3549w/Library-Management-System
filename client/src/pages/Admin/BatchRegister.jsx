@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
 import { Users, AlertCircle, CheckCircle, Loader } from 'lucide-react'
 
 const BatchRegister = () => {
@@ -13,8 +12,6 @@ const BatchRegister = () => {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
-
-  const dispatch = useDispatch()
 
   const degrees = [
     { value: 'btech', label: 'B.Tech', prefix: '1' },
@@ -105,8 +102,8 @@ const BatchRegister = () => {
           password,
           name: `Student ${rollNumber}`,
           rollNumber,
-          phone: '0000000000', // Dummy phone
-          address: 'IIIT Kurnool', // Dummy address
+          phone: '0000000000',
+          address: 'IIIT Kurnool',
           role: 'User'
         })
       }
@@ -159,26 +156,21 @@ const BatchRegister = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="card">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl">
-            <Users className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Batch Register Students</h1>
-            <p className="text-sm text-gray-600 mt-1">Register multiple students at once with auto-generated credentials</p>
-          </div>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Batch Register Students</h1>
+        <p className="text-gray-600">Register multiple students with auto-generated credentials</p>
       </div>
 
       {/* Success Message */}
       {result && result.success && (
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5" />
+            <CheckCircle className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
             <div className="flex-1">
               <h3 className="text-green-800 font-medium">{result.message}</h3>
-              <p className="text-green-700 text-sm mt-1">Sample: {result.sample.email} / Password: {generatePassword(result.sample.rollNumber)}</p>
+              <p className="text-green-700 text-sm mt-1">
+                Sample: {result.sample.email} / Password: {generatePassword(result.sample.rollNumber)}
+              </p>
             </div>
           </div>
         </div>
@@ -194,8 +186,18 @@ const BatchRegister = () => {
         </div>
       )}
 
-      {/* Form */}
+      {/* Batch Form */}
       <form onSubmit={handleSubmit} className="card">
+        <div className="flex items-center mb-6">
+          <div className="flex-shrink-0 p-3 bg-blue-100 rounded-lg">
+            <Users className="h-6 w-6 text-blue-600" />
+          </div>
+          <div className="ml-4">
+            <h2 className="text-lg font-medium text-gray-900">Student Information</h2>
+            <p className="text-sm text-gray-500">Configure batch registration parameters</p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Degree */}
           <div>
@@ -275,7 +277,7 @@ const BatchRegister = () => {
           </div>
 
           {/* End Roll Number */}
-          <div>
+          <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               End Roll Number *
             </label>
@@ -306,7 +308,7 @@ const BatchRegister = () => {
         )}
 
         {/* Submit Button */}
-        <div className="mt-6 flex gap-4">
+        <div className="mt-6 flex justify-end">
           <button
             type="submit"
             disabled={loading}
@@ -327,31 +329,39 @@ const BatchRegister = () => {
         </div>
       </form>
 
-      {/* Information */}
-      <div className="card bg-gray-50">
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">Roll Number Format</h3>
-        <div className="space-y-2 text-sm text-gray-700">
-          <p><span className="font-medium">Format:</span> [Degree][Year][Branch][RollNo]@iiitk.ac.in</p>
-          <p><span className="font-medium">Degree Prefix:</span> B.Tech = 1, Dual Degree = 5</p>
-          <p><span className="font-medium">Year Code:</span> 1st Year = 25, 2nd Year = 24, 3rd Year = 23, 4th Year = 22</p>
-          <p><span className="font-medium">Branch Codes:</span> CS, ECE, ME, AD</p>
-          <p><span className="font-medium">Example:</span> 123cs0003@iiitk.ac.in (B.Tech, 3rd Year, CS, Roll No. 3)</p>
-          <p><span className="font-medium">Password:</span> [rollnumber]@lib (e.g., 123cs0003@lib)</p>
+      {/* Information Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Roll Number Format */}
+        <div className="card bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-800 mb-3">Roll Number Format</h3>
+          <div className="space-y-2 text-sm text-gray-700">
+            <p><span className="font-medium">Format:</span> [Degree][Year][Branch][RollNo]</p>
+            <p><span className="font-medium">Email:</span> [rollnumber]@iiitk.ac.in</p>
+            <p><span className="font-medium">Degree Prefix:</span> B.Tech = 1, Dual = 5</p>
+            <p><span className="font-medium">Year Code:</span> 1st = 25, 2nd = 24, 3rd = 23, 4th = 22</p>
+            <p><span className="font-medium">Branch Codes:</span> CS, ECE, ME, AD</p>
+            <p className="mt-2 pt-2 border-t border-gray-300">
+              <span className="font-medium">Example:</span> 125cs0003@iiitk.ac.in
+            </p>
+            <p><span className="font-medium">Password:</span> [rollnumber]@lib</p>
+          </div>
         </div>
-      </div>
 
-      {/* Email Notification Info */}
-      <div className="card bg-blue-50 border border-blue-200">
-        <h3 className="text-lg font-semibold text-blue-900 mb-3">📧 Email Notifications</h3>
-        <div className="space-y-2 text-sm text-blue-800">
-          <p>✅ Each student will automatically receive a welcome email containing:</p>
-          <ul className="list-disc list-inside ml-4 space-y-1">
-            <li>Their email address and roll number</li>
-            <li>Temporary password</li>
-            <li>Instructions to login and change password</li>
-            <li>Profile update reminders</li>
-          </ul>
-          <p className="mt-3"><span className="font-medium">Note:</span> Students must change their password on first login for security.</p>
+        {/* Email Notification Info */}
+        <div className="card bg-blue-50 border border-blue-200">
+          <h3 className="text-lg font-semibold text-blue-900 mb-3">📧 Email Notifications</h3>
+          <div className="space-y-2 text-sm text-blue-800">
+            <p>✅ Each student will automatically receive:</p>
+            <ul className="list-disc list-inside ml-4 space-y-1">
+              <li>Email address and roll number</li>
+              <li>Temporary password</li>
+              <li>Login instructions</li>
+              <li>Profile update reminders</li>
+            </ul>
+            <p className="mt-3 pt-2 border-t border-blue-300">
+              <span className="font-medium">Note:</span> Students must change their password on first login for security.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -359,4 +369,3 @@ const BatchRegister = () => {
 }
 
 export default BatchRegister
-
