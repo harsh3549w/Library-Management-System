@@ -12,20 +12,44 @@ export const createSuggestion = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please provide all required fields", 400));
   }
 
-  // Check if user already suggested this book
-  const existingSuggestion = await BookSuggestion.findOne({
-    title: { $regex: new RegExp(`^${title}$`, 'i') },
-    author: { $regex: new RegExp(`^${author}$`, 'i') },
-    "suggestedBy.id": req.user._id
+  // Normalize inputs for case-insensitive matching
+  const normTitle = title.trim();
+  const normAuthor = author.trim();
+
+  // If a suggestion for the same book already exists (by anyone),
+  // add the current user's vote to it instead of blocking creation.
+  // This avoids duplicate documents and also sidesteps any unique index on title+author.
+  let existingByBook = await BookSuggestion.findOne({
+    title: { $regex: new RegExp(`^${normTitle}$`, 'i') },
+    author: { $regex: new RegExp(`^${normAuthor}$`, 'i') },
+    status: 'pending'
   });
 
-  if (existingSuggestion) {
-    return next(new ErrorHandler("You have already suggested this book", 400));
+  if (existingByBook) {
+    // If the same user already suggested this exact book, keep original error
+    if (existingByBook.suggestedBy?.id?.toString() === req.user._id.toString()) {
+      return next(new ErrorHandler("You have already suggested this book", 400));
+    }
+
+    // Ensure the current user has an upvote on the existing suggestion
+    const alreadyVoted = existingByBook.votes.some(v => v.toString() === req.user._id.toString());
+    if (!alreadyVoted) {
+      existingByBook.votes.push(req.user._id);
+      existingByBook.voteCount = (existingByBook.voteCount || 0) + 1;
+      await existingByBook.save();
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "This book is already suggested. We've added your vote to it.",
+      suggestion: existingByBook
+    });
   }
 
+  // Create a fresh suggestion and count the suggester's support as the first vote
   const suggestion = await BookSuggestion.create({
-    title,
-    author,
+    title: normTitle,
+    author: normAuthor,
     description,
     isbn,
     category,
@@ -33,7 +57,9 @@ export const createSuggestion = catchAsyncErrors(async (req, res, next) => {
       id: req.user._id,
       name: req.user.name,
       email: req.user.email
-    }
+    },
+    votes: [req.user._id],
+    voteCount: 1
   });
 
   res.status(201).json({
@@ -95,25 +121,26 @@ export const voteForSuggestion = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Cannot vote on this suggestion", 400));
   }
 
-  const userVoteIndex = suggestion.votes.indexOf(req.user._id);
+  const userIdStr = req.user._id.toString();
+  const hasVoted = suggestion.votes.some(v => v.toString() === userIdStr);
 
-  if (userVoteIndex > -1) {
-    // User already voted, remove vote
-    suggestion.votes.splice(userVoteIndex, 1);
-    suggestion.voteCount = Math.max(0, suggestion.voteCount - 1);
+  if (hasVoted) {
+    // Remove vote
+    suggestion.votes = suggestion.votes.filter(v => v.toString() !== userIdStr);
+    suggestion.voteCount = Math.max(0, (suggestion.voteCount || 0) - 1);
   } else {
     // Add vote
     suggestion.votes.push(req.user._id);
-    suggestion.voteCount += 1;
+    suggestion.voteCount = (suggestion.voteCount || 0) + 1;
   }
 
   await suggestion.save();
 
   res.status(200).json({
     success: true,
-    message: userVoteIndex > -1 ? "Vote removed" : "Vote added",
+    message: hasVoted ? "Vote removed" : "Vote added",
     voteCount: suggestion.voteCount,
-    hasVoted: userVoteIndex === -1
+    hasVoted: !hasVoted
   });
 });
 

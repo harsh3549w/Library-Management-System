@@ -8,6 +8,7 @@ import { calculateFine } from "../utils/fineCalculator.js";
 import { checkAndNotifyReservations } from "./reservationController.js";
 import { createTransaction } from "./transactionController.js";
 import { sendEmail } from "../utils/emailService.js";
+import { invalidateCache } from "../utils/cache.js";
 
 // Update fines for all overdue books
 export const updateOverdueFines = catchAsyncErrors(async (req, res, next) => {
@@ -96,6 +97,8 @@ export const recordBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   book.quantity -= 1;
   book.availability = book.quantity > 0;
   await book.save();
+  // Invalidate cached book lists so quantities/availability refresh
+  invalidateCache('/api/v1/book/all');
   
   const dueDate = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes for testing
   
@@ -162,6 +165,8 @@ export const borrowBookForSelf = catchAsyncErrors(async (req, res, next) => {
   book.quantity -= 1;
   book.availability = book.quantity > 0;
   await book.save();
+  // Invalidate cached book lists so quantities/availability refresh
+  invalidateCache('/api/v1/book/all');
   
   const dueDate = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes for testing
   
@@ -244,6 +249,8 @@ export const returnMyBorrowedBook = catchAsyncErrors(async (req, res, next) => {
   book.quantity += 1;
   book.availability = book.quantity > 0;
   await book.save();
+  // Invalidate cached book lists so quantities/availability refresh
+  invalidateCache('/api/v1/book/all');
 
   // Update user's fine balance if there's a fine
   if (fine > 0) {
@@ -349,6 +356,8 @@ export const returnBorrowBook = catchAsyncErrors(async (req, res, next) => {
   book.quantity += 1;
   book.availability = book.quantity > 0;
   await book.save();
+  // Invalidate cached book lists so quantities/availability refresh
+  invalidateCache('/api/v1/book/all');
   
   const borrow = await Borrow.findOne({
     book: bookId,

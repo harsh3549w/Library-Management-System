@@ -4,6 +4,7 @@ import { User } from "../models/userModel.js";
 import { Reservation } from "../models/reservationModel.js";
 import { createTransaction } from "../controllers/transactionController.js";
 import { sendEmail } from "../utils/emailService.js";
+import { invalidateCache } from "../utils/cache.js";
 
 // Automated book allocation service
 export const autoAllocateBooks = async (bookId) => {
@@ -89,6 +90,8 @@ export const autoAllocateBooks = async (bookId) => {
         book.quantity -= 1;
         book.availability = book.quantity > 0;
         await book.save();
+  // Invalidate cached book lists since availability/quantity changed
+  invalidateCache('/api/v1/book/all');
 
         // Mark reservation as fulfilled
         reservation.status = 'fulfilled';
